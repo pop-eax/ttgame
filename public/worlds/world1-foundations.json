@@ -1,0 +1,80 @@
+{
+  "id": "world1",
+  "name": "Type Foundations",
+  "description": "Learn about basic type constructors and function types",
+  "order": 1,
+  "prerequisites": ["world0"],
+  "icon": "🏗️",
+  "color": "#10b981",
+  "estimatedHours": 2,
+  "tags": ["types", "functions", "foundational"],
+  "levels": [
+    {
+      "id": "1.1",
+      "name": "Function Types",
+      "description": "Understand arrow types (→)",
+      "difficulty": 2,
+      "estimatedTime": 5,
+      "objective": "Construct a function that takes a nat and returns it",
+      "theory": {
+        "markdown": "# Function Types\n\nFunction types are written with arrows: `A -> B`\n\nThis means: a function that takes an `A` and returns a `B`.\n\n## The intro Tactic\n\nThe `intro` tactic introduces a function argument.\n\n```\nintro name.\n```\n\nThis gives you a variable to work with in your proof.",
+        "examples": [
+          {
+            "title": "Identity function",
+            "code": "Theorem id_nat : nat -> nat.\nProof.\n  intro n.  (* Now we have n : nat *)\n  exact n.  (* Return it *)\nQed."
+          }
+        ]
+      },
+      "startingCode": "Theorem identity : nat -> nat.\nProof.\n  (* Your proof here *)\nQed.",
+      "solution": "Theorem identity : nat -> nat.\nProof.\n  intro n.\n  exact n.\nQed.",
+      "hints": [
+        "Use 'intro' to get the argument",
+        "Give it a name like 'intro n'",
+        "Then use 'exact n' to return it"
+      ],
+      "unlockedTactics": ["intro"],
+      "rewards": {
+        "xp": 100
+      }
+    },
+    {
+      "id": "1.2",
+      "name": "Product Types",
+      "description": "Learn about pairs (A × B)",
+      "difficulty": 3,
+      "estimatedTime": 8,
+      "objective": "Construct a pair of natural numbers",
+      "theory": {
+        "markdown": "# Product Types\n\nProduct types represent pairs: `A * B`\n\nThis is a value that contains both an `A` and a `B`.\n\n## The split Tactic\n\nThe `split` tactic breaks a product goal into two subgoals:\n\n```\nsplit.\n(* Now you have two goals to prove *)\n```",
+        "examples": [
+          {
+            "title": "Making a pair",
+            "code": "Theorem make_pair : nat * nat.\nProof.\n  split.\n  - exact 0.  (* First component *)\n  - exact 1.  (* Second component *)\nQed."
+          }
+        ]
+      },
+      "startingCode": "Theorem pair_zero_one : nat * nat.\nProof.\n  (* Your proof here *)\nQed.",
+      "solution": "Theorem pair_zero_one : nat * nat.\nProof.\n  split.\n  - exact 0.\n  - exact 1.\nQed.",
+      "alternativeSolutions": [
+        "Theorem pair_zero_one : nat * nat.\nProof.\n  split.\n  exact 0.\n  exact 1.\nQed."
+      ],
+      "hints": [
+        "Use 'split' to create two goals",
+        "Provide a number for each goal with 'exact'",
+        "Try 'exact 0.' for the first, 'exact 1.' for the second"
+      ],
+      "unlockedTactics": ["split"],
+      "rewards": {
+        "xp": 150
+      },
+      "commonMistakes": [
+        {
+          "pattern": "exact (0, 1)",
+          "explanation": "You can't use tuple syntax directly in Rocq",
+          "suggestion": "Use the 'split' tactic to break it into two goals"
+        }
+      ]
+    }
+  ]
+}
+

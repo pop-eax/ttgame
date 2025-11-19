@@ -1,0 +1,46 @@
+{
+  "version": "1.0",
+  "lastUpdated": "2024-11-18",
+  "worlds": [
+    {
+      "file": "world0-tutorial.json",
+      "enabled": true,
+      "alwaysUnlocked": true
+    },
+    {
+      "file": "world1-foundations.json",
+      "enabled": true
+    },
+    {
+      "file": "world2-propositions.json",
+      "enabled": false,
+      "comingSoon": true
+    },
+    {
+      "file": "world3-dependent.json",
+      "enabled": false,
+      "comingSoon": true
+    },
+    {
+      "file": "world4-inductive.json",
+      "enabled": false,
+      "comingSoon": true
+    },
+    {
+      "file": "world5-equality.json",
+      "enabled": false,
+      "comingSoon": true
+    },
+    {
+      "file": "world6-higher-order.json",
+      "enabled": false,
+      "comingSoon": true
+    },
+    {
+      "file": "world7-advanced.json",
+      "enabled": false,
+      "comingSoon": true
+    }
+  ]
+}
+

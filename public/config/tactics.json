@@ -1,0 +1,59 @@
+{
+  "tactics": [
+    {
+      "id": "exact",
+      "name": "exact",
+      "syntax": "exact term.",
+      "category": "basic",
+      "description": "Provide a proof term directly. If the term has exactly the type you need to prove, you're done!",
+      "examples": [
+        "exact nat.",
+        "exact 42.",
+        "exact H."
+      ]
+    },
+    {
+      "id": "intro",
+      "name": "intro",
+      "syntax": "intro name.",
+      "category": "basic",
+      "description": "Introduce a function argument or assumption. This gives you a variable to work with in your proof.",
+      "examples": [
+        "intro n.",
+        "intro H."
+      ]
+    },
+    {
+      "id": "split",
+      "name": "split",
+      "syntax": "split.",
+      "category": "structural",
+      "description": "Break a product goal (A * B) into two subgoals: one for A and one for B.",
+      "examples": [
+        "split.\n- exact 0.\n- exact 1."
+      ]
+    },
+    {
+      "id": "apply",
+      "name": "apply",
+      "syntax": "apply term.",
+      "category": "basic",
+      "description": "Apply a lemma or hypothesis to the current goal.",
+      "examples": [
+        "apply H.",
+        "apply lemma_name."
+      ]
+    },
+    {
+      "id": "reflexivity",
+      "name": "reflexivity",
+      "syntax": "reflexivity.",
+      "category": "basic",
+      "description": "Prove equality by computation. Works when both sides are definitionally equal.",
+      "examples": [
+        "reflexivity."
+      ]
+    }
+  ]
+}
+

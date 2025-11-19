@@ -1,0 +1,206 @@
+{
+  "id": "world0",
+  "name": "Rocq Basics",
+  "description": "Learn the fundamentals of Rocq syntax and proof structure",
+  "order": 0,
+  "icon": "🎓",
+  "color": "#3b82f6",
+  "estimatedHours": 0.5,
+  "tags": ["tutorial", "beginner"],
+  "levels": [
+    {
+      "id": "0.1",
+      "name": "Welcome to Rocq",
+      "description": "Run your first Rocq command",
+      "difficulty": 1,
+      "estimatedTime": 2,
+      "objective": "Type 'Check nat.' and see what Rocq responds",
+      "theory": {
+        "markdown": "# Welcome to Rocq!\n\nRocq (formerly Coq) is a proof assistant that helps you write mathematical proofs.\n\n## The Check Command\n\nThe `Check` command tells you the type of any expression.\n\nTry typing: `Check nat.`",
+        "examples": [
+          {
+            "title": "Checking types",
+            "code": "Check nat.\n(* nat : Set *)"
+          },
+          {
+            "title": "Checking functions",
+            "code": "Check (fun x : nat => x).\n(* fun x : nat => x : nat -> nat *)"
+          }
+        ]
+      },
+      "startingCode": "(* Type the Check command below *)\n",
+      "solution": "Check nat.",
+      "hints": [
+        "Type 'Check' followed by what you want to check",
+        "Try 'Check nat.' (don't forget the period!)",
+        "The exact answer is: Check nat."
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 50,
+        "achievements": ["first_command"]
+      }
+    },
+    {
+      "id": "0.2",
+      "name": "Definitions",
+      "description": "Define a constant",
+      "difficulty": 1,
+      "estimatedTime": 3,
+      "objective": "Define a constant called 'five' equal to the number 5",
+      "theory": {
+        "markdown": "# Definitions\n\nYou can define constants using the `Definition` keyword.\n\n## Syntax\n\n```\nDefinition name : type := value.\n```",
+        "examples": [
+          {
+            "title": "Simple definition",
+            "code": "Definition three : nat := 3.\nCheck three.\n(* three : nat *)"
+          }
+        ]
+      },
+      "startingCode": "(* Define 'five' here *)\n",
+      "solution": "Definition five : nat := 5.",
+      "hints": [
+        "Use the Definition keyword",
+        "The syntax is: Definition name : type := value.",
+        "Try: Definition five : nat := 5."
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 50
+      }
+    },
+    {
+      "id": "0.3",
+      "name": "Your First Theorem",
+      "description": "State a theorem",
+      "difficulty": 1,
+      "estimatedTime": 3,
+      "objective": "State a theorem that nat is a Type",
+      "theory": {
+        "markdown": "# Theorems\n\nTheorems are statements we want to prove.\n\n## Syntax\n\n```\nTheorem name : statement.\n```\n\nWe'll prove it in the next level!",
+        "examples": [
+          {
+            "title": "Theorem statement",
+            "code": "Theorem example : nat."
+          }
+        ]
+      },
+      "startingCode": "(* State a theorem that nat is a Type *)\n",
+      "solution": "Theorem nat_is_type : Type.",
+      "hints": [
+        "Use the Theorem keyword",
+        "The statement should be just 'Type'",
+        "Try: Theorem nat_is_type : Type."
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 75
+      }
+    },
+    {
+      "id": "0.4",
+      "name": "Proof Structure",
+      "description": "Learn about Proof...Qed",
+      "difficulty": 1,
+      "estimatedTime": 3,
+      "objective": "Start and end a proof (we'll fill it in next)",
+      "theory": {
+        "markdown": "# Proof Structure\n\nEvery proof has the same structure:\n\n```\nTheorem name : statement.\nProof.\n  (* proof steps here *)\nQed.\n```\n\n- `Proof.` starts the proof\n- `Qed.` ends the proof (after it's complete)",
+        "examples": []
+      },
+      "startingCode": "Theorem nat_is_type : Type.\n(* Add Proof. and Qed. with tactics between them *)\n",
+      "solution": "Theorem nat_is_type : Type.\nProof.\n  exact nat.\nQed.",
+      "hints": [
+        "Start with 'Proof.'",
+        "You need a tactic in between (use 'exact nat.')",
+        "End with 'Qed.'"
+      ],
+      "unlockedTactics": ["exact"],
+      "rewards": {
+        "xp": 100,
+        "achievements": ["first_proof"]
+      }
+    },
+    {
+      "id": "0.5",
+      "name": "The Exact Tactic",
+      "description": "Provide a proof term directly",
+      "difficulty": 2,
+      "estimatedTime": 5,
+      "objective": "Use 'exact' to prove nat is a Type",
+      "theory": {
+        "markdown": "# The exact Tactic\n\nThe `exact` tactic provides a proof term directly.\n\n## Syntax\n\n```\nexact term.\n```\n\nIf `term` has exactly the type you need to prove, you're done!",
+        "examples": [
+          {
+            "title": "Using exact",
+            "code": "Theorem example : nat.\nProof.\n  exact 42.\nQed."
+          }
+        ]
+      },
+      "startingCode": "Theorem nat_is_type : Type.\nProof.\n  (* Use exact here *)\nQed.",
+      "solution": "Theorem nat_is_type : Type.\nProof.\n  exact nat.\nQed.",
+      "hints": [
+        "You need to provide something that has type 'Type'",
+        "nat is a Type!",
+        "Use: exact nat."
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 100
+      }
+    },
+    {
+      "id": "0.6",
+      "name": "Comments",
+      "description": "Learn to write comments",
+      "difficulty": 1,
+      "estimatedTime": 2,
+      "objective": "Add a comment to your proof",
+      "theory": {
+        "markdown": "# Comments\n\nComments help document your code.\n\n## Syntax\n\n```\n(* This is a comment *)\n```\n\nComments are ignored by Rocq but help humans understand your code!",
+        "examples": [
+          {
+            "title": "Using comments",
+            "code": "(* This theorem shows nat is a Type *)\nTheorem nat_is_type : Type.\nProof.\n  (* Just provide nat directly *)\n  exact nat.\nQed."
+          }
+        ]
+      },
+      "startingCode": "Theorem nat_is_type : Type.\nProof.\n  exact nat.\nQed.\n\n(* Add a comment above explaining what this proves *)",
+      "solution": "(* nat is a Type *)\nTheorem nat_is_type : Type.\nProof.\n  exact nat.\nQed.",
+      "hints": [
+        "Comments use (* and *)",
+        "Put a comment above the Theorem line",
+        "Any comment works - just add (* your text *)"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 50
+      }
+    },
+    {
+      "id": "0.7",
+      "name": "Tutorial Complete!",
+      "description": "You're ready for the real challenges",
+      "difficulty": 2,
+      "estimatedTime": 5,
+      "objective": "Prove that functions exist",
+      "theory": {
+        "markdown": "# Congratulations!\n\nYou've learned:\n- The Check command\n- How to define constants\n- How to state theorems\n- Proof structure (Proof...Qed)\n- The exact tactic\n- Comments\n\nNow let's prove something more interesting: that function types exist!",
+        "examples": []
+      },
+      "startingCode": "(* Prove that the function type nat -> nat exists *)\nTheorem function_type_exists : Type.\nProof.\n  (* Your proof here *)\nQed.",
+      "solution": "Theorem function_type_exists : Type.\nProof.\n  exact (nat -> nat).\nQed.",
+      "hints": [
+        "Function types use the arrow: A -> B",
+        "You need to provide a function type",
+        "Try: exact (nat -> nat)."
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 150,
+        "achievements": ["tutorial_complete"]
+      }
+    }
+  ]
+}
+

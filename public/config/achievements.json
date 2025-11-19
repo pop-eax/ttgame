@@ -1,0 +1,35 @@
+{
+  "achievements": [
+    {
+      "id": "first_command",
+      "name": "First Command",
+      "description": "Ran your first Rocq command",
+      "icon": "🎯"
+    },
+    {
+      "id": "first_proof",
+      "name": "First Proof",
+      "description": "Completed your first proof",
+      "icon": "✨"
+    },
+    {
+      "id": "tutorial_complete",
+      "name": "Tutorial Master",
+      "description": "Completed the tutorial world",
+      "icon": "🎓"
+    },
+    {
+      "id": "no_hints",
+      "name": "Independent",
+      "description": "Completed 5 levels without hints",
+      "icon": "🏆"
+    },
+    {
+      "id": "speed_runner",
+      "name": "Speed Runner",
+      "description": "Completed 10 levels in under 3 minutes each",
+      "icon": "⚡"
+    }
+  ]
+}
+

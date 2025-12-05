@@ -12,6 +12,10 @@
       "enabled": true
     },
     {
+      "file": "world2-lectures.json",
+      "enabled": true
+    },
+    {
       "file": "world2-propositions.json",
       "enabled": false,
       "comingSoon": true

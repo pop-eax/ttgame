@@ -8,6 +8,7 @@ export interface World {
   color?: string;
   estimatedHours?: number;
   tags?: string[];
+  availableTheorems?: string[]; // Theorems available in the context for all levels in this world
   levels: Level[];
 }
 

@@ -124,7 +124,6 @@ export function useJsCoq(containerId: string) {
       
       
       // Initialize jsCoq with configuration
-      // show: true makes jsCoq's UI visible (goal panel, etc.)
       const coqManager = await JsCoq.start([containerId], {
         wrapper_id: wrapperId,
         init_pkgs: ['init'],
@@ -132,26 +131,26 @@ export function useJsCoq(containerId: string) {
         theme: 'light',
         base_path: basePath,
         pkg_path: basePath + 'coq-pkgs/',
-        backend: 'js', // Use JS backend
-        show: true, // Show jsCoq's default UI (goal panel, etc.)
+        backend: 'wa', // Use JS backend
+        show: true, // Show jsCoq's UI (we'll hide specific panels via layout API)
         focus: true,
         prelude: true,
         implicit_libs: false, // Don't auto-load libraries
       });
       
       // Ensure the layout is visible
-      if (coqManager.layout && coqManager.layout.show) {
-        coqManager.layout.show();
-      }
+      // if (coqManager.layout && coqManager.layout.show) {
+      //   coqManager.layout.show();
+      // }
 
       coqManagerRef.current = coqManager;
       
       // Ensure the layout is visible - jsCoq's UI should be shown
-      if (coqManager.layout) {
-        if (coqManager.layout.show) {
-          coqManager.layout.show();
-        }
-      }
+      // if (coqManager.layout) {
+      //   if (coqManager.layout.show) {
+      //     coqManager.layout.show();
+      //   }
+      // }
       
       // Wait for the editor to be fully initialized - retry multiple times
       for (let i = 0; i < 10; i++) {
@@ -338,7 +337,7 @@ export function useJsCoq(containerId: string) {
     }
   };
 
-  const executeProof = async (code: string): Promise<ProofState> => {
+  const executeProof = async (_code: string): Promise<ProofState> => {
     // Don't execute if we're currently setting a value programmatically
     if (isSettingValueRef.current) {
       return {
@@ -418,8 +417,8 @@ export function useJsCoq(containerId: string) {
         } else if (coqManager.goCursor && typeof coqManager.goCursor === 'function') {
           // Move cursor to end and process
           const editor = provider.editor;
-          if (editor && editor.setCursor) {
-            const lineCount = editor.lineCount();
+          if (editor && editor.setCursor && typeof (editor as any).lineCount === 'function') {
+            const lineCount = (editor as any).lineCount();
             editor.setCursor({ line: lineCount - 1, ch: 999 });
           }
           coqManager.goCursor();
@@ -433,28 +432,71 @@ export function useJsCoq(containerId: string) {
       // Wait a bit more for final processing
       await new Promise(resolve => setTimeout(resolve, 300));
       
+      // Collect all messages from DOM query panel (Check/Compute results are displayed there)
+      const allMessages: any[] = [];
+      
+      // Read from jsCoq's query panel DOM element
+      if (coqManager.layout && coqManager.layout.query) {
+        const queryPanel = coqManager.layout.query as HTMLElement;
+        if (queryPanel) {
+          // Get all message items from the query panel
+          const messageItems = queryPanel.querySelectorAll('div[class*="Notice"], div[class*="Info"], div[class*="Warning"], div[class*="Error"]');
+          
+          messageItems.forEach((item: Element) => {
+            const text = item.textContent?.trim() || '';
+            if (text && text.length > 0) {
+              // Determine level from class name
+              let level: 'error' | 'warning' | 'info' = 'info';
+              if (item.classList.contains('Error')) level = 'error';
+              else if (item.classList.contains('Warning')) level = 'warning';
+              else if (item.classList.contains('Notice') || item.classList.contains('Info')) level = 'info';
+              
+              // Filter out metadata and empty messages
+              if (!text.includes('["Put",') && 
+                  !text.includes('["Init",') &&
+                  !text.includes('["NewDoc",') &&
+                  !text.includes('["Add",') &&
+                  !text.includes('["Query",') &&
+                  !text.includes('["Cancel",') &&
+                  !text.includes('["Exec",') &&
+                  text.length > 3) { // Minimum length to avoid noise
+                allMessages.push({
+                  level,
+                  text,
+                });
+              }
+            }
+          });
+        }
+      }
+      
+      // Also collect error messages from sentence feedback as fallback
+      sentences.forEach((s: any) => {
+        if ((s.phase === 'ERROR' || s.phase === 'FAILED') && s.feedback && Array.isArray(s.feedback)) {
+          s.feedback.forEach((fb: any) => {
+            if (fb && fb.msg) {
+              const text = ppToString(fb.msg, coqManager);
+              if (text && text.trim()) {
+                // Check if we already have this message from DOM
+                const exists = allMessages.some(m => m.text === text.trim());
+                if (!exists) {
+                  allMessages.push({
+                    level: 'error' as const,
+                    text: text.trim(),
+                  });
+                }
+              }
+            }
+          });
+        }
+      });
+      
       // Check for errors in any sentence
       const hasError = sentences.some((s: any) => 
         s.phase === 'ERROR' || s.phase === 'FAILED'
       );
       
       if (hasError) {
-        // Collect error messages
-        const errorMessages: any[] = [];
-        sentences.forEach((s: any) => {
-          if (s.phase === 'ERROR' || s.phase === 'FAILED') {
-            if (s.feedback && Array.isArray(s.feedback)) {
-              s.feedback.forEach((fb: any) => {
-                if (fb && (fb.msg || fb.message)) {
-                  errorMessages.push({
-                    level: 'error' as const,
-                    text: fb.msg || fb.message || 'Proof error',
-                  });
-                }
-              });
-            }
-          }
-        });
         
         // Still check goals even if there are errors
         const lastProcessed = sentences
@@ -471,7 +513,7 @@ export function useJsCoq(containerId: string) {
             goals = doc.goals?.[sid] || doc.goals_raw?.[sid];
           }
           
-          const state = parseJsCoqState(goals, coqManager, errorMessages);
+          const state = parseJsCoqState(goals, coqManager, allMessages);
           return {
             ...state,
             hasError: true,
@@ -481,7 +523,7 @@ export function useJsCoq(containerId: string) {
         return {
           goals: [],
           hypotheses: [],
-          messages: errorMessages.length > 0 ? errorMessages : [{
+          messages: allMessages.length > 0 ? allMessages : [{
             level: 'error' as const,
             text: 'Proof execution failed',
           }],
@@ -507,7 +549,7 @@ export function useJsCoq(containerId: string) {
         }
         
         if (goals !== undefined) {
-          const state = parseJsCoqState(goals, coqManager);
+          const state = parseJsCoqState(goals, coqManager, allMessages);
           return state;
         }
       }
@@ -526,7 +568,7 @@ export function useJsCoq(containerId: string) {
           }
           
           if (goals !== undefined) {
-            const state = parseJsCoqState(goals, coqManager);
+            const state = parseJsCoqState(goals, coqManager, allMessages);
             return state;
           }
         }
@@ -540,7 +582,7 @@ export function useJsCoq(containerId: string) {
       return {
         goals: [],
         hypotheses: [],
-        messages: [],
+        messages: allMessages,
         isComplete: allProcessed && !hasError,
         hasError: hasError,
       };
@@ -633,6 +675,71 @@ export function useJsCoq(containerId: string) {
 // Helper function to extract string from jsCoq's pretty-printing format
 // Format: ["Pp_tag", "constr.variable", ["Pp_string", "nat"]]
 // Or: ["Pp_string", "nat"]
+// Helper to convert pretty-printed format to string
+// Tries to use jsCoq's DOM conversion if available, otherwise uses our extraction
+function ppToString(pp: any, coqManager?: any): string {
+  if (!pp) return '';
+  if (typeof pp === 'string') return pp;
+  
+  // Try to use jsCoq's pp2DOM and extract text from DOM
+  if (coqManager && coqManager.pprint && typeof coqManager.pprint.pp2DOM === 'function') {
+    try {
+      const $ = (typeof window !== 'undefined' && (window as any).$) || (typeof globalThis !== 'undefined' && (globalThis as any).$);
+      if ($) {
+        const dom = coqManager.pprint.pp2DOM(pp);
+        const text = dom.text() || dom.textContent || '';
+        if (text.trim()) {
+          return text;
+        }
+      }
+    } catch (e) {
+      // Fall through to extractStringFromPp
+    }
+  }
+  
+  // Fallback to our extraction
+  return extractStringFromPp(pp);
+}
+
+// Helper to convert identifier to string (matching jsCoq's FormatPrettyPrint._idToString)
+function idToString(id: any, coqManager?: any): string {
+  if (typeof id === 'string') {
+    return id;
+  }
+  
+  // Try to use FormatPrettyPrint._idToString if available
+  if (coqManager && coqManager.pprint) {
+    const FormatPrettyPrint = (coqManager.pprint.constructor as any);
+    if (FormatPrettyPrint && typeof FormatPrettyPrint._idToString === 'function') {
+      try {
+        return FormatPrettyPrint._idToString(id);
+      } catch (e) {
+        // Fall through to manual extraction
+      }
+    }
+  }
+  
+  // Manual extraction fallback
+  if (Array.isArray(id)) {
+    // Identifier might be structured like [kind, name] or just [name]
+    if (id.length >= 2 && typeof id[1] === 'string') {
+      return id[1];
+    } else if (id.length >= 1) {
+      return id[0]?.toString() || '';
+    }
+  }
+  
+  if (id && typeof id === 'object') {
+    if (id.id) return id.id.toString();
+    if (id.name) return id.name.toString();
+    if (id.toString && typeof id.toString === 'function') {
+      return id.toString();
+    }
+  }
+  
+  return id?.toString() || '';
+}
+
 function extractStringFromPp(pp: any): string {
   if (typeof pp === 'string') {
     return pp;
@@ -641,11 +748,46 @@ function extractStringFromPp(pp: any): string {
     return '';
   }
   if (Array.isArray(pp)) {
-    // Check if it's a Pp_string directly
-    if (pp[0] === 'Pp_string' && pp.length >= 2) {
+    const tag = pp[0];
+    
+    // Handle Pp_string: ["Pp_string", "text"]
+    if (tag === 'Pp_string' && pp.length >= 2) {
       return pp[1];
     }
-    // Recursively extract strings from nested structure
+    
+    // Handle Pp_glue: ["Pp_glue", [elements]] - concatenates elements without spaces
+    if (tag === 'Pp_glue' && pp.length >= 2 && Array.isArray(pp[1])) {
+      return pp[1].map((elem: any) => extractStringFromPp(elem)).join('');
+    }
+    
+    // Handle Pp_box: ["Pp_box", [box_type, offset], content] - extract content
+    if (tag === 'Pp_box' && pp.length >= 3) {
+      return extractStringFromPp(pp[2]);
+    }
+    
+    // Handle Pp_tag: ["Pp_tag", tag_name, content] - extract content, ignore tag
+    if (tag === 'Pp_tag' && pp.length >= 3) {
+      return extractStringFromPp(pp[2]);
+    }
+    
+    // Handle Pp_print_break: ["Pp_print_break", nspaces, indent] - convert to space
+    if (tag === 'Pp_print_break' && pp.length >= 2) {
+      const nspaces = Math.max(0, pp[1] || 0);
+      return ' '.repeat(nspaces);
+    }
+    
+    // Handle Pp_force_newline: ["Pp_force_newline"] - convert to space
+    if (tag === 'Pp_force_newline') {
+      return ' ';
+    }
+    
+    // Handle Pp_empty: ["Pp_empty"] - return empty
+    if (tag === 'Pp_empty') {
+      return '';
+    }
+    
+    // For other arrays, recursively extract strings
+    // But be careful about spacing - only add space between non-empty parts
     const parts: string[] = [];
     for (let i = 0; i < pp.length; i++) {
       const part = extractStringFromPp(pp[i]);
@@ -653,8 +795,11 @@ function extractStringFromPp(pp: any): string {
         parts.push(part);
       }
     }
-    // Join parts, but skip tags and other metadata
-    return parts.filter(p => p && !p.startsWith('Pp_') && !p.includes('.')).join(' ');
+    
+    // Join parts without extra spaces (they should be handled by Pp_print_break)
+    // Only filter out metadata tags
+    const filtered = parts.filter(p => p && typeof p === 'string' && !p.startsWith('Pp_'));
+    return filtered.join('');
   }
   return pp?.toString() || '';
 }
@@ -675,22 +820,42 @@ export function parseJsCoqState(goals: any, coqManager: any, messagesData?: any[
       
       // Extract goals from the stack
       // stack structure: [[fg_goals, bg_goals], ...] where each level has foreground and background goals
+      // Each stack level can also have hypotheses at the level (shared across goals)
       if (Array.isArray(goals.stack)) {
         // Iterate through each stack level
         goals.stack.forEach((stackLevel: any) => {
           if (Array.isArray(stackLevel)) {
             // Each stack level is [fg_goals, bg_goals]
+            // Check if there are hypotheses at the stack level (if stackLevel is an object with array properties)
+            let stackHyps: any[] = [];
+            const stackLevelObj = stackLevel as any;
+            if (stackLevelObj && typeof stackLevelObj === 'object' && !Array.isArray(stackLevelObj)) {
+              if (stackLevelObj.hyps && Array.isArray(stackLevelObj.hyps)) {
+                stackHyps = stackLevelObj.hyps;
+              } else if (stackLevelObj.hyp && Array.isArray(stackLevelObj.hyp)) {
+                stackHyps = stackLevelObj.hyp;
+              }
+            }
+            
             stackLevel.forEach((goalGroup: any) => {
               if (Array.isArray(goalGroup)) {
                 // It's an array of goals (fg_goals or bg_goals)
                 goalGroup.forEach((goal: any) => {
                   if (goal && typeof goal === 'object' && !Array.isArray(goal)) {
                     // It's a goal object, add it
+                    // If goal doesn't have hypotheses but stack level does, attach them
+                    if (stackHyps.length > 0 && (!goal.hyp || goal.hyp.length === 0) && (!goal.hyps || goal.hyps.length === 0)) {
+                      goal.hyps = stackHyps;
+                    }
                     goalsArray.push(goal);
                   }
                 });
               } else if (goalGroup && typeof goalGroup === 'object' && !Array.isArray(goalGroup)) {
                 // It's a single goal object
+                // If goal doesn't have hypotheses but stack level does, attach them
+                if (stackHyps.length > 0 && (!goalGroup.hyp || goalGroup.hyp.length === 0) && (!goalGroup.hyps || goalGroup.hyps.length === 0)) {
+                  goalGroup.hyps = stackHyps;
+                }
                 goalsArray.push(goalGroup);
               }
             });
@@ -746,51 +911,69 @@ export function parseJsCoqState(goals: any, coqManager: any, messagesData?: any[
         // hyp is an array of hypothesis objects
         
         // Extract hypotheses from raw goal structure
-        // Check both 'hyp' and 'hyps' for compatibility
-        const hypsArray = goal.hyp || goal.hyps;
+        // jsCoq structure: goal.hyp is an array of [h_names, h_def, h_type]
+        // - h_names: array of identifier names (can be multiple names with same type)
+        // - h_def: optional definition (can be undefined/null)
+        // - h_type: type in pretty-printing format
+        const hypsArray = goal.hyp;
+        
         if (hypsArray && Array.isArray(hypsArray)) {
-          hypsArray.forEach((hyp: any) => {
-            if (hyp) {
-              let hypName = '';
-              let hypType = '';
+          // Reverse to match jsCoq's display order (goal2DOM does .reverse())
+          const reversedHyps = [...hypsArray].reverse();
+          
+          reversedHyps.forEach((hyp: any) => {
+            if (hyp && Array.isArray(hyp) && hyp.length >= 3) {
+              // Format: [h_names, h_def, h_type]
+              const h_names = hyp[0]; // Array of identifier names
+              const h_def = hyp[1];   // Optional definition
+              const h_type = hyp[2];  // Type in pretty-printing format
               
-              // Handle different hypothesis formats from jsCoq
-              if (Array.isArray(hyp) && hyp.length >= 2) {
-                // Format: [name, type] where type might be structured
-                hypName = hyp[0]?.toString() || '';
-                // Type might be structured (Pp format) or a string
-                if (Array.isArray(hyp[1])) {
-                  // Use pretty printer to format structured type
-                  if (coqManager && coqManager.pprint && typeof coqManager.pprint.pp2String === 'function') {
-                    hypType = coqManager.pprint.pp2String(hyp[1]);
-                  } else {
-                    hypType = JSON.stringify(hyp[1]);
+              // Extract type using pretty printer
+              let hypType = '';
+              if (Array.isArray(h_type)) {
+                // Type is in pretty-printing format
+                hypType = ppToString(h_type, coqManager);
+              } else {
+                hypType = h_type?.toString() || '';
+              }
+              
+              // Handle multiple names with the same type
+              // h_names is an array of identifiers
+              if (Array.isArray(h_names) && h_names.length > 0 && hypType) {
+                h_names.forEach((nameId: any) => {
+                  // Convert identifier to string using helper
+                  const hypName = idToString(nameId, coqManager);
+                  
+                  if (hypName && hypType) {
+                    // Include definition if present
+                    let fullType = hypType;
+                    if (h_def) {
+                      let defStr = '';
+                      if (Array.isArray(h_def)) {
+                        defStr = ppToString(h_def, coqManager);
+                      } else {
+                        defStr = h_def.toString();
+                      }
+                      if (defStr) {
+                        fullType = `${hypName} := ${defStr} : ${hypType}`;
+                      }
+                    }
+                    
+                    goalHyps.push({ name: hypName, type: fullType });
+                    if (!hypotheses.find(h => h.name === hypName)) {
+                      hypotheses.push({ name: hypName, type: fullType });
+                    }
                   }
-                } else {
-                  hypType = hyp[1]?.toString() || '';
-                }
-              } else if (hyp.id !== undefined && hyp.type !== undefined) {
-                hypName = hyp.id.toString();
-                if (Array.isArray(hyp.type)) {
-                  if (coqManager && coqManager.pprint && typeof coqManager.pprint.pp2String === 'function') {
-                    hypType = coqManager.pprint.pp2String(hyp.type);
-                  } else {
-                    hypType = JSON.stringify(hyp.type);
-                  }
-                } else {
-                  hypType = hyp.type.toString();
-                }
-              } else if (hyp.name !== undefined && hyp.ty !== undefined) {
-                hypName = hyp.name.toString();
-                if (Array.isArray(hyp.ty)) {
-                  if (coqManager && coqManager.pprint && typeof coqManager.pprint.pp2String === 'function') {
-                    hypType = coqManager.pprint.pp2String(hyp.ty);
-                  } else {
-                    hypType = JSON.stringify(hyp.ty);
-                  }
-                } else {
-                  hypType = hyp.ty.toString();
-                }
+                });
+              }
+            } else if (hyp && Array.isArray(hyp) && hyp.length >= 2) {
+              // Fallback: might be [name, type] format
+              const hypName = hyp[0]?.toString() || '';
+              let hypType = '';
+              if (Array.isArray(hyp[1])) {
+                hypType = ppToString(hyp[1], coqManager);
+              } else {
+                hypType = hyp[1]?.toString() || '';
               }
               
               if (hypName && hypType) {
@@ -806,26 +989,13 @@ export function parseJsCoqState(goals: any, coqManager: any, messagesData?: any[
         // Extract goal type from raw goal structure
         // jsCoq uses 'ty' (structured format) or 'ccl' for goal type
         if (goal.ty !== undefined) {
-          // ty is in structured format, use jsCoq's pretty printer
-          if (coqManager && coqManager.pprint && typeof coqManager.pprint.pp2String === 'function') {
-            goalType = coqManager.pprint.pp2String(goal.ty);
-          } else {
-            // Fallback: try to extract string from structure
-            goalType = extractStringFromPp(goal.ty);
-          }
+          // ty is in structured format
+          goalType = ppToString(goal.ty, coqManager);
         } else if (goal.ccl !== undefined) {
-          if (coqManager && coqManager.pprint && typeof coqManager.pprint.pp2String === 'function') {
-            goalType = coqManager.pprint.pp2String(goal.ccl);
-          } else {
-            goalType = extractStringFromPp(goal.ccl);
-          }
+          goalType = ppToString(goal.ccl, coqManager);
         } else if (goal.type !== undefined) {
           if (Array.isArray(goal.type)) {
-            if (coqManager && coqManager.pprint && typeof coqManager.pprint.pp2String === 'function') {
-              goalType = coqManager.pprint.pp2String(goal.type);
-            } else {
-              goalType = extractStringFromPp(goal.type);
-            }
+            goalType = ppToString(goal.type, coqManager);
           } else {
             goalType = goal.type.toString();
           }

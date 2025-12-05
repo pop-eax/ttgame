@@ -62,3 +62,33 @@ code {
   color: inherit;
 }
 
+/* Hide jsCoq panels - target the actual DOM structure jsCoq creates */
+/* The layout creates panels inside ide-wrapper */
+#ide-wrapper > div:not(:first-child),
+.ide-wrapper > div:not(:first-child),
+[id*="ide-wrapper"] > div:not(:first-child) {
+  /* Hide all panels except the first one (which is usually the editor/toolbar) */
+  display: none !important;
+}
+
+/* More specific: hide known panel sections */
+#goal-panel,
+#help-panel,
+.msg-area,
+#packages-panel,
+.flex-panel,
+.exits,
+[id*="ide-wrapper"] .goals,
+[id*="ide-wrapper"] .messages,
+[id*="ide-wrapper"] .packages,
+[id*="ide-wrapper"] .query {
+  display: none !important;
+}
+
+#panel-wrapper {
+  width: 100% !important;
+}
+
+.jscoq.CodeMirror {
+  height: 600px !important;
+}

@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef, startTransition } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Level } from '../types/world';
+import { Level, World } from '../types/world';
 import { ProofEditor } from '../components/level/ProofEditor';
 import { ProofOutput } from '../components/level/ProofOutput';
 import { TheoryPanel } from '../components/level/TheoryPanel';
 import { HintsPanel } from '../components/level/HintsPanel';
+import { TacticsAndTheoremsPanel } from '../components/level/TacticsAndTheoremsPanel';
 import { SuccessModal } from '../components/level/SuccessModal';
 import { Button } from '../components/common/Button';
 import { useGame } from '../context/GameContext';
@@ -74,12 +75,12 @@ function filterQueryMessages(text: string): string | null {
 export function LevelPage() {
   const { worldId, levelId } = useParams<{ worldId: string; levelId: string }>();
   const navigate = useNavigate();
-  const { completeLevel, saveProof, loadWorldData } = useGame();
+  const { completeLevel, saveProof, loadWorldData, gameData } = useGame();
   const { execute: executeProof, proofState, isExecuting, clearState } = useProofExecution();
   const { executeProof: jsCoqExecuteProof, isLoaded: jsCoqLoaded, setEditorValue, getEditorValue, setInitialCode, coqManager } = useJsCoq(COQ_EDITOR_ID);
   
   const [level, setLevel] = useState<Level | null>(null);
-  const [world, setWorld] = useState<any>(null); // Store world to find next level
+  const [world, setWorld] = useState<World | null>(null); // Store world to find next level
   const [hintsUsed, setHintsUsed] = useState(0);
   const [attempts, setAttempts] = useState(0);
   const [startTime] = useState(Date.now());
@@ -551,52 +552,63 @@ export function LevelPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Button onClick={() => navigate(`/worlds/${worldId}`)} variant="secondary">
-            ← Back to World
-          </Button>
-          <div className="text-center">
-            <h1 className="text-2xl font-bold">{level.name}</h1>
-            <p className="text-gray-600">{'★'.repeat(level.difficulty)}{'☆'.repeat(5 - level.difficulty)}</p>
+        <div className="mx-auto px-4 py-4">
+          <div className="flex items-center justify-between mb-4">
+            <Button onClick={() => navigate(`/worlds/${worldId}`)} variant="secondary">
+              ← Back to World
+            </Button>
+            <div className="space-y-2">
+            <div className="flex items-center justify-center space-x-3">
+              <h1 className="text-2xl font-bold">{level.name}</h1>
+              <span className="text-gray-600">{'★'.repeat(level.difficulty)}{'☆'.repeat(5 - level.difficulty)}</span>
+            </div>
+            <p className="text-center text-gray-700 max-w-3xl mx-auto">{level.objective}</p>
           </div>
-          <Button 
-            onClick={handleRunProof} 
-            disabled={isExecuting && !isLevelComplete}
-          >
-            {isExecuting && !isLevelComplete ? 'Running...' : isLevelComplete ? 'Next Level →' : 'Run Proof'}
-          </Button>
+            <Button 
+              onClick={handleRunProof} 
+              disabled={isExecuting && !isLevelComplete}
+            >
+              {isExecuting && !isLevelComplete ? 'Running...' : isLevelComplete ? 'Next Level →' : 'Run Proof'}
+            </Button>
+          </div>
+          
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-1">
+      <div className=" mx-auto px-4 py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Left Column: Theory & Hints */}
+          <div className="lg:col-span-3 space-y-6">
             <TheoryPanel 
               theory={level.theory}
-              objective={level.objective}
               show={showTheory}
               onToggle={() => setShowTheory(!showTheory)}
             />
-          </div>
-
-          <div className="lg:col-span-2 space-y-6">
-            <div className="grid grid-cols-1 gap-6">
-              <ProofOutput
-                state={goalState || proofState}
-                objective={level.objective}
-                isExecuting={isExecuting}
-              />
-              
-              <ProofEditor
-                containerId={COQ_EDITOR_ID}
-                initialValue={level.startingCode}
-                isLoaded={jsCoqLoaded}
-              />
-            </div>
-
             <HintsPanel
               hints={level.hints}
               onHintRequest={handleHintRequest}
+            />
+          </div>
+
+          {/* Middle Column: Proof Output & Editor - Takes most of the space */}
+          <div className="lg:col-span-6 space-y-6">
+            <ProofOutput
+              state={goalState || proofState}
+              isExecuting={isExecuting}
+            />
+            
+            <ProofEditor
+              containerId={COQ_EDITOR_ID}
+              initialValue={level.startingCode}
+              isLoaded={jsCoqLoaded}
+            />
+          </div>
+
+          {/* Right Column: Tactics & Theorems */}
+          <div className="lg:col-span-3">
+            <TacticsAndTheoremsPanel
+              unlockedTactics={gameData?.unlockedTactics || []}
+              availableTheorems={world?.availableTheorems || []}
             />
           </div>
         </div>

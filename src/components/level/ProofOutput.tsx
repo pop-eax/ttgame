@@ -4,7 +4,6 @@ import { AlertCircle, CheckCircle2, Info, Target, List } from 'lucide-react';
 
 interface ProofOutputProps {
   state: ProofStateType | null;
-  objective?: string;
   isExecuting?: boolean;
 }
 
@@ -35,10 +34,7 @@ function formatGoal(goal: any, index: number, total: number): string {
   return output;
 }
 
-export function ProofOutput({ state, objective, isExecuting }: ProofOutputProps) {
-  // Show initial state if no proof state yet
-  const showInitialState = !state && objective;
-  
+export function ProofOutput({ state, isExecuting }: ProofOutputProps) {
   return (
     <div className="bg-white rounded-lg border border-gray-200">
       <div className="bg-gray-50 px-4 py-2 border-b border-gray-200 flex items-center space-x-2">
@@ -50,22 +46,9 @@ export function ProofOutput({ state, objective, isExecuting }: ProofOutputProps)
       </div>
       
       <div className="p-4 space-y-4 max-h-96 overflow-y-auto">
-        {showInitialState && (
-          <div className="space-y-4">
-            <div>
-              <div className="flex items-center space-x-2 mb-2">
-                <Target size={16} className="text-primary-600" />
-                <h4 className="font-semibold text-gray-900">Goal</h4>
-              </div>
-              <div className="bg-primary-50 border border-primary-200 rounded p-3">
-                <pre className="text-sm font-mono text-gray-800 whitespace-pre-wrap">
-                  {objective}
-                </pre>
-              </div>
-            </div>
-            <div className="text-sm text-gray-500 italic">
-              Write your proof above and move your cursor to see the current state
-            </div>
+        {!state && (
+          <div className="text-sm text-gray-500 italic text-center py-8">
+            Start writing your proof to see the current state here
           </div>
         )}
 
@@ -92,14 +75,41 @@ export function ProofOutput({ state, objective, isExecuting }: ProofOutputProps)
                       </h4>
                     </div>
                     <div className="space-y-4">
-                      {state.goals.map((goal, idx) => (
-                        <div 
-                          key={goal.id || idx} 
-                          className="bg-gray-50 border border-gray-200 rounded p-4"
-                        >
-                          <pre className="text-sm font-mono text-gray-800 whitespace-pre-wrap">
-                            {formatGoal(goal, idx, state.goals.length)}
-                          </pre>
+                      {state.goals.map((goal, idx) => {
+                        // Get hypotheses from goal context or fallback to state-level hypotheses
+                        const goalHyps = goal.context && goal.context.length > 0 
+                          ? goal.context 
+                          : (state.hypotheses || []);
+                        
+                        return (
+                          <div 
+                            key={goal.id || idx} 
+                            className="bg-gray-50 border border-gray-200 rounded p-4"
+                          >
+                            <pre className="text-sm font-mono text-gray-800 whitespace-pre-wrap">
+                              {formatGoal({ ...goal, context: goalHyps }, idx, state.goals.length)}
+                            </pre>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+                
+                {/* Show hypotheses separately if they exist but aren't in goals */}
+                {state.hypotheses.length > 0 && state.goals.length > 0 && 
+                 state.goals.every(g => !g.context || g.context.length === 0) && (
+                  <div className="mt-4">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <List size={16} className="text-gray-600" />
+                      <h4 className="font-semibold text-gray-900">Hypotheses</h4>
+                    </div>
+                    <div className="bg-gray-50 rounded p-3 space-y-1.5">
+                      {state.hypotheses.map((hyp, idx) => (
+                        <div key={idx} className="text-sm text-gray-700">
+                          <span className="font-semibold text-primary-700">{hyp.name}</span>
+                          <span className="text-gray-400"> : </span>
+                          <span className="font-mono text-gray-800">{hyp.type}</span>
                         </div>
                       ))}
                     </div>

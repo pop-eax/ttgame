@@ -22,8 +22,8 @@ export function WorldMapPage() {
         
         // Load world data for enabled worlds
         for (const worldInfo of enabledWorlds) {
-          // Extract worldId from filename (e.g., "world0-tutorial.json" -> "world0")
-          const worldId = worldInfo.file.replace('.json', '').split('-')[0];
+          // Extract worldId from filename (e.g., "world0-tutorial.json" or "world0-tutorial.v" -> "world0")
+          const worldId = worldInfo.file.replace(/\.(json|v)$/, '').split('-')[0];
           const world = await loadWorld(worldId);
           if (world) {
             setLoadedWorlds(prev => new Map(prev).set(world.id, world));
@@ -63,7 +63,7 @@ export function WorldMapPage() {
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {worlds.map((worldInfo) => {
-          const worldId = worldInfo.file.replace('.json', '').split('-')[0];
+          const worldId = worldInfo.file.replace(/\.(json|v)$/, '').split('-')[0];
           const world = loadedWorlds.get(worldId);
           if (!world) return null;
           

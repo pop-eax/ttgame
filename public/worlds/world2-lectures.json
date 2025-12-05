@@ -1,0 +1,606 @@
+{
+  "id": "world2",
+  "name": "Type Theory Lectures",
+  "description": "Complete course material from lectures covering functional programming, proofs, data structures, and type systems",
+  "order": 2,
+  "icon": "📚",
+  "color": "#8b5cf6",
+  "estimatedHours": 10,
+  "tags": ["lectures", "comprehensive", "intermediate"],
+  "availableTheorems": [
+    "Nat.add_comm : forall n m : nat, n + m = m + n",
+    "Nat.add_assoc : forall n m p : nat, n + (m + p) = (n + m) + p",
+    "Nat.mul_comm : forall n m : nat, n * m = m * n",
+    "eq_refl : forall (A : Type) (x : A), x = x",
+    "eq_sym : forall (A : Type) (x y : A), x = y -> y = x",
+    "eq_trans : forall (A : Type) (x y z : A), x = y -> y = z -> x = z"
+  ],
+  "levels": [
+    {
+      "id": "2.1",
+      "name": "Introduction to Rocq",
+      "description": "Learn about Rocq as a proof assistant and basic commands",
+      "difficulty": 1,
+      "estimatedTime": 5,
+      "objective": "Understand Rocq basics: Check, Print, Compute, Search commands",
+      "theory": {
+        "markdown": "# Introduction to Rocq\n\nROCQ (originally COQ) is an interactive proof assistant (proof assistant).\n\nIt consists of several languages:\n- **Gallina**: Basic functional language (type theory)\n- **Vernacular**: Commands - Definition, Inductive, Lemma, Theorem, Print...\n- **Ltac**: Language - tactics for proving theorems\n\n## Basic Commands\n\n- `Check` - tells you the type of any expression\n- `Print` - shows the definition of an identifier\n- `Compute` - evaluates an expression\n- `Search` - searches for definitions matching a pattern\n- `Locate` - finds where a notation is defined",
+        "examples": [
+          {
+            "title": "Checking types",
+            "code": "Check nat.\n(* nat : Set *)\nCheck 1.\n(* 1 : nat *)"
+          },
+          {
+            "title": "Printing definitions",
+            "code": "Definition x := 10.\nPrint x.\n(* x = 10 : nat *)"
+          },
+          {
+            "title": "Computing expressions",
+            "code": "Definition succ (x : nat) : nat := x + 1.\nCompute (succ 10).\n(* = 11 : nat *)"
+          }
+        ]
+      },
+      "startingCode": "(* Use Check, Print, and Compute to explore Rocq *)\nDefinition x := 10.\n\n(* Your code here *)",
+      "solution": "Definition x := 10.\nCheck x.\nPrint x.\nCompute (x + 5).",
+      "hints": [
+        "Try using Check to see the type of x",
+        "Use Print to see the definition of x",
+        "Use Compute to evaluate x + 5"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 50
+      }
+    },
+    {
+      "id": "2.2",
+      "name": "Basic Definitions",
+      "description": "Learn to define constants and functions",
+      "difficulty": 1,
+      "estimatedTime": 5,
+      "objective": "Define a constant and a function using Definition",
+      "theory": {
+        "markdown": "# Definitions\n\nYou can define constants and functions using the `Definition` keyword.\n\n## Syntax\n\n```\nDefinition name : type := value.\nDefinition function_name (param : type) : return_type := body.\n```\n\n## Examples\n\n- Constants: `Definition x := 10.`\n- Functions: `Definition succ (x : nat) : nat := x + 1.`\n- Partial application: `Definition plus2 := plus 2.`",
+        "examples": [
+          {
+            "title": "Simple constant",
+            "code": "Definition x := 10.\nCheck x.\n(* x : nat *)"
+          },
+          {
+            "title": "Function definition",
+            "code": "Definition succ (x : nat) : nat := x + 1.\nCompute (succ 5).\n(* = 6 : nat *)"
+          },
+          {
+            "title": "Partial application",
+            "code": "Definition plus x y := x + y.\nDefinition plus2 := plus 2.\nCompute (plus2 3).\n(* = 5 : nat *)"
+          }
+        ]
+      },
+      "startingCode": "(* Define a constant called 'ten' equal to 10 *)\n(* Define a function 'double' that doubles a number *)\n",
+      "solution": "Definition ten := 10.\nDefinition double (x : nat) : nat := x * 2.\nCompute (double ten).",
+      "hints": [
+        "Use Definition for constants: Definition ten := 10.",
+        "For functions: Definition double (x : nat) : nat := x * 2.",
+        "Use Compute to test your function"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 75
+      }
+    },
+    {
+      "id": "2.3",
+      "name": "Basic Types and Type Hierarchy",
+      "description": "Understand the type hierarchy in Rocq",
+      "difficulty": 2,
+      "estimatedTime": 8,
+      "objective": "Understand Set, Prop, Type and basic types like nat, bool, list",
+      "theory": {
+        "markdown": "# Type Hierarchy in Rocq\n\nRocq has a hierarchy of types:\n\n| Type | Where it belongs | Meaning | Examples |\n|------|------------------|---------|----------|\n| Set | Type | Universe of data types | nat, bool, list |\n| Prop | Type | Universe of logical propositions | True, False, n=0 |\n| Type | Type1,2,.. | Universe of all types | Set, Prop, list |\n| bool | Set | Boolean logic | true, false |\n| nat | Set | Natural numbers (Peano) | O, S O, S (S O) |\n| unit | Set | One element (trivial type) | tt |\n| Empty_set | Set | Empty type (no elements) | -- |\n| list A | Set | List of elements of type A | nil, cons 1 nil |",
+        "examples": [
+          {
+            "title": "Type hierarchy",
+            "code": "Check Set.\n(* Set : Type *)\nCheck Prop.\n(* Prop : Type *)\nCheck Type.\n(* Type : Type1 *)"
+          },
+          {
+            "title": "Basic types",
+            "code": "Check bool.\n(* bool : Set *)\nCheck nat.\n(* nat : Set *)\nCheck (list nat).\n(* list nat : Set *)"
+          }
+        ]
+      },
+      "startingCode": "(* Explore the type hierarchy *)\n(* Check the types of Set, Prop, Type, bool, nat, and list *)\n",
+      "solution": "Check Set.\nCheck Prop.\nCheck Type.\nCheck bool.\nCheck nat.\nCheck (list nat).",
+      "hints": [
+        "Use Check to see types",
+        "Check Set, Prop, and Type to see the hierarchy",
+        "Check basic types like bool and nat"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 75
+      }
+    },
+    {
+      "id": "2.4",
+      "name": "Recursive Functions",
+      "description": "Learn to define recursive functions with Fixpoint",
+      "difficulty": 2,
+      "estimatedTime": 10,
+      "objective": "Define a recursive function using Fixpoint",
+      "theory": {
+        "markdown": "# Recursive Functions\n\nUse `Fixpoint` to define recursive functions.\n\n## Syntax\n\n```\nFixpoint function_name (param : type) : return_type :=\n  match param with\n  | pattern1 => result1\n  | pattern2 => result2\n  end.\n```\n\n## Important\n\nAll functions in Rocq must be **total** - they must terminate for every input.\n\n## Example: Factorial\n\n```\nFixpoint factorial (n:nat) : nat :=\n  match n with\n  | 0 => 1\n  | (S n') => n * factorial n'\n  end.\n```",
+        "examples": [
+          {
+            "title": "Factorial",
+            "code": "Fixpoint factorial (n:nat) : nat :=\n  match n with\n  | 0 => 1\n  | (S n') => n * factorial n'\n  end.\n\nCompute (factorial 5).\n(* = 120 : nat *)"
+          }
+        ]
+      },
+      "startingCode": "(* Define a recursive function to compute the sum of numbers from 0 to n *)\n(* Hint: sum n = 0 + 1 + 2 + ... + n *)\n",
+      "solution": "Fixpoint sum (n : nat) : nat :=\n  match n with\n  | 0 => 0\n  | (S n') => n + sum n'\n  end.\n\nCompute (sum 5).",
+      "hints": [
+        "Use Fixpoint for recursive functions",
+        "Base case: sum 0 = 0",
+        "Recursive case: sum (S n') = n + sum n'"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 100
+      }
+    },
+    {
+      "id": "2.5",
+      "name": "First Proofs: Reflexivity",
+      "description": "Learn your first proof tactics: intro and reflexivity",
+      "difficulty": 1,
+      "estimatedTime": 5,
+      "objective": "Prove that forall n : nat, n = n using intro and reflexivity",
+      "theory": {
+        "markdown": "# First Proofs\n\n## Basic Tactics\n\n- `intro` - introduces a variable or hypothesis\n- `reflexivity` - proves goals of the form `x = x`\n- `simpl` - simplifies expressions\n\n## Proof Structure\n\n```\nTheorem name : statement.\nProof.\n  (* tactics here *)\nQed.\n```",
+        "examples": [
+          {
+            "title": "Reflexivity proof",
+            "code": "Theorem refl_nat : forall n : nat, n = n.\nProof.\n  intro n.\n  reflexivity.\nQed."
+          }
+        ]
+      },
+      "startingCode": "Theorem my_first_proof : forall n : nat, n = n.\nProof.\n  (* Your proof here *)\nQed.",
+      "solution": "Theorem my_first_proof : forall n : nat, n = n.\nProof.\n  intro n.\n  reflexivity.\nQed.",
+      "hints": [
+        "Use intro to introduce the variable n",
+        "Use reflexivity to prove n = n",
+        "The proof structure is: intro n. reflexivity."
+      ],
+      "unlockedTactics": ["intro", "reflexivity"],
+      "rewards": {
+        "xp": 100,
+        "achievements": ["first_proof"]
+      }
+    },
+    {
+      "id": "2.6",
+      "name": "Proof by Simplification",
+      "description": "Use simpl to simplify expressions in proofs",
+      "difficulty": 1,
+      "estimatedTime": 5,
+      "objective": "Prove 2 + 3 = 5 using simpl and reflexivity",
+      "theory": {
+        "markdown": "# Simplification\n\nThe `simpl` tactic simplifies expressions by reducing function applications.\n\n## Example\n\n```\nTheorem dva_plus_tri : 2 + 3 = 5.\nProof.\n  simpl.\n  reflexivity.\nQed.\n```\n\nNote: Sometimes `reflexivity` can do the simplification automatically.",
+        "examples": [
+          {
+            "title": "Simplification",
+            "code": "Theorem example : 2 + 3 = 5.\nProof.\n  simpl.\n  reflexivity.\nQed."
+          }
+        ]
+      },
+      "startingCode": "Theorem add_example : 3 + 4 = 7.\nProof.\n  (* Your proof here *)\nQed.",
+      "solution": "Theorem add_example : 3 + 4 = 7.\nProof.\n  simpl.\n  reflexivity.\nQed.",
+      "hints": [
+        "Use simpl to simplify 3 + 4",
+        "Then use reflexivity to prove 7 = 7",
+        "The sequence is: simpl. reflexivity."
+      ],
+      "unlockedTactics": ["simpl"],
+      "rewards": {
+        "xp": 75
+      }
+    },
+    {
+      "id": "2.7",
+      "name": "Proof by Rewriting",
+      "description": "Use rewrite to apply equalities",
+      "difficulty": 2,
+      "estimatedTime": 8,
+      "objective": "Prove a theorem using rewrite",
+      "theory": {
+        "markdown": "# Proof by Rewriting\n\nThe `rewrite` tactic is used when you have an equality in context and want to use it to replace one side of an equation with the other.\n\n## Syntax\n\n- `rewrite H.` - replaces left side of H with right side\n- `rewrite <- H.` - replaces right side of H with left side (backwards)\n\n## Example\n\n```\nTheorem example_rewrite :\n  forall n m : nat, n = m -> n + 1 = m + 1.\nProof.\n  intros n m H.\n  rewrite H.\n  reflexivity.\nQed.\n```",
+        "examples": [
+          {
+            "title": "Forward rewrite",
+            "code": "Theorem example : forall n m : nat, n = m -> n + 1 = m + 1.\nProof.\n  intros n m H.\n  rewrite H.\n  reflexivity.\nQed."
+          },
+          {
+            "title": "Backward rewrite",
+            "code": "Theorem example_back : forall n m : nat, n = m -> m + 1 = n + 1.\nProof.\n  intros n m H.\n  rewrite <- H.\n  reflexivity.\nQed."
+          }
+        ]
+      },
+      "startingCode": "Theorem rewrite_example : forall n m : nat, n = m -> n + 2 = m + 2.\nProof.\n  (* Your proof here *)\nQed.",
+      "solution": "Theorem rewrite_example : forall n m : nat, n = m -> n + 2 = m + 2.\nProof.\n  intros n m H.\n  rewrite H.\n  reflexivity.\nQed.",
+      "hints": [
+        "Introduce n, m, and the hypothesis H: n = m",
+        "Use rewrite H to replace n with m",
+        "Use reflexivity to finish"
+      ],
+      "unlockedTactics": ["rewrite"],
+      "rewards": {
+        "xp": 100
+      }
+    },
+    {
+      "id": "2.8",
+      "name": "Proof by Case Analysis",
+      "description": "Use destruct to analyze cases",
+      "difficulty": 2,
+      "estimatedTime": 8,
+      "objective": "Prove a theorem about booleans using destruct",
+      "theory": {
+        "markdown": "# Case Analysis with Destruct\n\nThe `destruct` tactic performs case analysis without recursion.\n\nIt generates subgoals for each possible constructor of a term.\n\n## Example with bool\n\n```\nTheorem example_destruct_bool :\n  forall b : bool, b = b.\nProof.\n  intros b.\n  destruct b.\n  - reflexivity.  (* case true *)\n  - reflexivity.  (* case false *)\nQed.\n```",
+        "examples": [
+          {
+            "title": "Destruct on bool",
+            "code": "Theorem bool_example : forall b : bool, b = b.\nProof.\n  intros b.\n  destruct b.\n  - reflexivity.\n  - reflexivity.\nQed."
+          }
+        ]
+      },
+      "startingCode": "Theorem bool_identity : forall b : bool, b = b.\nProof.\n  (* Your proof here *)\nQed.",
+      "solution": "Theorem bool_identity : forall b : bool, b = b.\nProof.\n  intros b.\n  destruct b.\n  - reflexivity.\n  - reflexivity.\nQed.",
+      "hints": [
+        "Introduce b",
+        "Use destruct b to split into cases for true and false",
+        "Prove each case with reflexivity"
+      ],
+      "unlockedTactics": ["destruct"],
+      "rewards": {
+        "xp": 100
+      }
+    },
+    {
+      "id": "2.9",
+      "name": "Proof by Induction",
+      "description": "Learn to prove theorems by induction",
+      "difficulty": 3,
+      "estimatedTime": 15,
+      "objective": "Prove that n + 0 = n using induction",
+      "theory": {
+        "markdown": "# Proof by Induction\n\nInduction is used when a property requires recursion.\n\n## Principle\n\nTo prove P(n) for all n:\n1. **Base case**: Show P(0)\n2. **Inductive step**: Show that if P(n') holds, then P(S n') holds\n\n## Tactic\n\n- `induction n as [| n' IH].` - performs induction on n\n  - First case: n = 0\n  - Second case: n = S n' with inductive hypothesis IH: P(n')\n\n## Example\n\n```\nTheorem plus_n_O : forall n : nat, n + 0 = n.\nProof.\n  intro n.\n  induction n as [| n' IH].\n  - simpl. reflexivity.  (* base case *)\n  - simpl. rewrite IH. reflexivity.  (* inductive step *)\nQed.\n```",
+        "examples": [
+          {
+            "title": "Induction example",
+            "code": "Theorem plus_n_O : forall n : nat, n + 0 = n.\nProof.\n  intro n.\n  induction n as [| n' IH].\n  - simpl. reflexivity.\n  - simpl. rewrite IH. reflexivity.\nQed."
+          }
+        ]
+      },
+      "startingCode": "Theorem plus_O_n : forall n : nat, 0 + n = n.\nProof.\n  (* Your proof here *)\nQed.",
+      "solution": "Theorem plus_O_n : forall n : nat, 0 + n = n.\nProof.\n  intro n.\n  simpl.\n  reflexivity.\nQed.",
+      "hints": [
+        "This one doesn't need induction - simpl is enough!",
+        "Try simpl first",
+        "Then reflexivity"
+      ],
+      "unlockedTactics": ["induction"],
+      "rewards": {
+        "xp": 150
+      }
+    },
+    {
+      "id": "2.10",
+      "name": "Induction on Lists",
+      "description": "Prove properties about lists using induction",
+      "difficulty": 3,
+      "estimatedTime": 15,
+      "objective": "Prove that appending an empty list doesn't change a list",
+      "theory": {
+        "markdown": "# Induction on Lists\n\nInduction on lists works similarly to induction on natural numbers.\n\n## Principle\n\nTo prove P(l) for all lists l:\n1. **Base case**: Show P([])\n2. **Inductive step**: Show that if P(xs) holds, then P(x :: xs) holds\n\n## Example\n\n```\nTheorem app_nil_r : forall l : list nat, l ++ [] = l.\nProof.\n  intro l.\n  induction l.\n  - reflexivity.  (* base case: [] ++ [] = [] *)\n  - simpl. rewrite IHl. reflexivity.  (* inductive step *)\nQed.\n```",
+        "examples": [
+          {
+            "title": "List induction",
+            "code": "Require Import Coq.Lists.List.\nImport ListNotations.\n\nTheorem app_nil_r : forall l : list nat, l ++ [] = l.\nProof.\n  intro l.\n  induction l.\n  - reflexivity.\n  - simpl. rewrite IHl. reflexivity.\nQed."
+          }
+        ]
+      },
+      "startingCode": "Require Import Coq.Lists.List.\nImport ListNotations.\n\nTheorem nil_app : forall l : list nat, [] ++ l = l.\nProof.\n  (* Your proof here *)\nQed.",
+      "solution": "Require Import Coq.Lists.List.\nImport ListNotations.\n\nTheorem nil_app : forall l : list nat, [] ++ l = l.\nProof.\n  intro l.\n  simpl.\n  reflexivity.\nQed.",
+      "hints": [
+        "This one is simpler - no induction needed!",
+        "Use simpl to simplify [] ++ l",
+        "Then reflexivity"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 125
+      }
+    },
+    {
+      "id": "2.11",
+      "name": "Higher-Order Functions: Map",
+      "description": "Learn about the map function",
+      "difficulty": 2,
+      "estimatedTime": 10,
+      "objective": "Understand and use the map function",
+      "theory": {
+        "markdown": "# Higher-Order Functions: Map\n\nFunctions are \"first-class citizens\" in Rocq - they can be passed as arguments, returned, and stored in data structures.\n\n## Map Function\n\n`map` applies a function to every element of a list.\n\n```\nFixpoint map {X Y : Type} (f : X -> Y) (l : list X) : list Y :=\n  match l with\n  | [] => []\n  | head :: tail => (f head) :: (map f tail)\n  end.\n```\n\n## Example\n\n```\nCompute map (fun x => x + 5) [4;0;5;6;9].\n(* = [9; 5; 10; 11; 14] : list nat *)\n```",
+        "examples": [
+          {
+            "title": "Using map",
+            "code": "Require Import Coq.Lists.List.\nImport ListNotations.\n\nCompute map (fun x => x * 2) [1;2;3].\n(* = [2; 4; 6] : list nat *)"
+          }
+        ]
+      },
+      "startingCode": "Require Import Coq.Lists.List.\nImport ListNotations.\n\n(* Use map to double every number in the list [1;2;3;4] *)\n",
+      "solution": "Require Import Coq.Lists.List.\nImport ListNotations.\n\nCompute map (fun x => x * 2) [1;2;3;4].",
+      "hints": [
+        "Use map with a function that doubles a number",
+        "The function should be: fun x => x * 2",
+        "Apply it to [1;2;3;4]"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 100
+      }
+    },
+    {
+      "id": "2.12",
+      "name": "Higher-Order Functions: Filter",
+      "description": "Learn about the filter function",
+      "difficulty": 2,
+      "estimatedTime": 10,
+      "objective": "Use filter to select elements from a list",
+      "theory": {
+        "markdown": "# Filter Function\n\n`filter` takes a predicate (function from X to bool) and a list, and returns a new list containing only elements for which the predicate returns true.\n\n```\nFixpoint filter {X : Type} (test : X -> bool) (l : list X) : list X :=\n  match l with\n  | [] => []\n  | head :: tail =>\n      if test head then head :: (filter test tail)\n      else filter test tail\n  end.\n```",
+        "examples": [
+          {
+            "title": "Filtering even numbers",
+            "code": "Require Import Coq.Lists.List.\nImport ListNotations.\n\nCompute (filter even [1;2;3;4;5;6]).\n(* = [2; 4; 6] : list nat *)"
+          }
+        ]
+      },
+      "startingCode": "Require Import Coq.Lists.List.\nImport ListNotations.\n\n(* Use filter to get only odd numbers from [1;2;3;4;5;6] *)\n",
+      "solution": "Require Import Coq.Lists.List.\nImport ListNotations.\n\nCompute (filter odd [1;2;3;4;5;6]).",
+      "hints": [
+        "Use filter with the odd predicate",
+        "Apply it to [1;2;3;4;5;6]",
+        "The result should be [1; 3; 5]"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 100
+      }
+    },
+    {
+      "id": "2.13",
+      "name": "Inductive Data Types",
+      "description": "Define your own inductive data types",
+      "difficulty": 3,
+      "estimatedTime": 12,
+      "objective": "Define an inductive type for days of the week",
+      "theory": {
+        "markdown": "# Inductive Data Types\n\nUse `Inductive` to define your own data types.\n\n## Syntax\n\n```\nInductive TypeName : Type :=\n  | Constructor1 : TypeName\n  | Constructor2 : TypeName\n  | Constructor3 : param -> TypeName.\n```\n\n## Example: Days of the Week\n\n```\nInductive day : Type :=\n  | Monday\n  | Tuesday\n  | Wednesday\n  | Thursday\n  | Friday\n  | Saturday\n  | Sunday.\n```",
+        "examples": [
+          {
+            "title": "Days type",
+            "code": "Inductive day : Type :=\n  | Monday\n  | Tuesday\n  | Wednesday\n  | Thursday\n  | Friday\n  | Saturday\n  | Sunday.\n\nDefinition next_weekday (d : day) : day :=\n  match d with\n  | Monday => Tuesday\n  | Tuesday => Wednesday\n  | Wednesday => Thursday\n  | Thursday => Friday\n  | Friday => Saturday\n  | Saturday => Sunday\n  | Sunday => Monday\n  end."
+          }
+        ]
+      },
+      "startingCode": "(* Define an inductive type for colors: Red, Green, Blue *)\n(* Then define a function that returns the next color in sequence *)\n",
+      "solution": "Inductive color : Type :=\n  | Red\n  | Green\n  | Blue.\n\nDefinition next_color (c : color) : color :=\n  match c with\n  | Red => Green\n  | Green => Blue\n  | Blue => Red\n  end.",
+      "hints": [
+        "Use Inductive to define the color type with three constructors",
+        "Use match to pattern match on the color",
+        "Define the cyclic sequence: Red -> Green -> Blue -> Red"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 125
+      }
+    },
+    {
+      "id": "2.14",
+      "name": "Polymorphic Types",
+      "description": "Learn about polymorphic functions and types",
+      "difficulty": 3,
+      "estimatedTime": 12,
+      "objective": "Define a polymorphic identity function",
+      "theory": {
+        "markdown": "# Polymorphic Types\n\nPolymorphic functions work with any type.\n\n## Syntax\n\n```\nDefinition id_poly (A : Type) (x : A) : A := x.\n```\n\nOr with implicit arguments:\n\n```\nDefinition id_poly3 {A : Type} (x : A) : A := x.\n```\n\nWith implicit arguments, Rocq can infer the type automatically.",
+        "examples": [
+          {
+            "title": "Polymorphic identity",
+            "code": "Definition id_poly (A : Type) (x : A) : A := x.\nCompute id_poly nat 3.\n(* = 3 : nat *)\n\nDefinition id_poly3 {A : Type} (x : A) : A := x.\nCompute id_poly3 3.\n(* = 3 : nat - type inferred! *)"
+          }
+        ]
+      },
+      "startingCode": "(* Define a polymorphic function that takes two arguments of the same type and returns the first one *)\n",
+      "solution": "Definition first {A : Type} (x y : A) : A := x.\n\nCompute first 5 10.\n(* = 5 : nat *)\nCompute first true false.\n(* = true : bool *)",
+      "hints": [
+        "Use implicit type arguments: {A : Type}",
+        "The function should take two arguments x and y, both of type A",
+        "Return x"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 125
+      }
+    },
+    {
+      "id": "2.15",
+      "name": "Pairs and Products",
+      "description": "Work with pairs and product types",
+      "difficulty": 2,
+      "estimatedTime": 10,
+      "objective": "Use pairs and extract components with fst and snd",
+      "theory": {
+        "markdown": "# Pairs and Products\n\nPairs allow you to combine two values into one.\n\n## Syntax\n\n- `(x, y)` - creates a pair\n- `fst p` - gets the first component\n- `snd p` - gets the second component\n- `X * Y` - product type (type of pairs)\n\n## Example\n\n```\nDefinition p := (1, true).\nCompute fst p.  (* = 1 : nat *)\nCompute snd p.  (* = true : bool *)\n```",
+        "examples": [
+          {
+            "title": "Working with pairs",
+            "code": "Definition my_pair := (5, true).\nCompute fst my_pair.\n(* = 5 : nat *)\nCompute snd my_pair.\n(* = true : bool *)"
+          }
+        ]
+      },
+      "startingCode": "(* Create a pair (10, false) and extract both components *)\n",
+      "solution": "Definition my_pair := (10, false).\nCompute fst my_pair.\nCompute snd my_pair.",
+      "hints": [
+        "Use (10, false) to create a pair",
+        "Use fst to get the first component",
+        "Use snd to get the second component"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 100
+      }
+    },
+    {
+      "id": "2.16",
+      "name": "Option Type",
+      "description": "Use option to represent partial functions",
+      "difficulty": 2,
+      "estimatedTime": 10,
+      "objective": "Work with option type to handle possible absence of values",
+      "theory": {
+        "markdown": "# Option Type\n\nSince Rocq only allows total functions, we use `option` to represent partial functions.\n\n## Definition\n\n```\nInductive option (X: Type) : Type :=\n  | Some (x : X)\n  | None.\n```\n\n## Usage\n\n- `Some x` - represents a value x\n- `None` - represents absence of a value\n\n## Example: Safe List Access\n\n```\nFixpoint nth_error {X:Type} (l:list X) (n:nat): option X :=\n  match l with\n  | [] => None\n  | hd::tl => match n with\n             | 0 => Some hd\n             | S m => nth_error tl m\n             end\n  end.\n```",
+        "examples": [
+          {
+            "title": "Using option",
+            "code": "Require Import Coq.Lists.List.\nImport ListNotations.\n\nCompute nth_error [10;12;0] 1.\n(* = Some 12 : option nat *)\nCompute nth_error [10;12;0] 5.\n(* = None : option nat *)"
+          }
+        ]
+      },
+      "startingCode": "Require Import Coq.Lists.List.\nImport ListNotations.\n\n(* Use nth_error to safely access the 2nd element of [5;10;15] *)\n",
+      "solution": "Require Import Coq.Lists.List.\nImport ListNotations.\n\nCompute nth_error [5;10;15] 1.",
+      "hints": [
+        "Use nth_error with the list and index",
+        "Remember: indices start at 0, so 1 is the second element",
+        "The result will be Some 10"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 100
+      }
+    },
+    {
+      "id": "2.17",
+      "name": "Inductively Defined Propositions",
+      "description": "Define propositions inductively",
+      "difficulty": 4,
+      "estimatedTime": 15,
+      "objective": "Understand inductively defined propositions like 'even'",
+      "theory": {
+        "markdown": "# Inductively Defined Propositions\n\nYou can define propositions (properties) inductively, not just data types.\n\n## Example: Even Numbers\n\n```\nInductive even : nat -> Prop :=\n  | even_O : even 0\n  | even_SS : forall n, even n -> even (S (S n)).\n```\n\nThis says:\n- 0 is even (base case)\n- If n is even, then S (S n) (n+2) is even (inductive step)\n\n## Proving Evenness\n\n```\nLemma four_is_even : even 4.\nProof.\n  apply even_SS.\n  apply even_SS.\n  apply even_O.\nQed.\n```",
+        "examples": [
+          {
+            "title": "Proving evenness",
+            "code": "Inductive even : nat -> Prop :=\n  | even_O : even 0\n  | even_SS : forall n, even n -> even (S (S n)).\n\nLemma four_is_even : even 4.\nProof.\n  apply even_SS.\n  apply even_SS.\n  apply even_O.\nQed."
+          }
+        ]
+      },
+      "startingCode": "Inductive even : nat -> Prop :=\n  | even_O : even 0\n  | even_SS : forall n, even n -> even (S (S n)).\n\n(* Prove that 6 is even *)\nLemma six_is_even : even 6.\nProof.\n  (* Your proof here *)\nQed.",
+      "solution": "Inductive even : nat -> Prop :=\n  | even_O : even 0\n  | even_SS : forall n, even n -> even (S (S n)).\n\nLemma six_is_even : even 6.\nProof.\n  apply even_SS.\n  apply even_SS.\n  apply even_SS.\n  apply even_O.\nQed.",
+      "hints": [
+        "6 = S (S (S (S (S (S 0)))))",
+        "Apply even_SS three times to go from 0 to 6",
+        "Finish with even_O"
+      ],
+      "unlockedTactics": ["apply"],
+      "rewards": {
+        "xp": 150
+      }
+    },
+    {
+      "id": "2.18",
+      "name": "Inversion Tactic",
+      "description": "Use inversion to analyze inductively defined propositions",
+      "difficulty": 4,
+      "estimatedTime": 15,
+      "objective": "Use inversion to prove that 1 is not even",
+      "theory": {
+        "markdown": "# Inversion Tactic\n\nThe `inversion` tactic automatically handles inversion lemmas.\n\nIt can:\n- Recognize impossible cases (e.g., `even 1`)\n- Automatically unify variables\n\n## Example\n\n```\nInductive even : nat -> Prop :=\n  | even_O : even 0\n  | even_SS : forall n, even n -> even (S (S n)).\n\nTheorem one_not_even : ~ even 1.\nProof.\n  intros H.\n  inversion H.\nQed.\n```\n\nInversion automatically recognizes that 1 cannot be even.",
+        "examples": [
+          {
+            "title": "Using inversion",
+            "code": "Inductive even : nat -> Prop :=\n  | even_O : even 0\n  | even_SS : forall n, even n -> even (S (S n)).\n\nTheorem one_not_even : ~ even 1.\nProof.\n  intros H.\n  inversion H.\nQed."
+          }
+        ]
+      },
+      "startingCode": "Inductive even : nat -> Prop :=\n  | even_O : even 0\n  | even_SS : forall n, even n -> even (S (S n)).\n\n(* Prove that 3 is not even *)\nTheorem three_not_even : ~ even 3.\nProof.\n  (* Your proof here *)\nQed.",
+      "solution": "Inductive even : nat -> Prop :=\n  | even_O : even 0\n  | even_SS : forall n, even n -> even (S (S n)).\n\nTheorem three_not_even : ~ even 3.\nProof.\n  intros H.\n  inversion H.\n  inversion H1.\n  inversion H3.\nQed.",
+      "hints": [
+        "Assume even 3 and derive a contradiction",
+        "Use inversion to analyze the structure",
+        "Keep using inversion until you reach an impossible case"
+      ],
+      "unlockedTactics": ["inversion"],
+      "rewards": {
+        "xp": 150
+      }
+    },
+    {
+      "id": "2.19",
+      "name": "Binary Relations",
+      "description": "Define and work with binary relations",
+      "difficulty": 4,
+      "estimatedTime": 15,
+      "objective": "Understand reflexive, transitive, and symmetric relations",
+      "theory": {
+        "markdown": "# Binary Relations\n\nA binary relation on a set X has type: `X -> X -> Prop`.\n\n## Properties of Relations\n\n- **Reflexive**: `forall a : X, R a a`\n- **Transitive**: `forall a b c : X, R a b -> R b c -> R a c`\n- **Symmetric**: `forall a b : X, R a b -> R b a`\n- **Antisymmetric**: `forall a b : X, R a b -> R b a -> a = b`\n\n## Example: Less or Equal\n\nThe relation `<=` (le) on natural numbers is:\n- Reflexive\n- Transitive\n- Antisymmetric\n\nSo it's a **partial order**.",
+        "examples": [
+          {
+            "title": "Relation properties",
+            "code": "Definition relation (X: Type) := X -> X -> Prop.\n\nDefinition reflexive {X: Type} (R: relation X) :=\n  forall a : X, R a a.\n\nDefinition transitive {X: Type} (R: relation X) :=\n  forall a b c : X, R a b -> R b c -> R a c.\n\nTheorem le_reflexive : reflexive le.\nProof.\n  unfold reflexive. intro n. apply le_n.\nQed."
+          }
+        ]
+      },
+      "startingCode": "(* Prove that the equality relation = is reflexive *)\nTheorem eq_reflexive : forall (A : Type), reflexive (@eq A).\nProof.\n  (* Your proof here *)\nQed.",
+      "solution": "Definition relation (X: Type) := X -> X -> Prop.\nDefinition reflexive {X: Type} (R: relation X) :=\n  forall a : X, R a a.\n\nTheorem eq_reflexive : forall (A : Type), reflexive (@eq A).\nProof.\n  unfold reflexive.\n  intro A.\n  intro a.\n  reflexivity.\nQed.",
+      "hints": [
+        "Unfold the definition of reflexive",
+        "You need to show forall a : A, a = a",
+        "Use reflexivity"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 150
+      }
+    },
+    {
+      "id": "2.20",
+      "name": "Maps and Partial Maps",
+      "description": "Work with total and partial maps",
+      "difficulty": 3,
+      "estimatedTime": 12,
+      "objective": "Understand and use maps to store key-value pairs",
+      "theory": {
+        "markdown": "# Maps\n\nMaps are data structures that associate keys with values.\n\n## Total Maps\n\nA total map always returns a value, even for keys that weren't explicitly set (returns a default).\n\n```\nDefinition total_map (A : Type) := string -> A.\nDefinition t_empty {A : Type} (v : A) : total_map A :=\n  (fun _ => v).\nDefinition t_update {A : Type} (m : total_map A)\n                    (x : string) (v : A) :=\n  fun x' => if String.eqb x x' then v else m x'.\n```\n\n## Partial Maps\n\nA partial map uses `option` to represent keys that might not have values.\n\n```\nDefinition partial_map (A : Type) := total_map (option A).\n```",
+        "examples": [
+          {
+            "title": "Using maps",
+            "code": "Definition total_map (A : Type) := string -> A.\nDefinition t_empty {A : Type} (v : A) : total_map A :=\n  (fun _ => v).\nDefinition t_update {A : Type} (m : total_map A)\n                    (x : string) (v : A) :=\n  fun x' => if String.eqb x x' then v else m x'.\n\nNotation \"_ !-> v\" := (t_empty v).\nNotation \"x !-> v ; m\" := (t_update m x v).\n\nDefinition example := (\"foo\" !-> true; \"bar\" !-> false; _ !-> false).\nCompute example \"foo\".\n(* = true : bool *)"
+          }
+        ]
+      },
+      "startingCode": "(* Create a total map with \"x\" -> 5 and \"y\" -> 10, default 0 *)\n",
+      "solution": "Definition total_map (A : Type) := string -> A.\nDefinition t_empty {A : Type} (v : A) : total_map A :=\n  (fun _ => v).\nDefinition t_update {A : Type} (m : total_map A)\n                    (x : string) (v : A) :=\n  fun x' => if String.eqb x x' then v else m x'.\n\nNotation \"_ !-> v\" := (t_empty v).\nNotation \"x !-> v ; m\" := (t_update m x v).\n\nDefinition my_map := (\"x\" !-> 5; \"y\" !-> 10; _ !-> 0).\nCompute my_map \"x\".\nCompute my_map \"y\".",
+      "hints": [
+        "Use t_update to add entries to a map",
+        "Start with t_empty 0 for the default",
+        "Add \"x\" -> 5, then \"y\" -> 10"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 125
+      }
+    }
+  ]
+}
+

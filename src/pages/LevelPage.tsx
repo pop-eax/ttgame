@@ -10,7 +10,7 @@ import { SuccessModal } from '../components/level/SuccessModal';
 import { Button } from '../components/common/Button';
 import { useGame } from '../context/GameContext';
 import { useProofExecution } from '../hooks/useProofExecution';
-import { useJsCoq, parseJsCoqState } from '../hooks/useJsCoq';
+import { useJsCoq, parseJsCoqState, ppToString } from '../hooks/useJsCoq';
 import toast from 'react-hot-toast';
 
 const COQ_EDITOR_ID = 'coq-editor';
@@ -95,6 +95,10 @@ export function LevelPage() {
   const originalCoqGoalInfoRef = useRef<((sid: number, rawGoals: any) => any) | null>(null); // Store original function
   const messageCheckIntervalRef = useRef<number | null>(null); // Store message check interval
   const goalStateRef = useRef<any>(null); // Store current goal state for interval access
+  const previousQueryTextLengthRef = useRef<number>(0); // Track previous query panel text length to only read new messages
+  const processedMessagesRef = useRef<Set<string>>(new Set()); // Track processed messages to avoid duplicates
+  const allMessagesRef = useRef<Array<{ level: 'info' | 'warning' | 'error'; text: string }>>([]); // Single source of truth for all messages
+  const displayedMessagesCountRef = useRef<number>(0); // Track how many messages we've already displayed
 
   useEffect(() => {
     async function fetchLevel() {
@@ -146,6 +150,12 @@ export function LevelPage() {
     
     // Mark this level as initialized
     initializedLevelRef.current = level.id;
+    
+    // Reset query text length tracker and processed messages for new level
+    previousQueryTextLengthRef.current = 0;
+    processedMessagesRef.current = new Set();
+    allMessagesRef.current = [];
+    displayedMessagesCountRef.current = 0;
     
     // Use setInitialCode which will set it immediately if editor is ready,
     // or queue it for when the editor becomes ready
@@ -251,8 +261,51 @@ export function LevelPage() {
                   const sid = lastAdded.coq_sid;
                   goalData = doc.goals_raw?.[sid] || doc.goals?.[sid];
                   
-                  // Read from jsCoq's query panel where it displays Check/Compute results
-                  // Try multiple selectors to find the query panel
+                  // Read from doc.messages (Check/Compute outputs)
+                  // Only process messages we haven't seen before
+                  if (doc.messages && Array.isArray(doc.messages)) {
+                    doc.messages.forEach((msg: any) => {
+                      if (msg) {
+                        let messageText = '';
+                        let messageLevel: 'info' | 'warning' | 'error' = 'info';
+                        
+                        // Extract text from message
+                        if (msg.msg) {
+                          messageText = ppToString(msg.msg, coqManager);
+                        } else if (msg.text) {
+                          messageText = typeof msg.text === 'string' ? msg.text : ppToString(msg.text, coqManager);
+                        } else if (typeof msg === 'string') {
+                          messageText = msg;
+                        } else if (msg.content) {
+                          messageText = ppToString(msg.content, coqManager);
+                        }
+                        
+                        // Determine level
+                        if (msg.level) {
+                          messageLevel = msg.level;
+                        } else if (msg.feedback_id) {
+                          const fid = msg.feedback_id;
+                          if (Array.isArray(fid) && fid.length > 0) {
+                            const fidStr = fid[0]?.toString() || '';
+                            if (fidStr.includes('error') || fidStr.includes('Error')) messageLevel = 'error';
+                            else if (fidStr.includes('warning') || fidStr.includes('Warning')) messageLevel = 'warning';
+                          }
+                        }
+                        
+                        if (messageText && messageText.trim()) {
+                          const trimmedText = messageText.trim();
+                          // Only add if we haven't processed this message before
+                          if (!processedMessagesRef.current.has(trimmedText)) {
+                            messagesData.push({ level: messageLevel, text: trimmedText });
+                            processedMessagesRef.current.add(trimmedText);
+                          }
+                        }
+                      }
+                    });
+                  }
+                  
+                  // Also read from query panel DOM (fallback)
+                  // Only read new content by tracking previous text length
                   const querySelectors = [
                     '#query-panel',
                     '.query-panel',
@@ -261,43 +314,38 @@ export function LevelPage() {
                     '.coq-query'
                   ];
                   
+                  let queryPanelEl: HTMLElement | null = null;
                   for (const selector of querySelectors) {
-                    const queryPanelEl = document.querySelector(selector) as HTMLElement;
-                    if (queryPanelEl) {
-                      const queryText = queryPanelEl.textContent?.trim() || queryPanelEl.innerText?.trim() || '';
-                      if (queryText && queryText.length > 0) {
-                        // Filter to only show meaningful results (Check/Compute outputs)
-                        const filteredText = filterQueryMessages(queryText);
-                        if (filteredText) {
-                          messagesData.push({
-                            text: filteredText,
-                            level: 'info'
-                          });
-                        }
-                        break; // Found it, stop looking
-                      }
+                    const el = document.querySelector(selector) as HTMLElement;
+                    if (el) {
+                      queryPanelEl = el;
+                      break;
                     }
                   }
                   
                   // Also check layout.query if available
-                  if (coqManager.layout && coqManager.layout.query) {
+                  if (!queryPanelEl && coqManager.layout && coqManager.layout.query) {
                     const queryPanel = coqManager.layout.query;
                     if (queryPanel.content) {
-                      const content = queryPanel.content as HTMLElement;
-                      const queryText = content.textContent?.trim() || content.innerText?.trim() || '';
-                      if (queryText && queryText.length > 0) {
-                        const filteredText = filterQueryMessages(queryText);
-                        if (filteredText) {
-                          // Check if we already have this text
-                          const alreadyExists = messagesData.some((m: any) => m.text === filteredText);
-                          if (!alreadyExists) {
-                            messagesData.push({
-                              text: filteredText,
-                              level: 'info'
-                            });
-                          }
-                        }
+                      queryPanelEl = queryPanel.content as HTMLElement;
+                    }
+                  }
+                  
+                  if (queryPanelEl) {
+                    const fullQueryText = queryPanelEl.textContent?.trim() || queryPanelEl.innerText?.trim() || '';
+                    if (fullQueryText.length > previousQueryTextLengthRef.current) {
+                      // Only process the new part
+                      const newText = fullQueryText.substring(previousQueryTextLengthRef.current);
+                      const filteredText = filterQueryMessages(newText);
+                      if (filteredText && !processedMessagesRef.current.has(filteredText)) {
+                        messagesData.push({
+                          text: filteredText,
+                          level: 'info'
+                        });
+                        processedMessagesRef.current.add(filteredText);
                       }
+                      // Update the tracked length
+                      previousQueryTextLengthRef.current = fullQueryText.length;
                     }
                   }
                 }
@@ -317,12 +365,37 @@ export function LevelPage() {
             // Use requestIdleCallback if available for better performance
             const parseAndUpdate = () => {
               try {
-                const state = parseJsCoqState(goalData, coqManager, messagesData);
-                // Use startTransition to mark this as low-priority update
-                // This allows React to interrupt if user interactions occur
-                startTransition(() => {
-                  setGoalState(state);
+                // Add new messages to our single source of truth
+                messagesData.forEach(newMsg => {
+                  if (!allMessagesRef.current.some(m => m.text === newMsg.text)) {
+                    allMessagesRef.current.push(newMsg);
+                  }
                 });
+                
+                // Only show messages that are NEW (beyond what we've already displayed)
+                // If no new messages, only update goals, don't re-display old messages
+                const currentMessagesCount = allMessagesRef.current.length;
+                const newMessagesCount = currentMessagesCount - displayedMessagesCountRef.current;
+                
+                let messagesToDisplay: Array<{ level: 'info' | 'warning' | 'error'; text: string }> = [];
+                
+                if (newMessagesCount > 0) {
+                  // Only show the new messages (slice from displayed count to end)
+                  messagesToDisplay = allMessagesRef.current.slice(displayedMessagesCountRef.current);
+                  displayedMessagesCountRef.current = currentMessagesCount;
+                } else if (goalData !== undefined) {
+                  // No new messages, but we have goal updates - clear messages (user has read them)
+                  messagesToDisplay = [];
+                }
+                // If no new messages and no goal data, do nothing (don't update state)
+                
+                // Only update state if we have goals or new messages
+                if (goalData !== undefined || messagesToDisplay.length > 0) {
+                  const state = parseJsCoqState(goalData, coqManager, messagesToDisplay);
+                  startTransition(() => {
+                    setGoalState(state);
+                  });
+                }
               } catch (error) {
                 // Silently fail
               } finally {
@@ -341,10 +414,56 @@ export function LevelPage() {
         };
       }
       
-      // Also set up a simple interval to check for messages in the query panel
+      // Also set up a simple interval to check for messages in doc.messages and query panel
       // This ensures we catch messages even if updateGoals isn't called
       messageCheckIntervalRef.current = window.setInterval(() => {
         try {
+          const messagesData: any[] = [];
+          const doc = coqManager.doc;
+          
+          // Read from doc.messages first
+          // Only process messages we haven't seen before
+          if (doc && doc.messages && Array.isArray(doc.messages)) {
+            doc.messages.forEach((msg: any) => {
+              if (msg) {
+                let messageText = '';
+                let messageLevel: 'info' | 'warning' | 'error' = 'info';
+                
+                if (msg.msg) {
+                  messageText = ppToString(msg.msg, coqManager);
+                } else if (msg.text) {
+                  messageText = typeof msg.text === 'string' ? msg.text : ppToString(msg.text, coqManager);
+                } else if (typeof msg === 'string') {
+                  messageText = msg;
+                } else if (msg.content) {
+                  messageText = ppToString(msg.content, coqManager);
+                }
+                
+                if (msg.level) {
+                  messageLevel = msg.level;
+                } else if (msg.feedback_id) {
+                  const fid = msg.feedback_id;
+                  if (Array.isArray(fid) && fid.length > 0) {
+                    const fidStr = fid[0]?.toString() || '';
+                    if (fidStr.includes('error') || fidStr.includes('Error')) messageLevel = 'error';
+                    else if (fidStr.includes('warning') || fidStr.includes('Warning')) messageLevel = 'warning';
+                  }
+                }
+                
+                if (messageText && messageText.trim()) {
+                  const trimmedText = messageText.trim();
+                  // Only add if we haven't processed this message before
+                  if (!processedMessagesRef.current.has(trimmedText)) {
+                    messagesData.push({ level: messageLevel, text: trimmedText });
+                    processedMessagesRef.current.add(trimmedText);
+                  }
+                }
+              }
+            });
+          }
+          
+          // Also check query panel DOM as fallback
+          // Only read new content by tracking previous text length
           const querySelectors = [
             '#query-panel',
             '.query-panel',
@@ -353,53 +472,72 @@ export function LevelPage() {
             '.coq-query'
           ];
           
-          let foundText = '';
+          let queryPanelEl: HTMLElement | null = null;
           for (const selector of querySelectors) {
-            const queryPanelEl = document.querySelector(selector) as HTMLElement;
-            if (queryPanelEl) {
-              const queryText = queryPanelEl.textContent?.trim() || queryPanelEl.innerText?.trim() || '';
-              if (queryText && queryText.length > 0) {
-                foundText = queryText;
-                break;
-              }
+            const el = document.querySelector(selector) as HTMLElement;
+            if (el) {
+              queryPanelEl = el;
+              break;
             }
           }
           
-          // Also check layout.query
-          if (!foundText && coqManager.layout && coqManager.layout.query) {
+          if (!queryPanelEl && coqManager.layout && coqManager.layout.query) {
             const queryPanel = coqManager.layout.query;
             if (queryPanel.content) {
-              const content = queryPanel.content as HTMLElement;
-              foundText = content.textContent?.trim() || content.innerText?.trim() || '';
+              queryPanelEl = queryPanel.content as HTMLElement;
             }
           }
           
-          if (foundText) {
-            // Filter to only show meaningful results
-            const filteredText = filterQueryMessages(foundText);
-            if (filteredText) {
-              // Check if we need to update
-              const currentState = goalStateRef.current;
-              const hasMessage = currentState?.messages?.some((m: any) => m.text === filteredText);
-              
-              if (!hasMessage) {
-                // Create a simple state with just the message
-                const state = parseJsCoqState(undefined, coqManager, [{
+          if (queryPanelEl) {
+            const fullQueryText = queryPanelEl.textContent?.trim() || queryPanelEl.innerText?.trim() || '';
+            if (fullQueryText.length > previousQueryTextLengthRef.current) {
+              // Only process the new part
+              const newText = fullQueryText.substring(previousQueryTextLengthRef.current);
+              const filteredText = filterQueryMessages(newText);
+              if (filteredText && !processedMessagesRef.current.has(filteredText)) {
+                messagesData.push({
                   text: filteredText,
                   level: 'info'
-                }]);
-                startTransition(() => {
-                  setGoalState(state);
                 });
+                processedMessagesRef.current.add(filteredText);
               }
+              // Update the tracked length
+              previousQueryTextLengthRef.current = fullQueryText.length;
             }
-          } else {
-            // Debug: log what we're finding
-            // console.log('Query panel check:', {
-            //   selectors: querySelectors,
-            //   layoutQuery: coqManager.layout?.query,
-            //   foundElements: querySelectors.map(s => document.querySelector(s))
-            // });
+          }
+          
+          // Update if we have new messages
+          if (messagesData.length > 0) {
+            // Add new messages to our single source of truth
+            messagesData.forEach(newMsg => {
+              if (!allMessagesRef.current.some(m => m.text === newMsg.text)) {
+                allMessagesRef.current.push(newMsg);
+              }
+            });
+            
+            // Only show messages that are NEW (beyond what we've already displayed)
+            const currentMessagesCount = allMessagesRef.current.length;
+            const newMessagesCount = currentMessagesCount - displayedMessagesCountRef.current;
+            
+            if (newMessagesCount > 0) {
+              // Only show the new messages (slice from displayed count to end)
+              const messagesToDisplay = allMessagesRef.current.slice(displayedMessagesCountRef.current);
+              displayedMessagesCountRef.current = currentMessagesCount;
+              
+              // Merge with existing goals if any
+              const currentState = goalStateRef.current;
+              const currentGoals = currentState?.goals || [];
+              
+              const state = parseJsCoqState(
+                currentGoals.length > 0 ? { goals: currentGoals } : undefined, 
+                coqManager, 
+                messagesToDisplay
+              );
+              startTransition(() => {
+                setGoalState(state);
+              });
+            }
+            // If no new messages, don't update (don't re-display old messages)
           }
         } catch (error) {
           // Silently fail

@@ -5,10 +5,10 @@
  * - World metadata in comments: (*@WORLD: { ... }*)
  * - Level markers: (*@LEVEL: levelId*)
  * - Level metadata: (*@LEVEL_META: { ... }*)
- * - Theory sections: (*@THEORY: ... *)
- * - Examples: (*@EXAMPLE: title ... *)
- * - Starting code: (*@START: ... *)
- * - Solution: (*@SOLUTION: ... *)
+ * - Theory sections: (*@THEORY: ... @ENDTHEORY*)
+ * - Examples: (*@EXAMPLE: title ... @ENDEXAMPLE*)
+ * - Starting code: (*@START: ... @ENDSTART*)
+ * - Solution: (*@SOLUTION: ... @ENDSOLUTION*)
  * - Hints: (*@HINT: ... *)
  */
 
@@ -70,7 +70,6 @@ export function parseRocqWorld(content: string): ParsedRocqWorld | null {
     // Split content by level markers
     const levelRegex = /\(\*@LEVEL:\s*([^\s*]+)\s*\*\)/g;
     const levels: ParsedRocqLevel[] = [];
-    let lastIndex = 0;
     let match;
 
     while ((match = levelRegex.exec(content)) !== null) {
@@ -115,13 +114,12 @@ function parseLevel(levelId: string, content: string): ParsedRocqLevel | null {
 
     // Extract theory
     let theory: ParsedRocqLevel['theory'] | undefined;
-    const theoryMatch = content.match(/\(\*@THEORY:\s*([\s\S]*?)\s*\*\)/);
+    const theoryMatch = content.match(/\(\*@THEORY:\s*([\s\S]*?)\s*(?:@ENDTHEORY\*\))/);
     if (theoryMatch) {
       const theoryContent = theoryMatch[1].trim();
       const examples: Array<{ title: string; code: string }> = [];
       
-      // Extract examples
-      const exampleRegex = /\(\*@EXAMPLE:\s*([^\n*]+)\s*([\s\S]*?)\s*\*\)/g;
+      const exampleRegex = /\(\*@EXAMPLE:\s*([^\n*]+)\s*([\s\S]*?)\s*(?:@ENDEXAMPLE\*\))/g;
       let exampleMatch;
       while ((exampleMatch = exampleRegex.exec(theoryContent)) !== null) {
         examples.push({
@@ -130,8 +128,8 @@ function parseLevel(levelId: string, content: string): ParsedRocqLevel | null {
         });
       }
       
-      // Remove examples from theory markdown
-      const theoryMarkdown = theoryContent.replace(/\(\*@EXAMPLE:[\s\S]*?\*\)/g, '').trim();
+      // Remove examples from theory markdown (handle all formats)
+      const theoryMarkdown = theoryContent.replace(/\(\*@EXAMPLE:[\s\S]*?(?:@ENDEXAMPLE\*\))/g, '').trim();
       
       theory = {
         markdown: theoryMarkdown,
@@ -139,21 +137,18 @@ function parseLevel(levelId: string, content: string): ParsedRocqLevel | null {
       };
     }
 
-    // Extract starting code
-    const startMatch = content.match(/\(\*@START:\s*([\s\S]*?)\s*\*\)/);
+    const startMatch = content.match(/\(\*@START:\s*([\s\S]*?)\s*(?:@ENDSTART\*\))/);
     if (!startMatch) {
       throw new Error(`Starting code not found for level ${levelId}`);
     }
     const startingCode = startMatch[1].trim();
 
-    // Extract solution
-    const solutionMatch = content.match(/\(\*@SOLUTION:\s*([\s\S]*?)\s*\*\)/);
+    const solutionMatch = content.match(/\(\*@SOLUTION:\s*([\s\S]*?)\s*(?:@ENDSOLUTION\*\))/);
     if (!solutionMatch) {
       throw new Error(`Solution not found for level ${levelId}`);
     }
     const solution = solutionMatch[1].trim();
 
-    // Extract code context (everything between START and SOLUTION, or after SOLUTION)
     const codeStart = startMatch.index! + startMatch[0].length;
     const codeEnd = solutionMatch.index!;
     const code = content.substring(codeStart, codeEnd).trim();
@@ -200,22 +195,5 @@ export function rocqToJsonWorld(parsed: ParsedRocqWorld): any {
       rewards: level.metadata.rewards,
     })),
   };
-}
-
-/**
- * Load and parse a Rocq world file
- */
-export async function loadRocqWorld(filename: string): Promise<ParsedRocqWorld | null> {
-  try {
-    const response = await fetch(`/worlds/${filename}`);
-    if (!response.ok) {
-      throw new Error(`Failed to load Rocq world: ${response.statusText}`);
-    }
-    const content = await response.text();
-    return parseRocqWorld(content);
-  } catch (error) {
-    console.error(`Error loading Rocq world ${filename}:`, error);
-    return null;
-  }
 }
 

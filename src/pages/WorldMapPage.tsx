@@ -1,12 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { WorldCard } from '../components/worlds/WorldCard';
 import { useGame } from '../context/GameContext';
 import { loadWorldsManifest, loadWorld } from '../services/worldLoader';
 import { Spinner } from '../components/common/Spinner';
 
 export function WorldMapPage() {
-  const navigate = useNavigate();
   const { gameData, isWorldUnlocked, loadWorldData } = useGame();
   const [worlds, setWorlds] = useState<any[]>([]);
   const [loadedWorlds, setLoadedWorlds] = useState<Map<string, any>>(new Map());
@@ -22,8 +20,8 @@ export function WorldMapPage() {
         
         // Load world data for enabled worlds
         for (const worldInfo of enabledWorlds) {
-          // Extract worldId from filename (e.g., "world0-tutorial.json" or "world0-tutorial.v" -> "world0")
-          const worldId = worldInfo.file.replace(/\.(json|v)$/, '').split('-')[0];
+          // Extract worldId from filename (e.g., "world0-tutorial.json" -> "world0")
+          const worldId = worldInfo.file.replace(/\.json$/, '').split('-')[0];
           const world = await loadWorld(worldId);
           if (world) {
             setLoadedWorlds(prev => new Map(prev).set(world.id, world));
@@ -63,7 +61,7 @@ export function WorldMapPage() {
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {worlds.map((worldInfo) => {
-          const worldId = worldInfo.file.replace(/\.(json|v)$/, '').split('-')[0];
+          const worldId = worldInfo.file.replace(/\.json$/, '').split('-')[0];
           const world = loadedWorlds.get(worldId);
           if (!world) return null;
           

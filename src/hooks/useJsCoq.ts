@@ -72,8 +72,10 @@ export function useJsCoq(containerId: string, theme: 'light' | 'dark' = 'light')
       // Map theme: 'light' -> 'light', 'dark' -> 'dark' (jsCoq uses these directly)
       const coqManager = await JsCoq.start([containerId], {
         wrapper_id: wrapperId,
-        init_pkgs: ['init'],
-        all_pkgs: ['init'],
+        init_pkgs: ['init', 'coq'],
+        all_pkgs: ['init', 'coq', 'coq-collections'],
+        init_import: ['Coq.Lists.List'],
+
         theme: themeRef.current,
         base_path: basePath,
         pkg_path: basePath + 'coq-pkgs/',
@@ -81,7 +83,7 @@ export function useJsCoq(containerId: string, theme: 'light' | 'dark' = 'light')
         show: true,
         focus: true,
         prelude: true,
-        implicit_libs: false,
+        implicit_libs: true,
       });
 
       coqManagerRef.current = coqManager;

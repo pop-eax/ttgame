@@ -216,25 +216,18 @@ export function LevelPage() {
   };
 
   const handleNextLevel = () => {
-    console.log('🚀 handleNextLevel called', { world, level, worldId });
     
     if (!world || !level) {
       console.warn('⚠️ Cannot navigate: missing world or level', { world: !!world, level: !!level });
       return;
     }
     
-    // Find current level index
     const currentIndex = world.levels.findIndex((l: Level) => l.id === level.id);
-    console.log('📍 Current level index:', currentIndex, 'Total levels:', world.levels.length);
     
-    // Find next level
     if (currentIndex >= 0 && currentIndex < world.levels.length - 1) {
       const nextLevel = world.levels[currentIndex + 1];
-      console.log('➡️ Navigating to next level:', nextLevel.id);
       navigate(`/worlds/${worldId}/levels/${nextLevel.id}`);
     } else {
-      // No next level, go back to world
-      console.log('🏠 No next level, going back to world');
       navigate(`/worlds/${worldId}`);
     }
   };

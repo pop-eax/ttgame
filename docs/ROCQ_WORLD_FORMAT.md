@@ -170,14 +170,6 @@ The application supports both formats:
 
 The loader automatically detects the format based on file extension and parses accordingly.
 
-## Advantages Over JSON
-
-1. **No Duplication**: Code examples in theory are the actual code
-2. **Validation**: Can check syntax with Rocq compiler
-3. **IDE Support**: Full syntax highlighting and autocomplete
-4. **Version Control**: Better diffs for code changes
-5. **Documentation**: Theory and code live together
-
 ## Converting Lecture Files
 
 To convert existing lecture files:

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, startTransition } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Level, World } from '../types/world';
 import { ProofEditor } from '../components/level/ProofEditor';
@@ -10,67 +10,11 @@ import { SuccessModal } from '../components/level/SuccessModal';
 import { Button } from '../components/common/Button';
 import { useGame } from '../context/GameContext';
 import { useProofExecution } from '../hooks/useProofExecution';
-import { useJsCoq, parseJsCoqState, ppToString } from '../hooks/useJsCoq';
+import { useJsCoq } from '../hooks/useJsCoq';
+import { useJsCoqState } from '../hooks/useJsCoqState';
 import toast from 'react-hot-toast';
 
 const COQ_EDITOR_ID = 'coq-editor';
-
-// Filter query panel messages to only show meaningful results (Check/Compute outputs)
-function filterQueryMessages(text: string): string | null {
-  if (!text || text.trim().length === 0) return null;
-  
-  // Split by lines and filter out noise
-  const lines = text.split('\n').filter(line => {
-    const trimmed = line.trim();
-    if (!trimmed) return false;
-    
-    // Filter out library loading messages
-    if (trimmed.includes('["Put",') || 
-        trimmed.includes('["Init",') ||
-        trimmed.includes('["NewDoc",') ||
-        trimmed.includes('["Add",') ||
-        trimmed.includes('["Query",') ||
-        trimmed.includes('["Cancel",') ||
-        trimmed.includes(' loaded.') ||
-        trimmed.includes('["Exec",') && trimmed.length < 20) { // Short Exec lines are just command markers
-      return false;
-    }
-    
-    // Keep lines that look like results (contain ":" or "=" which are common in Check/Compute outputs)
-    // Or lines that are actual command results
-    if (trimmed.includes(':') || trimmed.includes('=') || trimmed.match(/^\s*[a-zA-Z_][a-zA-Z0-9_]*\s*:/)) {
-      return true;
-    }
-    
-    // Filter out JSON-like structures that are just metadata
-    if (trimmed.startsWith('[') && trimmed.includes('"')) {
-      return false;
-    }
-    
-    return false;
-  });
-  
-  // Also try to extract just the result parts (after "Exec" commands)
-  const execMatches = text.match(/\["Exec",\d+\]([^\[]+)/g);
-  if (execMatches && execMatches.length > 0) {
-    const results = execMatches.map(match => {
-      // Extract the part after ["Exec",N]
-      const result = match.replace(/\["Exec",\d+\]/, '').trim();
-      return result;
-    }).filter(r => r.length > 0 && !r.includes('["Put",') && !r.includes('["Init",'));
-    
-    if (results.length > 0) {
-      return results.join('\n');
-    }
-  }
-  
-  // If we have filtered lines, return them
-  if (lines.length > 0) {
-    return lines.join('\n');
-  }
-  
-  return null;
-}
 
 export function LevelPage() {
   const { worldId, levelId } = useParams<{ worldId: string; levelId: string }>();
@@ -78,27 +22,18 @@ export function LevelPage() {
   const { completeLevel, saveProof, loadWorldData, gameData } = useGame();
   const { execute: executeProof, proofState, isExecuting, clearState } = useProofExecution();
   const { executeProof: jsCoqExecuteProof, isLoaded: jsCoqLoaded, setEditorValue, getEditorValue, setInitialCode, coqManager } = useJsCoq(COQ_EDITOR_ID);
+  const { goalState, reset: resetJsCoqState } = useJsCoqState(coqManager, jsCoqLoaded);
   
   const [level, setLevel] = useState<Level | null>(null);
-  const [world, setWorld] = useState<World | null>(null); // Store world to find next level
+  const [world, setWorld] = useState<World | null>(null);
   const [hintsUsed, setHintsUsed] = useState(0);
   const [attempts, setAttempts] = useState(0);
   const [startTime] = useState(Date.now());
   const [showSuccess, setShowSuccess] = useState(false);
   const [showTheory, setShowTheory] = useState(true);
-  const [goalState, setGoalState] = useState<any>(null); // Track goals from jsCoq
-  const [isLevelComplete, setIsLevelComplete] = useState(false); // Track if level is complete
-  const initializedLevelRef = useRef<string | null>(null); // Track which level we've initialized
-  const goalUpdateTimeoutRef = useRef<number | null>(null); // Debounce goal updates
-  const isProcessingGoalsRef = useRef(false); // Prevent concurrent goal processing
-  const originalUpdateGoalsRef = useRef<((goals: any) => void) | null>(null); // Store original function
-  const originalCoqGoalInfoRef = useRef<((sid: number, rawGoals: any) => any) | null>(null); // Store original function
-  const messageCheckIntervalRef = useRef<number | null>(null); // Store message check interval
-  const goalStateRef = useRef<any>(null); // Store current goal state for interval access
-  const previousQueryTextLengthRef = useRef<number>(0); // Track previous query panel text length to only read new messages
-  const processedMessagesRef = useRef<Set<string>>(new Set()); // Track processed messages to avoid duplicates
-  const allMessagesRef = useRef<Array<{ level: 'info' | 'warning' | 'error'; text: string }>>([]); // Single source of truth for all messages
-  const displayedMessagesCountRef = useRef<number>(0); // Track how many messages we've already displayed
+  const [isLevelComplete, setIsLevelComplete] = useState(false);
+  const initializedLevelRef = useRef<string | null>(null);
+  const goalStateRef = useRef<any>(null);
 
   useEffect(() => {
     async function fetchLevel() {
@@ -119,11 +54,13 @@ export function LevelPage() {
         const loadedLevel = loadedWorld.levels.find(l => l.id === levelId);
         if (loadedLevel) {
           setLevel(loadedLevel);
-          setIsLevelComplete(false); // Reset completion state when level changes
+          
+          // Check if level is already completed
+          const isCompleted = gameData?.progress.completedLevels.includes(levelId) || false;
+          setIsLevelComplete(isCompleted);
+          
           // Set initial code in jsCoq editor when it's loaded
-          if (jsCoqLoaded && setEditorValue) {
-            setEditorValue(loadedLevel.startingCode);
-          }
+          // Will be handled by the useEffect that checks for saved proofs
         } else {
           toast.error('Level not found');
           navigate(`/worlds/${worldId}`);
@@ -151,433 +88,24 @@ export function LevelPage() {
     // Mark this level as initialized
     initializedLevelRef.current = level.id;
     
-    // Reset query text length tracker and processed messages for new level
-    previousQueryTextLengthRef.current = 0;
-    processedMessagesRef.current = new Set();
-    allMessagesRef.current = [];
-    displayedMessagesCountRef.current = 0;
+    // Reset jsCoq state for new level
+    resetJsCoqState();
     
-    // Use setInitialCode which will set it immediately if editor is ready,
-    // or queue it for when the editor becomes ready
-    setInitialCode(level.startingCode);
-    
-    // Also try setting it directly as a fallback
-    let retryCount = 0;
-    const maxRetries = 20;
-    
-    const initEditor = () => {
-      const editor = coqManager?.provider?.editor;
-      if (editor && typeof editor.setValue === 'function') {
-        const currentValue = editor.getValue ? editor.getValue() : '';
-        // Check if value is already set (don't reset if user has edited)
-        if (currentValue && currentValue.trim() && currentValue !== level.startingCode) {
-          // User has edited the code, don't reset it
-          return;
-        }
-        
-        if (currentValue === level.startingCode || currentValue.includes(level.startingCode.split('\n')[0])) {
-          return;
-        }
-        
-        // Try to set it
-        const success = setEditorValue(level.startingCode);
-        if (success) {
-          const newValue = editor.getValue ? editor.getValue() : '';
-          if (newValue === level.startingCode || newValue.includes(level.startingCode.split('\n')[0])) {
-            return;
-          }
-        }
+    // Check if there's a saved proof for this completed level
+    let codeToLoad = level.startingCode;
+    if (gameData) {
+      const savedProof = gameData.proofs[level.id];
+      const isCompleted = gameData.progress.completedLevels.includes(level.id);
+      
+      // If level is completed and we have saved code, use that instead
+      if (isCompleted && savedProof && savedProof.code) {
+        codeToLoad = savedProof.code;
       }
-      
-      if (retryCount < maxRetries) {
-        retryCount++;
-        setTimeout(initEditor, 300);
-      }
-    };
-    
-    // Start trying after a delay
-    setTimeout(initEditor, 500);
-  }, [level?.id, jsCoqLoaded, setInitialCode, setEditorValue, coqManager]);
-
-  // Hook into jsCoq's goal updates (when user steps through proof with Alt+Down)
-  useEffect(() => {
-    if (!coqManager || !jsCoqLoaded) return;
-
-    try {
-      // Only hook once - check if already hooked
-      if (originalCoqGoalInfoRef.current || originalUpdateGoalsRef.current) {
-        return; // Already hooked
-      }
-      
-      // Hook into coqGoalInfo to capture raw goals before DOM conversion
-      if ((coqManager as any).coqGoalInfo) {
-        originalCoqGoalInfoRef.current = (coqManager as any).coqGoalInfo.bind(coqManager);
-        (coqManager as any).coqGoalInfo = function(sid: number, rawGoals: any) {
-          // Store raw goals before converting to DOM
-          if (coqManager.doc) {
-            if (!coqManager.doc.goals_raw) {
-              coqManager.doc.goals_raw = {};
-            }
-            coqManager.doc.goals_raw[sid] = rawGoals;
-          }
-          // Call original function to convert to DOM and update UI
-          if (originalCoqGoalInfoRef.current) {
-            return originalCoqGoalInfoRef.current(sid, rawGoals);
-          }
-        };
-      }
-      
-      
-      // Hook into updateGoals to display goals when jsCoq updates them
-      const originalUpdateGoals = (coqManager as any).updateGoals;
-      if (originalUpdateGoals && typeof originalUpdateGoals === 'function') {
-        originalUpdateGoalsRef.current = originalUpdateGoals.bind(coqManager);
-        (coqManager as any).updateGoals = function(goals: any) {
-          // Call original function first - don't block it
-          if (originalUpdateGoalsRef.current) {
-            originalUpdateGoalsRef.current(goals);
-          }
-          
-          // Clear any pending updates
-          if (goalUpdateTimeoutRef.current !== null) {
-            clearTimeout(goalUpdateTimeoutRef.current);
-            goalUpdateTimeoutRef.current = null;
-          }
-          
-          // Debounce goal state updates to avoid stalling
-          // Make parsing fully async and non-blocking
-          goalUpdateTimeoutRef.current = window.setTimeout(() => {
-            // Prevent concurrent processing
-            if (isProcessingGoalsRef.current) return;
-            
-            // Capture data synchronously (fast)
-            let goalData: any = undefined;
-            let messagesData: any[] = [];
-            try {
-              const doc = coqManager.doc;
-              if (doc) {
-                const lastAdded = coqManager.lastAdded?.();
-                if (lastAdded && lastAdded.coq_sid) {
-                  const sid = lastAdded.coq_sid;
-                  goalData = doc.goals_raw?.[sid] || doc.goals?.[sid];
-                  
-                  // Read from doc.messages (Check/Compute outputs)
-                  // Only process messages we haven't seen before
-                  if (doc.messages && Array.isArray(doc.messages)) {
-                    doc.messages.forEach((msg: any) => {
-                      if (msg) {
-                        let messageText = '';
-                        let messageLevel: 'info' | 'warning' | 'error' = 'info';
-                        
-                        // Extract text from message
-                        if (msg.msg) {
-                          messageText = ppToString(msg.msg, coqManager);
-                        } else if (msg.text) {
-                          messageText = typeof msg.text === 'string' ? msg.text : ppToString(msg.text, coqManager);
-                        } else if (typeof msg === 'string') {
-                          messageText = msg;
-                        } else if (msg.content) {
-                          messageText = ppToString(msg.content, coqManager);
-                        }
-                        
-                        // Determine level
-                        if (msg.level) {
-                          messageLevel = msg.level;
-                        } else if (msg.feedback_id) {
-                          const fid = msg.feedback_id;
-                          if (Array.isArray(fid) && fid.length > 0) {
-                            const fidStr = fid[0]?.toString() || '';
-                            if (fidStr.includes('error') || fidStr.includes('Error')) messageLevel = 'error';
-                            else if (fidStr.includes('warning') || fidStr.includes('Warning')) messageLevel = 'warning';
-                          }
-                        }
-                        
-                        if (messageText && messageText.trim()) {
-                          const trimmedText = messageText.trim();
-                          // Only add if we haven't processed this message before
-                          if (!processedMessagesRef.current.has(trimmedText)) {
-                            messagesData.push({ level: messageLevel, text: trimmedText });
-                            processedMessagesRef.current.add(trimmedText);
-                          }
-                        }
-                      }
-                    });
-                  }
-                  
-                  // Also read from query panel DOM (fallback)
-                  // Only read new content by tracking previous text length
-                  const querySelectors = [
-                    '#query-panel',
-                    '.query-panel',
-                    '[id*="query"]',
-                    '.jscoq-query',
-                    '.coq-query'
-                  ];
-                  
-                  let queryPanelEl: HTMLElement | null = null;
-                  for (const selector of querySelectors) {
-                    const el = document.querySelector(selector) as HTMLElement;
-                    if (el) {
-                      queryPanelEl = el;
-                      break;
-                    }
-                  }
-                  
-                  // Also check layout.query if available
-                  if (!queryPanelEl && coqManager.layout && coqManager.layout.query) {
-                    const queryPanel = coqManager.layout.query;
-                    if (queryPanel.content) {
-                      queryPanelEl = queryPanel.content as HTMLElement;
-                    }
-                  }
-                  
-                  if (queryPanelEl) {
-                    const fullQueryText = queryPanelEl.textContent?.trim() || queryPanelEl.innerText?.trim() || '';
-                    if (fullQueryText.length > previousQueryTextLengthRef.current) {
-                      // Only process the new part
-                      const newText = fullQueryText.substring(previousQueryTextLengthRef.current);
-                      const filteredText = filterQueryMessages(newText);
-                      if (filteredText && !processedMessagesRef.current.has(filteredText)) {
-                        messagesData.push({
-                          text: filteredText,
-                          level: 'info'
-                        });
-                        processedMessagesRef.current.add(filteredText);
-                      }
-                      // Update the tracked length
-                      previousQueryTextLengthRef.current = fullQueryText.length;
-                    }
-                  }
-                }
-              }
-            } catch (error) {
-              // Silently fail
-              return;
-            }
-            
-            // Always process if we have messages, even without goals
-            if (goalData === undefined && messagesData.length === 0) return;
-            
-            // Mark as processing
-            isProcessingGoalsRef.current = true;
-            
-            // Parse in next tick to avoid blocking UI
-            // Use requestIdleCallback if available for better performance
-            const parseAndUpdate = () => {
-              try {
-                // Add new messages to our single source of truth
-                messagesData.forEach(newMsg => {
-                  if (!allMessagesRef.current.some(m => m.text === newMsg.text)) {
-                    allMessagesRef.current.push(newMsg);
-                  }
-                });
-                
-                // Only show messages that are NEW (beyond what we've already displayed)
-                // If no new messages, only update goals, don't re-display old messages
-                const currentMessagesCount = allMessagesRef.current.length;
-                const newMessagesCount = currentMessagesCount - displayedMessagesCountRef.current;
-                
-                let messagesToDisplay: Array<{ level: 'info' | 'warning' | 'error'; text: string }> = [];
-                
-                if (newMessagesCount > 0) {
-                  // Only show the new messages (slice from displayed count to end)
-                  messagesToDisplay = allMessagesRef.current.slice(displayedMessagesCountRef.current);
-                  displayedMessagesCountRef.current = currentMessagesCount;
-                } else if (goalData !== undefined) {
-                  // No new messages, but we have goal updates - clear messages (user has read them)
-                  messagesToDisplay = [];
-                }
-                // If no new messages and no goal data, do nothing (don't update state)
-                
-                // Only update state if we have goals or new messages
-                if (goalData !== undefined || messagesToDisplay.length > 0) {
-                  const state = parseJsCoqState(goalData, coqManager, messagesToDisplay);
-                  startTransition(() => {
-                    setGoalState(state);
-                  });
-                }
-              } catch (error) {
-                // Silently fail
-              } finally {
-                isProcessingGoalsRef.current = false;
-              }
-            };
-            
-            // Schedule parsing when browser is idle
-            if (typeof (window as any).requestIdleCallback === 'function') {
-              (window as any).requestIdleCallback(parseAndUpdate, { timeout: 50 });
-            } else {
-              // Fallback: use setTimeout with 0 delay to yield to browser
-              setTimeout(parseAndUpdate, 0);
-            }
-          }, 100); // Debounce to batch rapid updates
-        };
-      }
-      
-      // Also set up a simple interval to check for messages in doc.messages and query panel
-      // This ensures we catch messages even if updateGoals isn't called
-      messageCheckIntervalRef.current = window.setInterval(() => {
-        try {
-          const messagesData: any[] = [];
-          const doc = coqManager.doc;
-          
-          // Read from doc.messages first
-          // Only process messages we haven't seen before
-          if (doc && doc.messages && Array.isArray(doc.messages)) {
-            doc.messages.forEach((msg: any) => {
-              if (msg) {
-                let messageText = '';
-                let messageLevel: 'info' | 'warning' | 'error' = 'info';
-                
-                if (msg.msg) {
-                  messageText = ppToString(msg.msg, coqManager);
-                } else if (msg.text) {
-                  messageText = typeof msg.text === 'string' ? msg.text : ppToString(msg.text, coqManager);
-                } else if (typeof msg === 'string') {
-                  messageText = msg;
-                } else if (msg.content) {
-                  messageText = ppToString(msg.content, coqManager);
-                }
-                
-                if (msg.level) {
-                  messageLevel = msg.level;
-                } else if (msg.feedback_id) {
-                  const fid = msg.feedback_id;
-                  if (Array.isArray(fid) && fid.length > 0) {
-                    const fidStr = fid[0]?.toString() || '';
-                    if (fidStr.includes('error') || fidStr.includes('Error')) messageLevel = 'error';
-                    else if (fidStr.includes('warning') || fidStr.includes('Warning')) messageLevel = 'warning';
-                  }
-                }
-                
-                if (messageText && messageText.trim()) {
-                  const trimmedText = messageText.trim();
-                  // Only add if we haven't processed this message before
-                  if (!processedMessagesRef.current.has(trimmedText)) {
-                    messagesData.push({ level: messageLevel, text: trimmedText });
-                    processedMessagesRef.current.add(trimmedText);
-                  }
-                }
-              }
-            });
-          }
-          
-          // Also check query panel DOM as fallback
-          // Only read new content by tracking previous text length
-          const querySelectors = [
-            '#query-panel',
-            '.query-panel',
-            '[id*="query"]',
-            '.jscoq-query',
-            '.coq-query'
-          ];
-          
-          let queryPanelEl: HTMLElement | null = null;
-          for (const selector of querySelectors) {
-            const el = document.querySelector(selector) as HTMLElement;
-            if (el) {
-              queryPanelEl = el;
-              break;
-            }
-          }
-          
-          if (!queryPanelEl && coqManager.layout && coqManager.layout.query) {
-            const queryPanel = coqManager.layout.query;
-            if (queryPanel.content) {
-              queryPanelEl = queryPanel.content as HTMLElement;
-            }
-          }
-          
-          if (queryPanelEl) {
-            const fullQueryText = queryPanelEl.textContent?.trim() || queryPanelEl.innerText?.trim() || '';
-            if (fullQueryText.length > previousQueryTextLengthRef.current) {
-              // Only process the new part
-              const newText = fullQueryText.substring(previousQueryTextLengthRef.current);
-              const filteredText = filterQueryMessages(newText);
-              if (filteredText && !processedMessagesRef.current.has(filteredText)) {
-                messagesData.push({
-                  text: filteredText,
-                  level: 'info'
-                });
-                processedMessagesRef.current.add(filteredText);
-              }
-              // Update the tracked length
-              previousQueryTextLengthRef.current = fullQueryText.length;
-            }
-          }
-          
-          // Update if we have new messages
-          if (messagesData.length > 0) {
-            // Add new messages to our single source of truth
-            messagesData.forEach(newMsg => {
-              if (!allMessagesRef.current.some(m => m.text === newMsg.text)) {
-                allMessagesRef.current.push(newMsg);
-              }
-            });
-            
-            // Only show messages that are NEW (beyond what we've already displayed)
-            const currentMessagesCount = allMessagesRef.current.length;
-            const newMessagesCount = currentMessagesCount - displayedMessagesCountRef.current;
-            
-            if (newMessagesCount > 0) {
-              // Only show the new messages (slice from displayed count to end)
-              const messagesToDisplay = allMessagesRef.current.slice(displayedMessagesCountRef.current);
-              displayedMessagesCountRef.current = currentMessagesCount;
-              
-              // Merge with existing goals if any
-              const currentState = goalStateRef.current;
-              const currentGoals = currentState?.goals || [];
-              
-              const state = parseJsCoqState(
-                currentGoals.length > 0 ? { goals: currentGoals } : undefined, 
-                coqManager, 
-                messagesToDisplay
-              );
-              startTransition(() => {
-                setGoalState(state);
-              });
-            }
-            // If no new messages, don't update (don't re-display old messages)
-          }
-        } catch (error) {
-          // Silently fail
-        }
-      }, 500); // Check every 500ms
-      
-      return () => {
-        if (messageCheckIntervalRef.current !== null) {
-          clearInterval(messageCheckIntervalRef.current);
-          messageCheckIntervalRef.current = null;
-        }
-        // Clear any pending timeouts
-        if (goalUpdateTimeoutRef.current !== null) {
-          clearTimeout(goalUpdateTimeoutRef.current);
-          goalUpdateTimeoutRef.current = null;
-        }
-        // Restore original on cleanup
-        if (originalUpdateGoalsRef.current && (coqManager as any).updateGoals) {
-          (coqManager as any).updateGoals = originalUpdateGoalsRef.current;
-          originalUpdateGoalsRef.current = null;
-        }
-        if (originalCoqGoalInfoRef.current && (coqManager as any).coqGoalInfo) {
-          (coqManager as any).coqGoalInfo = originalCoqGoalInfoRef.current;
-          originalCoqGoalInfoRef.current = null;
-        }
-      };
-    } catch (error) {
-      // Silently fail
     }
-  }, [coqManager, jsCoqLoaded]);
-  
-  // Update ref when goalState changes
-  useEffect(() => {
-    goalStateRef.current = goalState;
-  }, [goalState]);
-
-  // Debug: log when isLevelComplete changes
-  useEffect(() => {
-    console.log('🔄 isLevelComplete changed:', isLevelComplete);
-  }, [isLevelComplete]);
+    
+    // Set initial code - will be set when editor is available
+    setInitialCode(codeToLoad);
+  }, [level?.id, jsCoqLoaded, setInitialCode, setEditorValue, coqManager, resetJsCoqState, gameData]);
 
   const handleRunProof = async () => {
     if (!level) return;
@@ -619,6 +147,19 @@ export function LevelPage() {
         const timeSpent = Math.floor((Date.now() - startTime) / 1000);
         const code = getEditorValue ? getEditorValue() : '';
         
+        console.log('💾 Saving proof:', {
+          levelId: level.id,
+          codeLength: code.length,
+          codePreview: code.substring(0, 100),
+          timeSpent,
+          hintsUsed,
+          attempts
+        });
+        
+        if (!code) {
+          console.warn('⚠️ Warning: No code retrieved from editor!');
+        }
+        
         saveProof(level.id, {
           code,
           completedAt: new Date().toISOString(),
@@ -627,6 +168,23 @@ export function LevelPage() {
           attempts,
           correct: true,
         });
+        
+        console.log('✅ Proof saved, checking localStorage...');
+        // Verify it was saved
+        setTimeout(() => {
+          const savedData = localStorage.getItem('rocq_game_data');
+          if (savedData) {
+            const parsed = JSON.parse(savedData);
+            const savedProof = parsed.proofs?.[level.id];
+            console.log('📦 Saved proof in localStorage:', {
+              hasProof: !!savedProof,
+              codeLength: savedProof?.code?.length || 0,
+              codePreview: savedProof?.code?.substring(0, 100) || 'N/A'
+            });
+          } else {
+            console.error('❌ No data found in localStorage!');
+          }
+        }, 100);
 
         completeLevel(level.id);
         setIsLevelComplete(true);

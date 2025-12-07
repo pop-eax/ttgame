@@ -8,6 +8,7 @@ export function useJsCoq(containerId: string) {
   const [isInitializing, setIsInitializing] = useState(false);
   const coqManagerRef = useRef<CoqManager | null>(null);
   const initRef = useRef(false);
+  const initialCodeRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!containerId || initRef.current) return;
@@ -71,6 +72,13 @@ export function useJsCoq(containerId: string) {
       });
 
       coqManagerRef.current = coqManager;
+      
+      // If we have initial code queued, set it now using provider.load()
+      if (initialCodeRef.current && coqManager.provider) {
+        coqManager.provider.load(initialCodeRef.current);
+        initialCodeRef.current = null;
+      }
+      
       setIsLoaded(true);
       setIsInitializing(false);
     } catch (error: any) {
@@ -264,27 +272,42 @@ export function useJsCoq(containerId: string) {
   };
 
   const getEditorValue = (): string => {
-    return coqManagerRef.current?.provider?.editor?.getValue() || '';
+    const coqManager = coqManagerRef.current;
+    if (!coqManager?.provider) return '';
+    
+    // Get from current focus or first snippet
+    const provider = coqManager.provider.currentFocus || coqManager.provider.snippets[0];
+    if (provider) {
+      return provider.getText();
+    }
+    return '';
   };
 
   const setEditorValue = (value: string): boolean => {
-    const editor = coqManagerRef.current?.provider?.editor;
-    if (!editor?.setValue) return false;
+    const coqManager = coqManagerRef.current;
+    if (!coqManager?.provider) return false;
     
-    editor.setValue(value);
-    if ((editor as any).trigger) {
-      (editor as any).trigger('change', 'setValue', [value]);
+    try {
+      // Use provider.load() to set the content
+      coqManager.provider.load(value);
+      if (coqManager.work) {
+        coqManager.work();
+      }
+      return true;
+    } catch (error) {
+      console.error('Error setting editor value:', error);
+      return false;
     }
-    if (coqManagerRef.current?.work) {
-      coqManagerRef.current.work();
-    }
-    return true;
   };
 
   const setInitialCode = (code: string) => {
-    if (coqManagerRef.current?.provider?.editor) {
-      setEditorValue(code);
-    }
+    initialCodeRef.current = code;
+    const coqManager = coqManagerRef.current;
+    if (!coqManager?.provider) return;
+    
+    // Use provider.load() method to set the code
+    coqManager.provider.load(code);
+    initialCodeRef.current = null;
   };
 
   return {

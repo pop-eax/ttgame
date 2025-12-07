@@ -60,9 +60,18 @@ export function useGameState() {
   }, [gameData, saveGameData]);
 
   const saveProof = useCallback((levelId: string, proof: ProofRecord) => {
-    if (!gameData) return;
+    if (!gameData) {
+      console.warn('⚠️ Cannot save proof: gameData is null');
+      return;
+    }
+    
+    console.log('💾 saveProof called:', { levelId, proof: { ...proof, code: proof.code?.substring(0, 50) + '...' } });
     
     const updated = { ...gameData };
+    // Ensure proofs object exists
+    if (!updated.proofs) {
+      updated.proofs = {};
+    }
     updated.proofs[levelId] = proof;
     
     // Update XP
@@ -88,6 +97,7 @@ export function useGameState() {
       });
     }
     
+    console.log('💾 Calling saveGameData with updated proofs:', Object.keys(updated.proofs));
     saveGameData(updated);
   }, [gameData, worlds, saveGameData]);
 

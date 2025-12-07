@@ -32,5 +32,11 @@ export default {
   },
   plugins: [],
   darkMode: 'class',
+  // Important: ensure Tailwind utilities override Bootstrap
+  important: true,
+  corePlugins: {
+    // Disable preflight to avoid conflicts, but we'll handle it manually
+    preflight: true,
+  },
 }
 

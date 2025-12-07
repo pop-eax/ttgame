@@ -9,6 +9,7 @@ import { TacticsAndTheoremsPanel } from '../components/level/TacticsAndTheoremsP
 import { SuccessModal } from '../components/level/SuccessModal';
 import { Button } from '../components/common/Button';
 import { useGame } from '../context/GameContext';
+import { useTheme } from '../context/ThemeContext';
 import { useProofExecution } from '../hooks/useProofExecution';
 import { useJsCoq } from '../hooks/useJsCoq';
 import { useJsCoqState } from '../hooks/useJsCoqState';
@@ -20,8 +21,9 @@ export function LevelPage() {
   const { worldId, levelId } = useParams<{ worldId: string; levelId: string }>();
   const navigate = useNavigate();
   const { completeLevel, saveProof, loadWorldData, gameData } = useGame();
+  const { theme } = useTheme();
   const { execute: executeProof, proofState, isExecuting, clearState } = useProofExecution();
-  const { executeProof: jsCoqExecuteProof, isLoaded: jsCoqLoaded, setEditorValue, getEditorValue, setInitialCode, coqManager } = useJsCoq(COQ_EDITOR_ID);
+  const { executeProof: jsCoqExecuteProof, isLoaded: jsCoqLoaded, setEditorValue, getEditorValue, setInitialCode, coqManager } = useJsCoq(COQ_EDITOR_ID, theme);
   const { goalState, reset: resetJsCoqState } = useJsCoqState(coqManager, jsCoqLoaded);
   
   const [level, setLevel] = useState<Level | null>(null);
@@ -240,14 +242,14 @@ export function LevelPage() {
   if (!level) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div>Loading...</div>
+        <div className="text-gray-900 dark:text-gray-100">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="bg-white dark:bg-gray-800 border-b dark:border-gray-700">
         <div className="mx-auto px-4 py-4">
           <div className="flex items-center justify-between mb-4">
             <Button onClick={() => navigate(`/worlds/${worldId}`)} variant="secondary">
@@ -255,10 +257,10 @@ export function LevelPage() {
             </Button>
             <div className="space-y-2">
             <div className="flex items-center justify-center space-x-3">
-              <h1 className="text-2xl font-bold">{level.name}</h1>
-              <span className="text-gray-600">{'★'.repeat(level.difficulty)}{'☆'.repeat(5 - level.difficulty)}</span>
+              <h1 className="text-2xl font-bold dark:text-gray-100">{level.name}</h1>
+              <span className="text-gray-600 dark:text-gray-400">{'★'.repeat(level.difficulty)}{'☆'.repeat(5 - level.difficulty)}</span>
             </div>
-            <p className="text-center text-gray-700 max-w-3xl mx-auto">{level.objective}</p>
+            <p className="text-center text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">{level.objective}</p>
           </div>
             <Button 
               onClick={handleRunProof} 

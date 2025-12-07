@@ -2,13 +2,75 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Reset Bootstrap styles globally - Bootstrap is only for jsCoq/CodeMirror */
+/* Bootstrap is loaded by jsCoq in coq-layout-classic.ts, so we need to override its global styles */
+
+/* Reset Bootstrap's body/html defaults */
 body {
-  margin: 0;
+  margin: 0 !important;
+  padding: 0 !important;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+    sans-serif !important;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: transparent !important;
+  color: inherit !important;
+}
+
+html {
+  background-color: transparent !important;
+}
+
+/* Reset Bootstrap's box-sizing globally, but allow it in jsCoq containers */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Scope Bootstrap to jsCoq containers only */
+#root,
+#root > * {
+  /* Reset Bootstrap interference on root and direct children */
+}
+
+/* Reset Bootstrap utility classes outside jsCoq containers */
+#root [class*="container"]:not([id*="ide-wrapper"] *):not([id*="coq"] *):not(.coq-wrapper *):not([class*="jscoq"] *),
+#root [class*="row"]:not([id*="ide-wrapper"] *):not([id*="coq"] *):not(.coq-wrapper *):not([class*="jscoq"] *),
+#root [class*="col-"]:not([id*="ide-wrapper"] *):not([id*="coq"] *):not(.coq-wrapper *):not([class*="jscoq"] *) {
+  max-width: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  flex: none !important;
+}
+
+/* Override Bootstrap's default white background on body */
+body:not([class*="jscoq"]) {
+  background-color: transparent !important;
+}
+
+/* Ensure Tailwind bg-white works - override Bootstrap */
+.app-root .bg-white {
+  background-color: rgb(255 255 255) !important;
+}
+
+.dark .app-root .bg-white {
+  background-color: rgb(31 41 55) !important; /* gray-800 */
+}
+
+/* Override Bootstrap's default text colors in app-root */
+.app-root *:not([id*="ide-wrapper"] *):not([id*="coq"] *):not(.coq-wrapper *):not([class*="jscoq"] *):not([class*="CodeMirror"] *) {
+  /* Let Tailwind handle colors */
+}
+
+/* Ensure Tailwind utilities override Bootstrap in app-root */
+.app-root [class*="bg-"]:not([id*="ide-wrapper"] [class*="bg-"]):not([id*="coq"] [class*="bg-"]):not(.coq-wrapper [class*="bg-"]):not([class*="jscoq"] [class*="bg-"]) {
+  /* Tailwind bg- classes take precedence */
+}
+
+.app-root [class*="text-"]:not([id*="ide-wrapper"] [class*="text-"]):not([id*="coq"] [class*="text-"]):not(.coq-wrapper [class*="text-"]):not([class*="jscoq"] [class*="text-"]) {
+  /* Tailwind text- classes take precedence */
 }
 
 code {
@@ -26,6 +88,10 @@ code {
   color: #374151;
 }
 
+.dark .prose {
+  color: #d1d5db; /* gray-300 */
+}
+
 .prose h1,
 .prose h2,
 .prose h3,
@@ -36,24 +102,42 @@ code {
   margin-bottom: 0.5em;
 }
 
+.dark .prose h1,
+.dark .prose h2,
+.dark .prose h3,
+.dark .prose h4 {
+  color: #f9fafb; /* gray-50 */
+}
+
 .prose p {
   margin-bottom: 1em;
 }
 
 .prose code {
-  background-color: #f3f4f6;
+  background-color: #f3f4f6; /* gray-100 */
   padding: 0.125rem 0.25rem;
   border-radius: 0.25rem;
   font-size: 0.875em;
+  color: #111827; /* gray-900 */
+}
+
+.dark .prose code {
+  background-color: #374151; /* gray-700 */
+  color: #f9fafb; /* gray-50 */
 }
 
 .prose pre {
-  background-color: #1f2937;
-  color: #f9fafb;
+  background-color: #1f2937; /* gray-800 */
+  color: #f9fafb; /* gray-50 */
   padding: 1rem;
   border-radius: 0.5rem;
   overflow-x: auto;
   margin: 1em 0;
+}
+
+.dark .prose pre {
+  background-color: #111827; /* gray-900 */
+  color: #f9fafb; /* gray-50 */
 }
 
 .prose pre code {
@@ -91,4 +175,9 @@ code {
 
 .jscoq.CodeMirror {
   height: 600px !important;
+}
+
+/* Reset Bootstrap h4 styles */
+h4 {
+  background-color: transparent !important;
 }

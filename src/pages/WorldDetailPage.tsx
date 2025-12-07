@@ -60,19 +60,19 @@ export function WorldDetailPage() {
         <div className="flex items-center space-x-3 mb-4">
           <span className="text-4xl">{world.icon}</span>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">{world.name}</h1>
-            <p className="text-gray-600">{world.description}</p>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{world.name}</h1>
+            <p className="text-gray-600 dark:text-gray-300">{world.description}</p>
           </div>
         </div>
         {world.estimatedHours && (
-          <p className="text-sm text-gray-500">Estimated time: {world.estimatedHours} hours</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Estimated time: {world.estimatedHours} hours</p>
         )}
       </div>
 
       {!isUnlocked ? (
-        <div className="bg-gray-100 rounded-lg p-8 text-center">
-          <p className="text-gray-600 mb-4">This world is locked.</p>
-          <p className="text-sm text-gray-500">
+        <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-8 text-center">
+          <p className="text-gray-600 dark:text-gray-300 mb-4">This world is locked.</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
             Complete the previous worlds to unlock this one.
           </p>
         </div>

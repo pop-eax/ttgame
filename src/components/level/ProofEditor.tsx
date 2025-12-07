@@ -25,9 +25,9 @@ export function ProofEditor({
   }, [containerId]);
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200">
-      <div className="bg-gray-50 px-4 py-2 border-b border-gray-200">
-        <h3 className="text-sm font-semibold text-gray-700">Proof Editor</h3>
+    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+      <div className="bg-gray-50 dark:bg-gray-700 px-4 py-2 border-b border-gray-200 dark:border-gray-600">
+        <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">Proof Editor</h3>
       </div>
       {/* jsCoq will create its own UI here with editor and goal panel */}
       {/* Don't use overflow-hidden as it might hide jsCoq's goal panel */}
@@ -39,7 +39,7 @@ export function ProofEditor({
       >
         {!isLoaded && (
           <div className="flex items-center justify-center" style={{ minHeight: '600px' }}>
-            <div className="text-gray-500">Loading jsCoq editor...</div>
+            <div className="text-gray-500 dark:text-gray-400">Loading jsCoq editor...</div>
           </div>
         )}
       </div>

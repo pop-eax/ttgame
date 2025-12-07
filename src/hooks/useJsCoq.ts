@@ -3,12 +3,24 @@ import { ProofState } from '../types/proof';
 import { JsCoq } from 'jscoq';
 import type { CoqManager } from 'jscoq';
 
-export function useJsCoq(containerId: string) {
+export function useJsCoq(containerId: string, theme: 'light' | 'dark' = 'light') {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isInitializing, setIsInitializing] = useState(false);
   const coqManagerRef = useRef<CoqManager | null>(null);
   const initRef = useRef(false);
   const initialCodeRef = useRef<string | null>(null);
+  const themeRef = useRef<'light' | 'dark'>(theme);
+
+  // Update theme when it changes
+  useEffect(() => {
+    themeRef.current = theme;
+    const coqManager = coqManagerRef.current;
+    if (coqManager?.provider && isLoaded) {
+      // Map theme: 'light' -> 'default', 'dark' -> 'blackboard' for CodeMirror
+      const editorTheme = theme === 'dark' ? 'blackboard' : 'default';
+      coqManager.provider.configure({ theme: editorTheme });
+    }
+  }, [theme, isLoaded]);
 
   useEffect(() => {
     if (!containerId || initRef.current) return;
@@ -57,11 +69,12 @@ export function useJsCoq(containerId: string) {
         container.appendChild(wrapper);
       }
 
+      // Map theme: 'light' -> 'light', 'dark' -> 'dark' (jsCoq uses these directly)
       const coqManager = await JsCoq.start([containerId], {
         wrapper_id: wrapperId,
         init_pkgs: ['init'],
         all_pkgs: ['init'],
-        theme: 'light',
+        theme: themeRef.current,
         base_path: basePath,
         pkg_path: basePath + 'coq-pkgs/',
         backend: 'wa',

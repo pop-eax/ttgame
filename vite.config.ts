@@ -1,11 +1,27 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
+import { readFileSync, existsSync } from 'fs';
 
-
+// Plugin to fix jsCoq .js imports resolving to .ts files
+const jscoqResolvePlugin = () => ({
+  name: 'jscoq-resolve',
+  resolveId(id, importer) {
+    if (importer && importer.includes('jscoq/frontend/classic/js') && id.startsWith('./') && id.endsWith('.js')) {
+      // Try to resolve .ts version
+      const tsId = id.replace(/\.js$/, '.ts');
+      const importerDir = path.dirname(importer);
+      const tsPath = path.resolve(importerDir, tsId);
+      if (existsSync(tsPath)) {
+        return tsPath;
+      }
+    }
+    return null;
+  },
+});
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), jscoqResolvePlugin()],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

@@ -43,6 +43,7 @@ Require Import Init.Nat.
 Theorem refl_nat : forall n : nat, n = n.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -81,6 +82,7 @@ Require Import Init.Nat.
 Theorem use_hypothesis : forall (n m : nat), n = m -> n = m.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -123,6 +125,7 @@ Require Import Init.Nat.
 Theorem two_plus_three : 2 + 3 = 5.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -179,6 +182,7 @@ Require Import Init.Nat.
 Theorem example_rewrite : forall n m : nat, n = m -> n + 1 = m + 1.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -218,6 +222,7 @@ Require Import Init.Nat.
 Theorem example_rewrite_backwards : forall n m : nat, n = m -> m + 1 = n + 1.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -259,6 +264,7 @@ Require Import Bool.Bool.
 Theorem bool_self : forall b : bool, b = b.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -299,6 +305,7 @@ Require Import Bool.Bool.
 Theorem orb_true : forall b : bool, b || true = true.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -338,6 +345,7 @@ Require Import Init.Nat.
 Theorem plus_O_n : forall n : nat, 0 + n = n.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -377,6 +385,7 @@ Require Import Init.Nat.
 Theorem one_plus_n : forall n : nat, 1 + n = S n.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -414,6 +423,7 @@ Require Import Init.Nat.
 Theorem trans_eq : forall n m k : nat, n = m -> m = k -> n = k.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -452,6 +462,7 @@ Require Import Init.Nat.
 Theorem plus_two : forall (n m : nat), n = m -> n + 2 = m + 2.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -497,6 +508,7 @@ Require Import Arith.PeanoNat.
 Theorem plus_n_O : forall n : nat, n + 0 = n.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -575,6 +587,7 @@ Require Import Arith.PeanoNat.
 Theorem minus_n_n : forall n, minus n n = 0.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -616,6 +629,7 @@ Require Import Arith.PeanoNat.
 Theorem mul_0_r : forall n : nat, n * 0 = 0.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -690,6 +704,7 @@ Proof. intro. induction n. reflexivity. simpl. rewrite IHn. reflexivity. Qed.
 Theorem mult_n_1 : forall n, n * 1 = n.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -731,6 +746,7 @@ Require Import Arith.PeanoNat.
 Theorem plus_n_Sm : forall n m : nat, S (n + m) = n + (S m).
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -781,6 +797,7 @@ Proof. intros. induction n. reflexivity. simpl. rewrite IHn. reflexivity. Qed.
 Theorem add_comm : forall n m : nat, n + m = m + n.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -825,6 +842,7 @@ Require Import Arith.PeanoNat.
 Theorem add_assoc : forall n m p : nat, n + (m + p) = (n + m) + p.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:

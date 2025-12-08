@@ -15,23 +15,23 @@ import './styles/globals.css';
 function App() {
   return (
     <div className="app-root">
-      <ThemeProvider>
-        <GameProvider>
-          <BrowserRouter>
-            <Layout>
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/worlds" element={<WorldMapPage />} />
-                <Route path="/worlds/:worldId" element={<WorldDetailPage />} />
-                <Route path="/worlds/:worldId/levels/:levelId" element={<LevelPage />} />
-                <Route path="/progress" element={<ProgressPage />} />
-                <Route path="/help" element={<HelpPage />} />
-              </Routes>
-            </Layout>
-            <Toaster position="top-right" />
-          </BrowserRouter>
-        </GameProvider>
-      </ThemeProvider>
+    <ThemeProvider>
+      <GameProvider>
+        <BrowserRouter>
+          <Layout>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/worlds" element={<WorldMapPage />} />
+              <Route path="/worlds/:worldId" element={<WorldDetailPage />} />
+              <Route path="/worlds/:worldId/levels/:levelId" element={<LevelPage />} />
+              <Route path="/progress" element={<ProgressPage />} />
+              <Route path="/help" element={<HelpPage />} />
+            </Routes>
+          </Layout>
+          <Toaster position="top-right" />
+        </BrowserRouter>
+      </GameProvider>
+    </ThemeProvider>
     </div>
   );
 }

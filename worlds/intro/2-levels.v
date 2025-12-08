@@ -78,6 +78,7 @@ Proof. intros. induction n. reflexivity. simpl. rewrite IHn. reflexivity. Qed.
 Lemma double_plus : forall n, double n = n + n.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -120,6 +121,7 @@ Require Import Arith.PeanoNat.
 Theorem even_S : forall n : nat, even (S n) = negb (even n).
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -175,6 +177,7 @@ Proof. intros. induction n. reflexivity. simpl. rewrite IHn. reflexivity. Qed.
 Theorem add_shuffle3 : forall n m p : nat, n + (m + p) = m + (n + p).
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -244,6 +247,7 @@ Qed.
 Theorem mul_comm : forall m n : nat, m * n = n * m.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -316,6 +320,7 @@ Require Import Init.Nat.
 Theorem fst_pair : forall (n m : nat), fst (n, m) = n.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -354,6 +359,7 @@ Theorem pair_reconstruction : forall (p : nat * nat),
   p = (fst p, snd p).
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -400,6 +406,7 @@ Definition swap (p : nat * nat) : nat * nat :=
 Theorem swap_swap : forall (p : nat * nat), swap (swap p) = p.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -466,6 +473,7 @@ Import ListNotations.
 Theorem nil_app : forall (l : list nat), [] ++ l = l.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -540,6 +548,7 @@ Import ListNotations.
 Theorem app_nil : forall (l : list nat), l ++ [] = l.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -623,6 +632,7 @@ Theorem app_assoc : forall (l1 l2 l3 : list nat),
   (l1 ++ l2) ++ l3 = l1 ++ (l2 ++ l3).
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -666,6 +676,7 @@ Theorem pred_length : forall (l : list nat),
   pred (length l) = length (tail l).
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -747,6 +758,7 @@ Theorem rev_length : forall (l : list nat),
   length l = length (rev l).
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -828,6 +840,7 @@ Theorem rev_app_distr : forall (l1 l2 : list nat),
   rev (l1 ++ l2) = rev l2 ++ rev l1.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -884,6 +897,7 @@ Theorem rev_involutive : forall (l : list nat),
   rev (rev l) = l.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -929,6 +943,7 @@ Theorem nth_error_after_last : forall (n : nat) (l : list nat),
   length l = n -> nth_error l n = None.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -978,6 +993,7 @@ Theorem map_length : forall (A B : Type) (f : A -> B) (l : list A),
   length (map f l) = length l.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -1020,6 +1036,7 @@ Theorem map_app : forall (A B : Type) (f : A -> B) (l1 l2 : list A),
   map f (l1 ++ l2) = map f l1 ++ map f l2.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -1068,6 +1085,7 @@ Theorem map_rev : forall (A B : Type) (f : A -> B) (l : list A),
   map f (rev l) = rev (map f l).
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -1115,6 +1133,7 @@ Theorem filter_exercise : forall (X : Type) (test : X -> bool)
   filter test l = x :: lf -> test x = true.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -1159,6 +1178,7 @@ Require Import Init.Nat.
 Theorem and_intro : forall P Q : Prop, P -> Q -> P /\ Q.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -1199,6 +1219,7 @@ Require Import Init.Nat.
 Theorem and_elim_left : forall P Q : Prop, P /\ Q -> P.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -1239,6 +1260,7 @@ Require Import Init.Nat.
 Theorem and_commut : forall P Q : Prop, P /\ Q -> Q /\ P.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -1280,6 +1302,7 @@ Require Import Init.Nat.
 Theorem or_intro_left : forall P Q : Prop, P -> P \/ Q.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -1322,6 +1345,7 @@ Theorem or_elim : forall P Q R : Prop,
   P \/ Q -> (P -> R) -> (Q -> R) -> R.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -1363,6 +1387,7 @@ Require Import Init.Nat.
 Theorem or_commut : forall P Q : Prop, P \/ Q -> Q \/ P.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -1403,6 +1428,7 @@ Require Import Init.Nat.
 Theorem not_intro : forall P : Prop, (P -> False) -> ~P.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -1446,6 +1472,7 @@ Require Import Init.Nat.
 Theorem contrapositive : forall P Q : Prop, (P -> Q) -> (~Q -> ~P).
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -1491,6 +1518,7 @@ Require Import Init.Nat.
 Theorem not_both_true_and_false : forall P : Prop, ~ (P /\ ~P).
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -1537,6 +1565,7 @@ Theorem de_morgan_not_or : forall P Q : Prop,
   ~ (P \/ Q) -> ~P /\ ~Q.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -1582,6 +1611,7 @@ Theorem or_distributes_over_and : forall P Q R : Prop,
   P \/ (Q /\ R) <-> (P \/ Q) /\ (P \/ R).
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -1628,6 +1658,7 @@ Require Import Init.Nat.
 Theorem exists_intro : forall n : nat, exists m : nat, n + 2 = m.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -1670,6 +1701,7 @@ Theorem exists_elim : forall (P : nat -> Prop) (Q : Prop),
   (exists n, P n) -> (forall n, P n -> Q) -> Q.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -1714,6 +1746,7 @@ Theorem dist_exists_or : forall (P Q : nat -> Prop),
   (exists x, P x \/ Q x) <-> (exists x, P x) \/ (exists x, Q x).
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -1758,6 +1791,7 @@ Require Import Init.Nat.
 Theorem discriminate_example : forall n : nat, 0 = S n -> 2 = 3.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -1796,6 +1830,7 @@ Require Import Init.Nat.
 Theorem injection_example : forall n m : nat, S n = S m -> n = m.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -1837,6 +1872,7 @@ Theorem injection_ex3 : forall (X : Type) (x y z : X) (l j : list X),
   x = y.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -1880,6 +1916,7 @@ Theorem f_equal_example : forall (f : nat -> nat) (n m : nat),
   n = m -> f n = f m.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -1924,6 +1961,7 @@ Require Import Arith.PeanoNat.
 Theorem eqb_true : forall n m, n =? m = true -> n = m.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -1969,6 +2007,7 @@ Proof. intros. induction n. reflexivity. simpl. rewrite IHn. reflexivity. Qed.
 Theorem plus_n_n_injective : forall n m, n + n = m + m -> n = m.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -2019,6 +2058,7 @@ Theorem bool_fn_applied_thrice :
   f (f (f b)) = f b.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:

@@ -422,40 +422,56 @@ export function parseJsCoqState(goals: any, coqManager: any, messagesData?: any[
     let goalsArray: any[] = [];
     
     // Extract goals from raw structure
-    if (goals && typeof goals === 'object' && !goals.nodeType && goals.stack !== undefined) {
-      if (Array.isArray(goals.stack)) {
-        goals.stack.forEach((stackLevel: any) => {
-          if (Array.isArray(stackLevel)) {
-            stackLevel.forEach((goalGroup: any) => {
-              if (Array.isArray(goalGroup)) {
-                goalGroup.forEach((goal: any) => {
-                  if (goal && typeof goal === 'object' && !Array.isArray(goal)) {
-                    goalsArray.push(goal);
-                  }
-                });
-              } else if (goalGroup && typeof goalGroup === 'object' && !Array.isArray(goalGroup)) {
-                goalsArray.push(goalGroup);
-              }
-            });
-          } else if (stackLevel && typeof stackLevel === 'object' && !Array.isArray(stackLevel)) {
-            goalsArray.push(stackLevel);
-          }
-        });
-      }
-      
-      if (Array.isArray(goals.goals) && goals.goals.length > 0) {
-        goals.goals.forEach((goal: any) => {
-          if (goal && typeof goal === 'object') goalsArray.push(goal);
-        });
+    // When using bullets (-, +, *) to focus goals, Coq separates them into:
+    // - fg_goals: foreground/focused goals (what should be shown when focused)
+    // - bg_goals: background/shelved goals (what should be hidden when focused)
+    // We should only show fg_goals when they exist and are non-empty, otherwise show all goals
+    
+    if (goals && typeof goals === 'object' && !goals.nodeType) {
+      // Check if we have fg_goals (focused goals from bullet commands like `-`)
+      // fg_goals takes precedence - when it exists, only show focused goals
+      if (goals.fg_goals !== undefined && goals.fg_goals !== null) {
+        // Only show focused goals when using bullets
+        if (Array.isArray(goals.fg_goals)) {
+          // Filter out invalid entries
+          goalsArray = goals.fg_goals.filter((g: any) => g && typeof g === 'object' && !Array.isArray(g));
+        } else if (goals.fg_goals && typeof goals.fg_goals === 'object') {
+          goalsArray = [goals.fg_goals];
+        }
+        // If fg_goals is an empty array, goalsArray will be empty (all goals are shelved/background)
+      } else if (goals.stack !== undefined) {
+        // Handle stack-based goal structure (when not using bullets)
+        if (Array.isArray(goals.stack)) {
+          goals.stack.forEach((stackLevel: any) => {
+            if (Array.isArray(stackLevel)) {
+              stackLevel.forEach((goalGroup: any) => {
+                if (Array.isArray(goalGroup)) {
+                  goalGroup.forEach((goal: any) => {
+                    if (goal && typeof goal === 'object' && !Array.isArray(goal)) {
+                      goalsArray.push(goal);
+                    }
+                  });
+                } else if (goalGroup && typeof goalGroup === 'object' && !Array.isArray(goalGroup)) {
+                  goalsArray.push(goalGroup);
+                }
+              });
+            } else if (stackLevel && typeof stackLevel === 'object' && !Array.isArray(stackLevel)) {
+              goalsArray.push(stackLevel);
+            }
+          });
+        }
+        
+        if (Array.isArray(goals.goals) && goals.goals.length > 0) {
+          goals.goals.forEach((goal: any) => {
+            if (goal && typeof goal === 'object') goalsArray.push(goal);
+          });
+        }
+      } else {
+        // Simple goal object (no stack, no fg_goals)
+        goalsArray = [goals];
       }
     } else if (Array.isArray(goals)) {
       goalsArray = goals;
-    } else if (goals && typeof goals === 'object') {
-      if (goals.fg_goals) {
-        goalsArray = Array.isArray(goals.fg_goals) ? goals.fg_goals : [goals.fg_goals];
-      } else {
-        goalsArray = [goals];
-      }
     }
     
     // Parse goals

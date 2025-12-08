@@ -71,6 +71,7 @@ Inductive even : nat -> Prop :=
 Theorem four_is_even : even 4.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -149,6 +150,7 @@ Inductive even : nat -> Prop :=
 Theorem evSS_ev : forall n, even (S (S n)) -> even n.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -194,6 +196,7 @@ Inductive even : nat -> Prop :=
 Theorem one_not_even : ~ even 1.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -238,6 +241,7 @@ Require Import Arith.PeanoNat.
 Theorem le_reflexive : forall n : nat, n <= n.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -281,6 +285,7 @@ Require Import Arith.PeanoNat.
 Theorem le_trans : forall n m p : nat, n <= m -> m <= p -> n <= p.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -335,6 +340,7 @@ Inductive R_example : nat -> nat -> Prop :=
 Theorem trans_closure_example : clos_trans R_example 1 3.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -391,6 +397,7 @@ Inductive R_example : nat -> nat -> Prop :=
 Theorem refl_trans_example : clos_refl_trans R_example 1 1.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -446,6 +453,7 @@ Theorem empty_maps_to_none : forall (A : Type) (x : string),
   empty x = @None A.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -504,6 +512,7 @@ Theorem update_eq : forall (A : Type) (m : partial_map A) (x : string) (v : A),
   update m x v x = Some v.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -563,6 +572,7 @@ Theorem update_neq : forall (A : Type) (m : partial_map A) (x y : string) (v : A
   x <> y -> update m x v y = m y.
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -610,6 +620,7 @@ Theorem excluded_middle_for_decidable :
   forall b : bool, (b = true) \/ (b = false).
 Proof.
   (* Your proof here *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:
@@ -678,6 +689,7 @@ Theorem you_are_awesome : forall skills : list string,
   length skills >= 3.
 Proof.
   (* Your proof here - or just celebrate! *)
+Qed.
 @ENDSTART*)
 
 (*@SOLUTION:

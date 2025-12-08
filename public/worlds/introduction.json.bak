@@ -1,0 +1,447 @@
+{
+  "id": "introduction",
+  "name": "Introduction to Rocq",
+  "description": "Learn the fundamentals of Rocq through interactive lectures and exercises",
+  "order": 0,
+  "icon": "📖",
+  "color": "#3b82f6",
+  "estimatedHours": 15,
+  "tags": [
+    "introduction",
+    "basics",
+    "tutorial"
+  ],
+  "levels": [
+    {
+      "id": "1.1",
+      "name": "Lecture 1: Introduction to Rocq",
+      "description": "Learn what Rocq is and its basic concepts",
+      "difficulty": 1,
+      "estimatedTime": 20,
+      "objective": "Understand the basics of Rocq and its languages",
+      "theory": {
+        "markdown": "# Introduction to Rocq\n\nROCQ (originally COQ) is an interactive proof assistant (proof assistant).\nIt consists of several languages:\n- **Gallina**: Basic functional language (type theory)\n- **Vernacular**: Commands - Definition, Inductive, Lemma, Theorem, Print...\n- **Ltac**: Language - tactics for proving theorems\n\nOfficial website and documentation:\nhttps://rocq-prover.org/ \nhttps://rocq-prover.org/docs\n\nIt is based on type theory:\nCalculus of Inductive Constructions\nhttps://en.wikipedia.org/wiki/Calculus_of_constructions\n\nMore information on the course page:\n- https://kurzy.kpi.fei.tuke.sk/tt/rocq/01.html"
+      },
+      "startingCode": "(* Define a variable x with value 10 *)",
+      "solution": "Definition x := 10.",
+      "hints": [
+        "Read the theory section carefully",
+        "Rocq is a proof assistant based on type theory",
+        "It consists of multiple languages: Gallina, Vernacular, and Ltac"
+      ],
+      "rewards": {
+        "xp": 50
+      }
+    },
+    {
+      "id": "1.2",
+      "name": "Lecture 1: Basic Definitions and Functions",
+      "description": "Learn how to define variables and functions in Rocq",
+      "difficulty": 1,
+      "estimatedTime": 25,
+      "objective": "Define a function that adds 1 to a natural number",
+      "theory": {
+        "markdown": "## Basic Definitions\n\nQuerying and controlling ROCQ through Vernacular language commands:\n- Variable definitions\n- Function definitions\n- Information about objects and searching for objects.\n\n\n\n\n\n\n\n## Function Definitions\n\nFunctions in Rocq:\n- Higher-order functions\n- Let construction\n- Pattern matching\n\nIn Rocq, you can only define complete functions,\ni.e., those that terminate for every input.",
+        "examples": [
+          {
+            "title": "Defining a variable",
+            "code": "Definition x := 10."
+          },
+          {
+            "title": "Defining a function",
+            "code": "Definition succ (x : nat) : nat := x + 1."
+          },
+          {
+            "title": "Partial function application",
+            "code": "Definition plus x y := x + y.\nDefinition plus2 := plus 2.\nCompute plus2 3. (* Returns 5 *)"
+          }
+        ]
+      },
+      "startingCode": "(* Define a function succ that adds 1 to a natural number *)",
+      "solution": "Definition succ (x : nat) : nat := x + 1.",
+      "hints": [
+        "Use the Definition keyword",
+        "Functions can take parameters",
+        "The syntax is: Definition name (param : type) : return_type := body."
+      ],
+      "rewards": {
+        "xp": 75
+      }
+    },
+    {
+      "id": "1.3",
+      "name": "Lecture 1: Recursive Functions",
+      "description": "Learn how to define recursive functions using Fixpoint",
+      "difficulty": 2,
+      "estimatedTime": 30,
+      "objective": "Define a recursive factorial function",
+      "theory": {
+        "markdown": "## Recursive Functions\n\nRecursive functions are defined using the `Fixpoint` keyword.\n\n\n\nThe pattern matching syntax:\n- `match n with` - start pattern matching on n\n- `| 0 => ...` - base case when n is 0\n- `| (S n') => ...` - recursive case when n is successor of n'",
+        "examples": [
+          {
+            "title": "Factorial function",
+            "code": "Fixpoint factorial (n:nat) := \n  match n with\n    | 0 => 1\n    | (S n') => n * factorial n'\n  end."
+          }
+        ]
+      },
+      "startingCode": "(* Define a recursive factorial function *)\nFixpoint factorial (n:nat) := \n  match n with\n    | 0 => (* base case *)\n    | (S n') => (* recursive case *)\n  end.",
+      "solution": "Fixpoint factorial (n:nat) := \n  match n with\n    | 0 => 1\n    | (S n') => n * factorial n'\n  end.",
+      "hints": [
+        "Use Fixpoint for recursive functions",
+        "Use pattern matching with match",
+        "Handle the base case (0) and recursive case (S n')"
+      ],
+      "rewards": {
+        "xp": 100
+      }
+    },
+    {
+      "id": "1.4",
+      "name": "Lecture 1: Basic Types and Type Hierarchy",
+      "description": "Understand the type system in Rocq",
+      "difficulty": 1,
+      "estimatedTime": 20,
+      "objective": "Understand the type hierarchy",
+      "theory": {
+        "markdown": "## Basic Types and Type Hierarchy in ROCQ\n\n| Type      | Where it belongs | Meaning                      | Example values |\n|-----------|------------------|------------------------------|----------------|\n| Set       | Type             | Universe of data types       | nat, bool, list |\n| Prop      | Type             | Universe of logical propositions | True, False, n=0|\n| Type      | Type1,2,..       | Universe of all types        | Set, Prop, list |\n| bool      | Set              | Boolean logic                | true, false     |\n| nat       | Set              | Natural numbers (Peano)      | O, S O, S (S O) |\n| unit      | Set              | One element (trivial type)   | tt              |\n| Empty_set | Set              | Empty type (no elements)     | --              |\n| list A    | Set              | List of elements of type A   | nil, cons 1 nil |",
+        "examples": [
+          {
+            "title": "Checking types",
+            "code": "Check Set.              (* Set : Type *)\nCheck Prop.             (* Prop : Type *)\nCheck nat.              (* nat : Set *)\nCheck True.             (* True : Prop *)\nCheck (3 = 4).          (* 3 = 4 : Prop *)"
+          }
+        ]
+      },
+      "startingCode": "(* Check the type of the boolean value true *)",
+      "solution": "Check true.\n(* true : bool *)",
+      "hints": [
+        "Set is the universe of data types",
+        "Prop is the universe of logical propositions",
+        "Type is the universe of all types"
+      ],
+      "rewards": {
+        "xp": 50
+      }
+    },
+    {
+      "id": "1.5",
+      "name": "Lecture 1: Inductive Types",
+      "description": "Learn how to define custom data types using Inductive",
+      "difficulty": 2,
+      "estimatedTime": 30,
+      "objective": "Define a custom inductive type for days of the week",
+      "theory": {
+        "markdown": "## Custom Data Types\n\nThe `Inductive` keyword is used to define custom data types.\n\nDefinition:\n\n```\nInductive TypeName : Type :=\n  | Constructor1 : Type1 -> TypeName\n  | Constructor2 : Type2 -> TypeName\n  | ...\n  | ConstructorN : TypeN -> TypeName.\n```\n\n- Each constructor must have a unique name (can contain parameters).\n- Inductive types can have multiple parameters.",
+        "examples": [
+          {
+            "title": "Days of the week",
+            "code": "Inductive day : Type :=\n  | Monday\n  | Tuesday\n  | Wednesday\n  | Thursday\n  | Friday\n  | Saturday\n  | Sunday."
+          },
+          {
+            "title": "Using pattern matching with inductive types",
+            "code": "Definition next_weekday (d : day) : day :=\n  match d with\n  | Monday    => Tuesday\n  | Tuesday   => Wednesday\n  | Wednesday => Thursday\n  | Thursday  => Friday\n  | Friday    => Saturday\n  | Saturday  => Sunday\n  | Sunday    => Monday\n  end."
+          }
+        ]
+      },
+      "startingCode": "(* Define an inductive type for days of the week with seven constructors *)",
+      "solution": "Inductive day : Type :=\n  | Monday\n  | Tuesday\n  | Wednesday\n  | Thursday\n  | Friday\n  | Saturday\n  | Sunday.",
+      "hints": [
+        "Use the Inductive keyword",
+        "Each constructor must have a unique name",
+        "Constructors can take parameters"
+      ],
+      "rewards": {
+        "xp": 100
+      }
+    },
+    {
+      "id": "1.6",
+      "name": "Lecture 1: First Proofs - Intro and Reflexivity",
+      "description": "Learn your first proof tactics: intro and reflexivity",
+      "difficulty": 2,
+      "estimatedTime": 30,
+      "objective": "Prove that forall n : nat, n = n",
+      "theory": {
+        "markdown": "## First Proofs\n\nLtac: Language of tactics for constructing proofs\n\n### Basic Tactics\n\n- `intro` - introduces a variable or hypothesis\n  - The intro tactic has optional parameters to name the introduced objects\n- `reflexivity` - proves goals of the form `x = x`\n- `simpl` - simplifies expressions",
+        "examples": [
+          {
+            "title": "Reflexivity proof",
+            "code": "Theorem refl_nat : forall n : nat, n = n.\nProof.\n  intro n.         (* take any n *)\n  reflexivity.     (* trivial equality n = n *)\nQed."
+          },
+          {
+            "title": "Using simpl",
+            "code": "Theorem dva_plus_tri : 2 + 3 = 5.\nProof.\n  simpl.           (* simplifies 2 + 3 to 5 *)\n  reflexivity.     (* 5 = 5 *)\nQed."
+          }
+        ]
+      },
+      "startingCode": "Theorem my_first_proof : forall n : nat, n = n.\nProof.\n  (* Your proof here *)\nQed.",
+      "solution": "Theorem my_first_proof : forall n : nat, n = n.\nProof.\n  intro n.\n  reflexivity.\nQed.",
+      "hints": [
+        "Use intro to introduce the variable",
+        "Use reflexivity to prove equality",
+        "The proof is: intro n. reflexivity."
+      ],
+      "unlockedTactics": [
+        "intro",
+        "reflexivity"
+      ],
+      "rewards": {
+        "xp": 100
+      }
+    },
+    {
+      "id": "1.7",
+      "name": "Lecture 1: Proof by Rewriting",
+      "description": "Learn how to use the rewrite tactic",
+      "difficulty": 2,
+      "estimatedTime": 30,
+      "objective": "Prove a theorem using rewrite",
+      "theory": {
+        "markdown": "## Proof by Rewriting\n\nThe `rewrite` tactic is used when we have an equality in context\nand want to use it to replace one side of the equation with the other.",
+        "examples": [
+          {
+            "title": "Basic rewrite",
+            "code": "Theorem example_rewrite :\n  forall n m : nat, n = m -> n + 1 = m + 1.\nProof.\n  intros n m H.       (* n, m and assumption H: n = m *)\n  rewrite H.          (* replace n with m in the goal *)\n  reflexivity.        (* m + 1 = m + 1 *)\nQed."
+          },
+          {
+            "title": "Rewrite backwards",
+            "code": "Theorem example_rewrite_backwards :\n  forall n m : nat, n = m -> m + 1 = n + 1.\nProof.\n  intros n m H.\n  rewrite <- H.       (* replace m back with n *)\n  reflexivity.\nQed."
+          }
+        ]
+      },
+      "startingCode": "Theorem rewrite_exercise : forall n m : nat, n = m -> n + 2 = m + 2.\nProof.\n  (* Your proof here *)\nQed.",
+      "solution": "Theorem rewrite_exercise : forall n m : nat, n = m -> n + 2 = m + 2.\nProof.\n  intros n m H.\n  rewrite H.\n  reflexivity.\nQed.",
+      "hints": [
+        "rewrite is used when we have an equality in context",
+        "Use rewrite H to replace one side with the other",
+        "Use rewrite <- H for the opposite direction"
+      ],
+      "unlockedTactics": [
+        "rewrite"
+      ],
+      "rewards": {
+        "xp": 100
+      }
+    },
+    {
+      "id": "1.8",
+      "name": "Lecture 1: Proof by Case Analysis - Destruct",
+      "description": "Learn how to use destruct for case analysis",
+      "difficulty": 2,
+      "estimatedTime": 30,
+      "objective": "Prove a theorem using destruct",
+      "theory": {
+        "markdown": "## Proof by Case Analysis - Destruct\n\nThe `destruct` tactic is used to perform case analysis without recursion.\nThe tactic generates subgoals for each possible constructor of the term.\nSuitable for inductive types without recursion.",
+        "examples": [
+          {
+            "title": "Destruct on bool",
+            "code": "Theorem example_destruct_bool :\n  forall b : bool, b = b. \nProof.\n  intros b.\n  destruct b.      (* split into cases true and false *)\n  - reflexivity.   (* case true *)\n  - reflexivity.   (* case false *)\nQed."
+          },
+          {
+            "title": "Destruct on nat",
+            "code": "Theorem example_destruct_nat :\n  forall n : nat, n = n.\nProof.\n  intros n.\n  destruct n as [| n'].  (* split into O and S n' *)\n  - reflexivity.          (* case O *)\n  - reflexivity.          (* case S n' *)\nQed."
+          }
+        ]
+      },
+      "startingCode": "Theorem destruct_exercise : forall b : bool, b = b.\nProof.\n  (* Your proof here *)\nQed.",
+      "solution": "Theorem destruct_exercise : forall b : bool, b = b.\nProof.\n  intros b.\n  destruct b.\n  - reflexivity.\n  - reflexivity.\nQed.",
+      "hints": [
+        "destruct is used for case analysis without recursion",
+        "It generates subgoals for each possible constructor",
+        "Use destruct b for bool, destruct n for nat"
+      ],
+      "unlockedTactics": [
+        "destruct"
+      ],
+      "rewards": {
+        "xp": 100
+      }
+    },
+    {
+      "id": "2.1",
+      "name": "Lecture 2: Proof by Induction",
+      "description": "Learn how to prove theorems using induction",
+      "difficulty": 3,
+      "estimatedTime": 40,
+      "objective": "Prove a theorem using induction",
+      "theory": {
+        "markdown": "## Proof by Induction\n\nInduction proof for a statement that some property P(n) holds for all n : nat:\n\n1. Base case: show that P(0) holds.\n2. Inductive step: show that if P(n') holds, then P(S n') also holds.\n3. Conclusion: from 1. and 2. it follows that P(n) holds for all n.\n\nFormally, the principle of proof by induction can be expressed as:\n    (P(0) ∧ ∀n.(P(n) → P(S n))) → ∀n.P(n)\n\nDifference between tactics destruct and induction:\n\n- **destruct**:\n  * Used for case analysis according to constructors.\n  * Does not extend the proof with an inductive hypothesis.\n  * Typical for bool, small cases of nat, or when dividing into finite possibilities is sufficient.\n\n- **induction**:\n  * Used when the property requires recursion.\n  * In addition to dividing into cases, we also get an inductive hypothesis.\n  * Typical for proofs about nat, list, or other recursive structures."
+      },
+      "startingCode": "Theorem induction_exercise : forall n : nat, 0 + n = n.\nProof.\n  (* Your proof here *)\nQed.",
+      "solution": "Theorem induction_exercise : forall n : nat, 0 + n = n.\nProof.\n  intro n.\n  simpl.\n  reflexivity.\nQed.",
+      "hints": [
+        "induction generates base case and inductive step",
+        "Base case: prove P(0)",
+        "Inductive step: prove P(n) -> P(S n) using inductive hypothesis"
+      ],
+      "unlockedTactics": [
+        "induction"
+      ],
+      "rewards": {
+        "xp": 150
+      }
+    },
+    {
+      "id": "3.1",
+      "name": "Lecture 3: Data Structures - Pairs",
+      "description": "Learn about pairs and how to work with them",
+      "difficulty": 2,
+      "estimatedTime": 30,
+      "objective": "Define a pair type and projection functions",
+      "theory": {
+        "markdown": "## Data Structures - Pairs\n\nIn this section we will get acquainted with some basic data structures\nin the Rocq environment, which are the foundation for data representation\nand logical reasoning about programs.\n\nWe will cover:\n- Simple structures like **pairs**,\n- Dynamic structures like **lists**,\n- We will reason about these structures formally using logical proofs,\n- We will show their **polymorphic versions** that work for any type,\n- And finally introduce the **option** type, which is used to represent\n  partially defined functions.\n\nImportant note:\n- The standard Rocq library contains definitions of basic structures\n  like **pair** and **list**.\n- However, we will first define them ourselves from scratch,\n  to better understand the principles of their operation.\n\n### Pair\n\nThe only way to create a pair of natural numbers\nis to apply the natpair constructor to two arguments of type nat.\n\nTo extract values of type natpair we need two projections: fst and snd.",
+        "examples": [
+          {
+            "title": "Defining a pair type",
+            "code": "Inductive natpair: Type :=\n| pair (n m :nat)."
+          },
+          {
+            "title": "Projection functions",
+            "code": "Definition fst (x: natpair) : nat := \n  match x with\n  | pair n m => n\n  end.\n\nDefinition snd (x: natpair) : nat := \n  match x with\n  | pair n m => m\n  end."
+          }
+        ]
+      },
+      "startingCode": "(* Define a pair type for natural numbers and projection functions *)\nInductive natpair: Type :=\n| pair (n m :nat).\n\n(* Define fst function *)\nDefinition fst (x: natpair) : nat := \n  (* Your code here *)\n\n(* Define snd function *)\nDefinition snd (x: natpair) : nat := \n  (* Your code here *)",
+      "solution": "Inductive natpair: Type :=\n| pair (n m :nat).\n\nDefinition fst (x: natpair) : nat := \n  match x with\n  | pair n m => n\n  end.\n\nDefinition snd (x: natpair) : nat := \n  match x with\n  | pair n m => m\n  end.",
+      "hints": [
+        "Use Inductive to define the pair type",
+        "Create projection functions fst and snd",
+        "Use pattern matching to extract values"
+      ],
+      "rewards": {
+        "xp": 100
+      }
+    },
+    {
+      "id": "3.2",
+      "name": "Lecture 3: Lists",
+      "description": "Learn about lists and list operations",
+      "difficulty": 2,
+      "estimatedTime": 35,
+      "objective": "Define list operations like length and append",
+      "theory": {
+        "markdown": "## Lists\n\nLists are dynamic data structures that can grow or shrink.",
+        "examples": [
+          {
+            "title": "Defining a list type",
+            "code": "Inductive natlist : Type :=\n  | nil : natlist\n  | cons : nat -> natlist -> natlist."
+          },
+          {
+            "title": "List length function",
+            "code": "Fixpoint length (l:natlist) : nat := \n  match l with \n  | [] => 0\n  | head :: tail => 1 + (length tail)\n  end."
+          },
+          {
+            "title": "List append function",
+            "code": "Fixpoint append (l1 l2: natlist) : natlist :=\n  match l1 with\n  | [] => l2\n  | head::tail => head::(append tail l2)\n  end."
+          }
+        ]
+      },
+      "startingCode": "(* Define a length function for lists *)\nFixpoint length (l:natlist) : nat := \n  (* Your code here *)",
+      "solution": "Fixpoint length (l:natlist) : nat := \n  match l with \n  | [] => 0\n  | head :: tail => 1 + (length tail)\n  end.",
+      "hints": [
+        "Lists are defined inductively with nil and cons",
+        "Use Fixpoint for recursive list functions",
+        "Pattern match on the list structure"
+      ],
+      "rewards": {
+        "xp": 100
+      }
+    },
+    {
+      "id": "5.1",
+      "name": "Lecture 5: Inductively Defined Propositions",
+      "description": "Learn about inductively defined propositions and relations",
+      "difficulty": 3,
+      "estimatedTime": 40,
+      "objective": "Define an inductive proposition for even numbers",
+      "theory": {
+        "markdown": "## Inductively Defined Propositions\n\nIn Rocq (and logic in general), an inductively defined proposition means\nthat a predicate or set is defined using construction rules that determine:\n- when the proposition holds (what are the base cases),\n- rules for deriving further cases (inductive step).\n\n### Example: Even Numbers\n\nDeduction rules:\n\n```\n------------ (ev_0)\n   even 0\n\n     even n\n----------------- (ev_SS)\n  even (S (S n))\n```\n\nDefinition: n is even if it is 0, or if n-2 is even.",
+        "examples": [
+          {
+            "title": "Defining even numbers",
+            "code": "Inductive even : nat -> Prop :=\n  | even_O : even 0\n  | even_SS : forall n, even n -> even (S (S n))."
+          },
+          {
+            "title": "Proving 4 is even",
+            "code": "Lemma four_is_even : even 4.\nProof.\n  apply even_SS.\n  apply even_SS.\n  apply even_O.\nQed."
+          }
+        ]
+      },
+      "startingCode": "(* Define an inductive proposition for even numbers *)\nInductive even : nat -> Prop :=\n  (* Your constructors here *)",
+      "solution": "Inductive even : nat -> Prop :=\n  | even_O : even 0\n  | even_SS : forall n, even n -> even (S (S n)).",
+      "hints": [
+        "Use Inductive to define propositions",
+        "Define base cases and inductive steps",
+        "Use constructors to build proofs"
+      ],
+      "rewards": {
+        "xp": 150
+      }
+    },
+    {
+      "id": "5.2",
+      "name": "Lecture 5: Binary Relations - Less or Equal",
+      "description": "Learn about binary relations and how to define them",
+      "difficulty": 3,
+      "estimatedTime": 40,
+      "objective": "Prove a theorem about the less-or-equal relation",
+      "theory": {
+        "markdown": "## Binary Relations\n\n### Less or Equal Relation\n\nInductive definition of the less-or-equal relation:\n\nDeduction rules:\n\n```\n-------------- (le_n)\n    n <= n\n\n    n <= m\n-------------- (le_S)\n    n <= S m\n```",
+        "examples": [
+          {
+            "title": "Defining le",
+            "code": "Inductive le : nat -> nat -> Prop :=\n  | le_n (n : nat) : le n n\n  | le_S (n m : nat) : le n m -> le n (S m).\n\nNotation \"n <= m\" := (le n m) (at level 70)."
+          },
+          {
+            "title": "Proving 3 <= 5",
+            "code": "Example le_3_5 : 3 <= 5.\nProof.\n  apply le_S.\n  apply le_S.\n  apply le_n.\nQed."
+          }
+        ]
+      },
+      "startingCode": "(* Prove that 2 <= 4 *)\nExample le_2_4 : 2 <= 4.\nProof.\n  (* Your proof here *)\nQed.",
+      "solution": "Example le_2_4 : 2 <= 4.\nProof.\n  apply le_S.\n  apply le_S.\n  apply le_n.\nQed.",
+      "hints": [
+        "Use apply to use constructors",
+        "le_n proves n <= n",
+        "le_S proves n <= m -> n <= S m"
+      ],
+      "rewards": {
+        "xp": 150
+      }
+    },
+    {
+      "id": "6.1",
+      "name": "Lecture 6: Maps and Total Maps",
+      "description": "Learn about maps as data structures",
+      "difficulty": 3,
+      "estimatedTime": 40,
+      "objective": "Define a total map and update operation",
+      "theory": {
+        "markdown": "## Maps and Total Maps\n\n### Total Maps\n\nA total map is a function from keys to values that always returns a value,\neven when the key is not explicitly defined.",
+        "examples": [
+          {
+            "title": "Defining total map",
+            "code": "Definition total_map (A : Type) := string -> A."
+          },
+          {
+            "title": "Empty total map",
+            "code": "Definition t_empty {A : Type} (v : A) : total_map A :=\n  (fun _ => v)."
+          },
+          {
+            "title": "Updating a total map",
+            "code": "Definition t_update {A : Type} (m : total_map A)\n                    (x : string) (v : A) :=\n  fun x' => if String.eqb x x' then v else m x'."
+          }
+        ]
+      },
+      "startingCode": "(* Define a total map update function *)\nDefinition t_update {A : Type} (m : total_map A)\n                    (x : string) (v : A) :=\n  (* Your code here *)",
+      "solution": "Definition t_update {A : Type} (m : total_map A)\n                    (x : string) (v : A) :=\n  fun x' => if String.eqb x x' then v else m x'.",
+      "hints": [
+        "Total maps are functions from keys to values",
+        "Use string as the key type",
+        "Update creates a new function that checks for the key"
+      ],
+      "rewards": {
+        "xp": 150
+      }
+    }
+  ]
+}

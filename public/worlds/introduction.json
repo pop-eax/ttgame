@@ -1,446 +1,1619 @@
 {
   "id": "introduction",
-  "name": "Introduction to Rocq",
-  "description": "Learn the fundamentals of Rocq through interactive lectures and exercises",
-  "order": 0,
-  "icon": "📖",
-  "color": "#3b82f6",
+  "name": "Introduction to Type Theory",
+  "description": "A comprehensive introduction to functional programming, formal proofs, and type theory using the Rocq proof assistant. Master the foundations of theorem proving through 70 carefully designed levels.",
+  "order": 1,
+  "icon": "🎓",
+  "color": "#3B82F6",
   "estimatedHours": 15,
   "tags": [
-    "introduction",
     "basics",
-    "tutorial"
+    "induction",
+    "logic",
+    "data-structures"
+  ],
+  "availableTheorems": [
+    "plus_n_O",
+    "add_comm",
+    "add_assoc",
+    "mul_comm",
+    "app_assoc",
+    "rev_app_distr"
   ],
   "levels": [
     {
-      "id": "1.1",
-      "name": "Lecture 1: Introduction to Rocq",
-      "description": "Learn what Rocq is and its basic concepts",
+      "id": "level_19",
+      "name": "Double Function",
+      "description": "Prove a property about the double function.",
+      "difficulty": 3,
+      "estimatedTime": 6,
+      "objective": "Prove that double n = n + n.",
+      "theory": {
+        "markdown": "## Proof by Induction\n\nThe `Fixpoint` keyword defines recursive functions.\n\nFor double:\n```\nFixpoint double (n:nat) :=\n  match n with\n  | O => O\n  | S n' => S (S (double n'))\n  end.\n```\n\n### Induction Principle\n\nProof by induction for a statement that some property P(n) holds for all n : nat:\n\n1. **Base case**: Show that P(0) holds.\n2. **Inductive step**: Show that if P(n') holds, then P(S n') also holds.\n3. **Conclusion**: From 1. and 2. it follows that P(n) holds for all n.\n\nFormally: (P(0) ∧ ∀n.(P(n) → P(S n))) → ∀n.P(n)\n\n### Difference between destruct and induction:\n\n- **destruct**: Used for case analysis according to constructors. Does not extend the proof with an inductive hypothesis. Typical for bool, small cases of nat.\n\n- **induction**: Used when the property requires recursion. In addition to dividing into cases, we also get an inductive hypothesis. Typical for proofs about nat, list, or other recursive structures.\n\n### Example from Lecture:\n\n```\nTheorem plus_n_O : forall n : nat, n + 0 = n.\nProof.\n  intro n.\n  induction n as [| n' IH].\n  - (* Base case: n = 0 *)\n    simpl. reflexivity.\n  - (* Inductive step: assume n' + 0 = n' (IH),\n       then prove (S n') + 0 = S n' *)\n    simpl.\n    rewrite IH.\n    reflexivity.\nQed.\n```\n\nProve that double n = n + n using induction on n."
+      },
+      "startingCode": "Require Import Init.Nat.\nRequire Import Arith.PeanoNat.\n\nFixpoint double (n:nat) :=\n  match n with\n  | O => O\n  | S n' => S (S (double n'))\n  end.\n\nLemma plus_n_Sm : forall n m, S (n + m) = n + (S m).\nProof. intros. induction n. reflexivity. simpl. rewrite IHn. reflexivity. Qed.\n\nLemma double_plus : forall n, double n = n + n.\nProof.\n  (* Your proof here *)",
+      "solution": "intro n.\n  induction n as [| n' IH].\n  - simpl. reflexivity.\n  - simpl. rewrite IH. rewrite plus_n_Sm. reflexivity.\nQed.",
+      "hints": [
+        "Use induction on n",
+        "You'll need plus_n_Sm",
+        "Simpl will compute double"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 25
+      }
+    },
+    {
+      "id": "level_20",
+      "name": "Even Successor",
+      "description": "Prove even (S n) = negb (even n).",
+      "difficulty": 3,
+      "estimatedTime": 7,
+      "objective": "Work with the even function from the standard library.",
+      "theory": {
+        "markdown": "The `even` function from the standard library is defined as:\n- even 0 = true\n- even (S n) = negb (even n)\n\nBut we need to prove this property holds!\n\nUse induction and case analysis on what even computes to."
+      },
+      "startingCode": "Require Import Init.Nat.\nRequire Import Bool.Bool.\nRequire Import Arith.PeanoNat.\n\nTheorem even_S : forall n : nat, even (S n) = negb (even n).\nProof.\n  (* Your proof here *)",
+      "solution": "intro n.\n  induction n as [| n' IH].\n  - simpl. reflexivity.\n  - rewrite IH. \n    destruct (even n').\n    + simpl. reflexivity.\n    + simpl. reflexivity.\nQed.",
+      "hints": [
+        "Use induction on n",
+        "Destruct (even n') in the inductive step",
+        "Both cases lead to reflexivity"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 30
+      }
+    },
+    {
+      "id": "level_21",
+      "name": "Addition Shuffle",
+      "description": "Prove n + (m + p) = m + (n + p).",
+      "difficulty": 3,
+      "estimatedTime": 6,
+      "objective": "Use commutativity and associativity together.",
+      "theory": {
+        "markdown": "This can be proved using:\n- Commutativity: a + b = b + a\n- Associativity: a + (b + c) = (a + b) + c\n\nThink about the structure:\nn + (m + p) = (n + m) + p = (m + n) + p = m + (n + p)\n\nYou can use `rewrite add_comm` and `rewrite add_assoc`."
+      },
+      "startingCode": "Require Import Init.Nat.\nRequire Import Arith.PeanoNat.\n\nLemma add_comm : forall n m, n + m = m + n.\nProof. \n  intros. induction n. \n  - simpl. induction m. reflexivity. simpl. rewrite <- IHm. reflexivity.\n  - simpl. rewrite IHn. induction m. reflexivity. simpl. rewrite <- IHm. reflexivity.\nQed.\n\nLemma add_assoc : forall n m p, n + (m + p) = (n + m) + p.\nProof. intros. induction n. reflexivity. simpl. rewrite IHn. reflexivity. Qed.\n\nTheorem add_shuffle3 : forall n m p : nat, n + (m + p) = m + (n + p).\nProof.\n  (* Your proof here *)",
+      "solution": "intros n m p.\n  rewrite add_assoc.\n  rewrite (add_comm n m).\n  rewrite <- add_assoc.\n  reflexivity.\nQed.",
+      "hints": [
+        "Use add_assoc to group differently",
+        "Use add_comm to swap n and m",
+        "Chain the rewrites together"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 25
+      }
+    },
+    {
+      "id": "level_22",
+      "name": "Commutativity of Multiplication",
+      "description": "The big theorem: multiplication is commutative!",
+      "difficulty": 5,
+      "estimatedTime": 15,
+      "objective": "Prove m * n = n * m.",
+      "theory": {
+        "markdown": "This is significantly more complex than addition.\n\nYou'll need helper lemmas:\n- n * 0 = 0\n- n * 1 = n\n- n * (S m) = n + (n * m)\n\nStrategy: Induction on n, then use the helper lemmas.\n\nThis is a challenging proof - take your time!"
+      },
+      "startingCode": "Require Import Init.Nat.\nRequire Import Arith.PeanoNat.\n\nLemma mul_0_r : forall n, n * 0 = 0.\nProof. intro. induction n. reflexivity. simpl. exact IHn. Qed.\n\nLemma add_comm : forall n m, n + m = m + n.\nProof. \n  intros. induction n. \n  - simpl. induction m. reflexivity. simpl. rewrite <- IHm. reflexivity.\n  - simpl. rewrite IHn. induction m. reflexivity. simpl. rewrite <- IHm. reflexivity.\nQed.\n\nLemma add_assoc : forall n m p, n + (m + p) = (n + m) + p.\nProof. intros. induction n. reflexivity. simpl. rewrite IHn. reflexivity. Qed.\n\nLemma mul_n_Sm : forall n m, n * (S m) = n + (n * m).\nProof.\n  intros. induction n.\n  - reflexivity.\n  - simpl. rewrite IHn. \n    rewrite <- (add_assoc n m (n * m)).\n    rewrite (add_comm n m).\n    rewrite add_assoc.\n    reflexivity.\nQed.\n\nTheorem mul_comm : forall m n : nat, m * n = n * m.\nProof.\n  (* Your proof here *)",
+      "solution": "intros m n.\n  induction n as [| n' IH].\n  - rewrite mul_0_r. reflexivity.\n  - rewrite mul_n_Sm. simpl. rewrite IH. reflexivity.\nQed.",
+      "hints": [
+        "You'll need several helper lemmas",
+        "Use mul_n_Sm lemma in the inductive step",
+        "This is challenging - take your time!"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 100,
+        "achievements": [
+          "multiplication_master"
+        ]
+      }
+    },
+    {
+      "id": "level_23",
+      "name": "Pairs - First Projection",
+      "description": "Work with pairs and the fst function.",
       "difficulty": 1,
-      "estimatedTime": 20,
-      "objective": "Understand the basics of Rocq and its languages",
+      "estimatedTime": 3,
+      "objective": "Prove that fst (n, m) = n.",
       "theory": {
-        "markdown": "# Introduction to Rocq\n\nROCQ (originally COQ) is an interactive proof assistant (proof assistant).\nIt consists of several languages:\n- **Gallina**: Basic functional language (type theory)\n- **Vernacular**: Commands - Definition, Inductive, Lemma, Theorem, Print...\n- **Ltac**: Language - tactics for proving theorems\n\nOfficial website and documentation:\nhttps://rocq-prover.org/ \nhttps://rocq-prover.org/docs\n\nIt is based on type theory:\nCalculus of Inductive Constructions\nhttps://en.wikipedia.org/wiki/Calculus_of_constructions\n\nMore information on the course page:\n- https://kurzy.kpi.fei.tuke.sk/tt/rocq/01.html"
+        "markdown": "## Data Structures - Pairs\n\nFrom Lecture 3: In this section we get acquainted with basic data structures\nin the Rocq environment, which are the foundation for data representation\nand logical reasoning about programs.\n\n### Pairs\n\nA pair is a product type containing two values. In Rocq, pairs are defined as:\n\n```\nInductive prod (A B : Type) : Type :=\n| pair : A -> B -> prod A B.\n```\n\nThe only way to create a pair is to apply the `pair` constructor to two arguments.\n\n### Projection Functions\n\nTo extract values from a pair, we need projection functions:\n\n```\nDefinition fst {A B} (p : A * B) : A :=\n  match p with\n  | (x, y) => x\n  end.\n\nDefinition snd {A B} (p : A * B) : B :=\n  match p with\n  | (x, y) => y\n  end.\n```\n\nThe notation `(x, y)` is syntactic sugar for `(pair x y)`.\n\n### Standard Notation\n\nThe standard library provides the notation `(x, y)` for pairs, and you can use it\nin pattern matching as well."
       },
-      "startingCode": "(* Define a variable x with value 10 *)",
-      "solution": "Definition x := 10.",
+      "startingCode": "Require Import Init.Nat.\n\nTheorem fst_pair : forall (n m : nat), fst (n, m) = n.\nProof.\n  (* Your proof here *)",
+      "solution": "intros n m.\n  simpl.\n  reflexivity.\nQed.",
       "hints": [
-        "Read the theory section carefully",
-        "Rocq is a proof assistant based on type theory",
-        "It consists of multiple languages: Gallina, Vernacular, and Ltac"
+        "Simpl will unfold the fst definition",
+        "Then reflexivity",
+        "Pairs are simple!"
       ],
+      "unlockedTactics": [],
       "rewards": {
-        "xp": 50
+        "xp": 15
       }
     },
     {
-      "id": "1.2",
-      "name": "Lecture 1: Basic Definitions and Functions",
-      "description": "Learn how to define variables and functions in Rocq",
+      "id": "level_24",
+      "name": "Pair Reconstruction",
+      "description": "Prove p = (fst p, snd p).",
+      "difficulty": 2,
+      "estimatedTime": 5,
+      "objective": "Use destruct to expose pair structure.",
+      "theory": {
+        "markdown": "For any pair p, we have: p = (fst p, snd p)\n\nThis requires `destruct` on the pair to expose its structure.\n\nWhen you `destruct p`, it splits into `(a, b)` for some a and b, then you can reason about the components."
+      },
+      "startingCode": "Require Import Init.Nat.\n\nTheorem pair_reconstruction : forall (p : nat * nat),\n  p = (fst p, snd p).\nProof.\n  (* Your proof here *)",
+      "solution": "intro p.\n  destruct p as [n m].\n  simpl.\n  reflexivity.\nQed.",
+      "hints": [
+        "Use 'destruct p as [n m]'",
+        "This splits the pair into components",
+        "Then simpl and reflexivity"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 20
+      }
+    },
+    {
+      "id": "level_25",
+      "name": "Swap Involution",
+      "description": "Prove swap (swap p) = p.",
+      "difficulty": 2,
+      "estimatedTime": 4,
+      "objective": "Prove that swap is an involution.",
+      "theory": {
+        "markdown": "The swap function is defined as:\nDefinition swap (p : nat * nat) : nat * nat :=\nmatch p with\n| (a, b) => (b, a)\nend.\nAn involution is a function where f(f(x)) = x.\n\nProve that swap is an involution."
+      },
+      "startingCode": "Require Import Init.Nat.\n\nDefinition swap (p : nat * nat) : nat * nat :=\n  match p with\n  | (a, b) => (b, a)\n  end.\n\nTheorem swap_swap : forall (p : nat * nat), swap (swap p) = p.\nProof.\n  (* Your proof here *)",
+      "solution": "intro p.\n  destruct p as [n m].\n  simpl.\n  reflexivity.\nQed.",
+      "hints": [
+        "Destruct the pair",
+        "Simpl will compute swap twice",
+        "Should simplify to reflexivity"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 20
+      }
+    },
+    {
+      "id": "level_26",
+      "name": "Lists - Nil Append",
+      "description": "Prove [] ++ l = l.",
       "difficulty": 1,
-      "estimatedTime": 25,
-      "objective": "Define a function that adds 1 to a natural number",
+      "estimatedTime": 3,
+      "objective": "Work with list append.",
       "theory": {
-        "markdown": "## Basic Definitions\n\nQuerying and controlling ROCQ through Vernacular language commands:\n- Variable definitions\n- Function definitions\n- Information about objects and searching for objects.\n\n\n\n\n\n\n\n## Function Definitions\n\nFunctions in Rocq:\n- Higher-order functions\n- Let construction\n- Pattern matching\n\nIn Rocq, you can only define complete functions,\ni.e., those that terminate for every input.",
-        "examples": [
-          {
-            "title": "Defining a variable",
-            "code": "Definition x := 10."
-          },
-          {
-            "title": "Defining a function",
-            "code": "Definition succ (x : nat) : nat := x + 1."
-          },
-          {
-            "title": "Partial function application",
-            "code": "Definition plus x y := x + y.\nDefinition plus2 := plus 2.\nCompute plus2 3. (* Returns 5 *)"
-          }
-        ]
+        "markdown": "## Introduction to Lists\n\nFrom Lecture 3: Lists are dynamic data structures that can grow or shrink.\nThey are one of the most fundamental data structures in functional programming.\n\n### List Definition\n\nLists are defined inductively:\n```\nInductive list (A : Type) : Type :=\n  | nil : list A\n  | cons : A -> list A -> list A.\n```\n\nNotation:\n- `[]` for `nil` (empty list)\n- `h :: t` for `cons h t` (head and tail)\n- `[1;2;3]` for `cons 1 (cons 2 (cons 3 nil))`\n\n### Append Function\n\nThe append function (`++`) joins two lists:\n```\nFixpoint append (l1 l2: list A) : list A :=\n  match l1 with\n  | [] => l2\n  | head::tail => head::(append tail l2)\n  end.\n```\n\nSo `[] ++ l` simplifies directly to `l` by the definition - when the first list is empty,\nappend just returns the second list."
       },
-      "startingCode": "(* Define a function succ that adds 1 to a natural number *)",
-      "solution": "Definition succ (x : nat) : nat := x + 1.",
+      "startingCode": "Require Import List.\nImport ListNotations.\n\nTheorem nil_app : forall (l : list nat), [] ++ l = l.\nProof.\n  (* Your proof here *)",
+      "solution": "intro l.\n  simpl.\n  reflexivity.\nQed.",
       "hints": [
-        "Use the Definition keyword",
-        "Functions can take parameters",
-        "The syntax is: Definition name (param : type) : return_type := body."
+        "Simpl evaluates [] ++ l directly",
+        "The definition makes this easy",
+        "Then reflexivity"
       ],
+      "unlockedTactics": [],
       "rewards": {
-        "xp": 75
+        "xp": 15
       }
     },
     {
-      "id": "1.3",
-      "name": "Lecture 1: Recursive Functions",
-      "description": "Learn how to define recursive functions using Fixpoint",
+      "id": "level_27",
+      "name": "Lists - App Nil",
+      "description": "Prove l ++ [] = l.",
       "difficulty": 2,
-      "estimatedTime": 30,
-      "objective": "Define a recursive factorial function",
+      "estimatedTime": 5,
+      "objective": "Use induction on lists.",
       "theory": {
-        "markdown": "## Recursive Functions\n\nRecursive functions are defined using the `Fixpoint` keyword.\n\n\n\nThe pattern matching syntax:\n- `match n with` - start pattern matching on n\n- `| 0 => ...` - base case when n is 0\n- `| (S n') => ...` - recursive case when n is successor of n'",
-        "examples": [
-          {
-            "title": "Factorial function",
-            "code": "Fixpoint factorial (n:nat) := \n  match n with\n    | 0 => 1\n    | (S n') => n * factorial n'\n  end."
-          }
-        ]
+        "markdown": "## Induction on Lists\n\nFrom Lecture 3: The principle of induction over lists is completely analogous\nto induction over natural numbers, just the constructor `x::xs` replaces the successor `n+1`.\n\n### Induction Principle for Lists\n\nRocq automatically generates two subgoals when using `induction l`:\n- **Base case**: `[]` (empty list)\n- **Inductive case**: `x::xs` (head and tail)\n\nThe pattern:\n- **Base case**: P([])\n- **Inductive hypothesis**: ∀x.∀xs.(P(xs) => P(x::xs))\n- **Goal**: ∀l.P(l)\n\n### This Exercise\n\nThis requires induction because append recurses on the first argument!\n\n**Base case**: `[] ++ [] = []` - both sides are the empty list.\n\n**Inductive step**: \n```\n(h :: t) ++ [] = h :: (t ++ [])    [by definition of append]\n               = h :: t             [by IH: t ++ [] = t]\n```\n\nThe pattern: when the recursive structure is on the left, you need induction.\n\n### Example from Lecture:\n\n```\nTheorem l_app_nil : forall l, l++[]=l.\nProof.\n  intros. \n  induction l.\n  - reflexivity.                    (* base case *)\n  - simpl. rewrite IHl. reflexivity. (* inductive step *)\nQed.\n```"
       },
-      "startingCode": "(* Define a recursive factorial function *)\nFixpoint factorial (n:nat) := \n  match n with\n    | 0 => (* base case *)\n    | (S n') => (* recursive case *)\n  end.",
-      "solution": "Fixpoint factorial (n:nat) := \n  match n with\n    | 0 => 1\n    | (S n') => n * factorial n'\n  end.",
+      "startingCode": "Require Import List.\nImport ListNotations.\n\nTheorem app_nil : forall (l : list nat), l ++ [] = l.\nProof.\n  (* Your proof here *)",
+      "solution": "intro l.\n  induction l as [| h t IH].\n  - simpl. reflexivity.\n  - simpl. rewrite IH. reflexivity.\nQed.",
       "hints": [
-        "Use Fixpoint for recursive functions",
-        "Use pattern matching with match",
-        "Handle the base case (0) and recursive case (S n')"
+        "This requires induction on l",
+        "Base case: [] ++ [] = []",
+        "Inductive step: use IH after simpl"
       ],
+      "unlockedTactics": [],
       "rewards": {
-        "xp": 100
+        "xp": 20
       }
     },
     {
-      "id": "1.4",
-      "name": "Lecture 1: Basic Types and Type Hierarchy",
-      "description": "Understand the type system in Rocq",
+      "id": "level_28",
+      "name": "Associativity of Append",
+      "description": "Prove list append is associative.",
+      "difficulty": 3,
+      "estimatedTime": 6,
+      "objective": "Prove (l1 ++ l2) ++ l3 = l1 ++ (l2 ++ l3).",
+      "theory": {
+        "markdown": "## Lists and Induction\n\n### Lists in Rocq\n\nLists are dynamic data structures that can grow or shrink. They are defined inductively:\n\n```\nInductive list (A : Type) : Type :=\n  | nil : list A\n  | cons : A -> list A -> list A.\n```\n\nNotation: `[]` for nil, `h :: t` for cons h t, `[1;2;3]` for lists.\n\n### List Functions\n\n**Append** (`++`) joins two lists:\n```\nFixpoint append (l1 l2: list A) : list A :=\n  match l1 with\n  | [] => l2\n  | head::tail => head::(append tail l2)\n  end.\n```\n\n### Induction on Lists\n\nFrom Lecture 3: The principle of induction over lists is completely analogous to induction over natural numbers, just the constructor `x::xs` replaces the successor `n+1`.\n\n- **Base case**: P([])\n- **Inductive hypothesis**: ∀x.∀xs.(P(xs) => P(x::xs))\n- **Goal**: ∀l.P(l)\n\nRocq automatically generates two subgoals when using `induction l`:\n- Base case: []\n- Inductive case: x::xs\n\n### Associativity of Append\n\nJust like addition, append is associative:\n(l1 ++ l2) ++ l3 = l1 ++ (l2 ++ l3)\n\nUse induction on l1. Notice the parallel with addition:\n- [] is like 0\n- (::) is like S\n- (++) is like (+)\n\nThis is not a coincidence - they're all monoids!"
+      },
+      "startingCode": "Require Import List.\nImport ListNotations.\n\nTheorem app_assoc : forall (l1 l2 l3 : list nat),\n  (l1 ++ l2) ++ l3 = l1 ++ (l2 ++ l3).\nProof.\n  (* Your proof here *)",
+      "solution": "intros l1 l2 l3.\n  induction l1 as [| h t IH].\n  - simpl. reflexivity.\n  - simpl. rewrite IH. reflexivity.\nQed.",
+      "hints": [
+        "Induction on l1",
+        "Notice the parallel with addition",
+        "Base case is simple, inductive step uses IH"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 25
+      }
+    },
+    {
+      "id": "level_29",
+      "name": "Length of Tail",
+      "description": "Relate length and tail.",
+      "difficulty": 2,
+      "estimatedTime": 4,
+      "objective": "Prove pred (length l) = length (tail l).",
+      "theory": {
+        "markdown": "The `pred` function returns the predecessor (n - 1, or 0 if n=0).\n\nFor a non-empty list, length (tail l) = pred (length l).\n\nUse `destruct` on the list:\n- If l = [], both sides equal 0\n- If l = h :: t, length t = pred (S (length t))"
+      },
+      "startingCode": "Require Import List.\nImport ListNotations.\nRequire Import Init.Nat.\n\nTheorem pred_length : forall (l : list nat),\n  pred (length l) = length (tail l).\nProof.\n  (* Your proof here *)",
+      "solution": "intro l.\n  destruct l as [| h t].\n  - simpl. reflexivity.\n  - simpl. reflexivity.\nQed.",
+      "hints": [
+        "Destruct l into cases",
+        "Case []: both sides are 0",
+        "Case h::t: both sides are length t"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 20
+      }
+    },
+    {
+      "id": "level_30",
+      "name": "Reverse Length",
+      "description": "Prove reversing doesn't change length.",
+      "difficulty": 4,
+      "estimatedTime": 10,
+      "objective": "Prove length l = length (rev l).",
+      "theory": {
+        "markdown": "## Reverse and Helper Lemmas\n\n### Reverse Function\n\nFrom Lecture 3, the reverse function flips the order of elements:\n```\nFixpoint reverse (l : list A) : list A :=\n  match l with \n  | [] => []\n  | hd::tl => (reverse tl) ++ [hd]\n  end.\n```\n\n### Helper Lemmas\n\nWhen proving properties about reverse, you often need helper lemmas first.\n\n**Helper Lemma**: `length (l ++ [x]) = S (length l)`\n\nThis says: appending a single element increases the length by one.\n\n### Main Theorem: Reverse Preserves Length\n\nYou'll need the helper lemma first, then use induction on l for the main theorem.\n\n**Base case**: `length (rev []) = length []` - both are 0.\n\n**Inductive step**: \n```\nlength (rev (h :: t)) = length ((rev t) ++ [h])\n                      = S (length (rev t))      [by helper lemma]\n                      = S (length t)            [by IH]\n                      = length (h :: t)\n```\n\nThe key insight: reversing a list doesn't change its length, but the proof requires understanding how reverse builds the result by appending elements."
+      },
+      "startingCode": "Require Import List.\nImport ListNotations.\nRequire Import Init.Nat.\n\nLemma length_app_one : forall (l : list nat) (n : nat),\n  length (l ++ [n]) = S (length l).\nProof.\n  intros l n.\n  induction l as [| h t IH].\n  - simpl. reflexivity.\n  - simpl. rewrite IH. reflexivity.\nQed.\n\nTheorem rev_length : forall (l : list nat),\n  length l = length (rev l).\nProof.\n  (* Your proof here *)",
+      "solution": "intro l.\n  induction l as [| h t IH].\n  - simpl. reflexivity.\n  - simpl. rewrite length_app_one. rewrite <- IH. reflexivity.\nQed.",
+      "hints": [
+        "You need a helper lemma first!",
+        "Prove: length (l ++ [x]) = S (length l)",
+        "Then use induction on main theorem"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 40
+      }
+    },
+    {
+      "id": "level_31",
+      "name": "Reverse Distribution",
+      "description": "Prove rev (l1 ++ l2) = rev l2 ++ rev l1.",
+      "difficulty": 4,
+      "estimatedTime": 10,
+      "objective": "Prove that reverse distributes over append.",
+      "theory": {
+        "markdown": "## Reverse Distribution Over Append\n\nThis is a beautiful theorem from Lecture 3:\n```\nrev (l1 ++ l2) = (rev l2) ++ (rev l1)\n```\n\n### Intuitive Understanding\n\nThink about it intuitively: \n- Reversing `[1;2;3;4;5]` gives `[5;4;3;2;1]`\n- If we split it as `[1;2] ++ [3;4;5]`\n- Reversing gives `[5;4;3] ++ [2;1]`\n\nNotice: the order of l1 and l2 is swapped in the result!\n\n### Proof Strategy\n\nUse induction on l1 and the associativity of append (`app_assoc`).\n\n**Base case** (l1 = []):\n```\nrev ([] ++ l2) = rev l2 = (rev l2) ++ [] = (rev l2) ++ (rev [])\n```\n\n**Inductive step** (l1 = h :: t):\n```\nrev ((h :: t) ++ l2) = rev (h :: (t ++ l2))\n                     = (rev (t ++ l2)) ++ [h]\n                     = ((rev l2) ++ (rev t)) ++ [h]  [by IH]\n                     = (rev l2) ++ ((rev t) ++ [h])  [by app_assoc]\n                     = (rev l2) ++ (rev (h :: t))\n```\n\nThis theorem shows how reverse interacts with list concatenation!"
+      },
+      "startingCode": "Require Import List.\nImport ListNotations.\n\nLemma app_assoc : forall (l1 l2 l3 : list nat),\n  (l1 ++ l2) ++ l3 = l1 ++ (l2 ++ l3).\nProof.\n  intros. induction l1. reflexivity. simpl. rewrite IHl1. reflexivity.\nQed.\n\nLemma app_nil : forall (l : list nat), l ++ [] = l.\nProof.\n  intro. induction l. reflexivity. simpl. rewrite IHl. reflexivity.\nQed.\n\nTheorem rev_app_distr : forall (l1 l2 : list nat),\n  rev (l1 ++ l2) = rev l2 ++ rev l1.\nProof.\n  (* Your proof here *)",
+      "solution": "intros l1 l2.\n  induction l1 as [| h t IH].\n  - simpl. rewrite app_nil. reflexivity.\n  - simpl. rewrite IH. rewrite app_assoc. reflexivity.\nQed.",
+      "hints": [
+        "Induction on l1",
+        "Use app_assoc in the inductive step",
+        "Base case needs app_nil"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 40
+      }
+    },
+    {
+      "id": "level_32",
+      "name": "Reverse Involution",
+      "description": "Prove rev (rev l) = l.",
+      "difficulty": 3,
+      "estimatedTime": 7,
+      "objective": "Prove that reversing twice gives the original.",
+      "theory": {
+        "markdown": "This is a classic theorem: rev (rev l) = l\n\nUse:\n- Induction on l\n- The distribution property you just proved\n- The fact that rev [x] = [x]\n\nThis completes our understanding of reverse!"
+      },
+      "startingCode": "Require Import List.\nImport ListNotations.\n\nLemma rev_app_distr : forall (l1 l2 : list nat),\n  rev (l1 ++ l2) = rev l2 ++ rev l1.\nProof.\n  intros. induction l1.\n  - simpl. induction l2. reflexivity. simpl. rewrite <- IHl2. reflexivity.\n  - simpl. rewrite IHl1. \n    induction l2. simpl. induction (rev l1). reflexivity. simpl. rewrite <- IHl. reflexivity.\n    simpl. rewrite <- IHl2. simpl. \n    assert (H: forall l1 l2 l3, (l1 ++ l2) ++ l3 = l1 ++ (l2 ++ l3)).\n    { intros. induction l0. reflexivity. simpl. rewrite IHl0. reflexivity. }\n    rewrite H. reflexivity.\nQed.\n\nTheorem rev_involutive : forall (l : list nat),\n  rev (rev l) = l.\nProof.\n  (* Your proof here *)",
+      "solution": "intro l.\n  induction l as [| h t IH].\n  - simpl. reflexivity.\n  - simpl. rewrite rev_app_distr. simpl. rewrite IH. reflexivity.\nQed.",
+      "hints": [
+        "Induction on l",
+        "Use rev_app_distr",
+        "Simpl in the inductive step"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 30
+      }
+    },
+    {
+      "id": "level_33",
+      "name": "Option Type - None Case",
+      "description": "Work with the Option type.",
+      "difficulty": 3,
+      "estimatedTime": 8,
+      "objective": "Prove nth_error returns None past the end.",
+      "theory": {
+        "markdown": "The Option type represents computations that might fail:\nInductive option (A : Type) : Type :=\n| Some : A -> option A\n| None : option A.\nIt's used for functions that aren't defined everywhere.\n\nFor example, nth_error returns None when the index is out of bounds.\n\nProve that accessing past the end of a list returns None."
+      },
+      "startingCode": "Require Import List.\nImport ListNotations.\nRequire Import Init.Nat.\n\nTheorem nth_error_after_last : forall (n : nat) (l : list nat),\n  length l = n -> nth_error l n = None.\nProof.\n  (* Your proof here *)",
+      "solution": "intros n l.\n  generalize dependent n.\n  induction l as [| h t IH].\n  - intros n H. simpl. destruct n. reflexivity. reflexivity.\n  - intros n H. destruct n.\n    + simpl in H. discriminate H.\n    + simpl in H. injection H as H'. simpl. apply IH. exact H'.\nQed.",
+      "hints": [
+        "Use 'generalize dependent n'",
+        "Then induction on l",
+        "Use injection when needed"
+      ],
+      "unlockedTactics": [
+        "generalize dependent",
+        "injection"
+      ],
+      "rewards": {
+        "xp": 35
+      }
+    },
+    {
+      "id": "level_34",
+      "name": "Map Preserves Length",
+      "description": "Prove map doesn't change length.",
+      "difficulty": 2,
+      "estimatedTime": 5,
+      "objective": "Prove length (map f l) = length l.",
+      "theory": {
+        "markdown": "The `map` function applies a function to every element:\n```\nFixpoint map {A B} (f : A -> B) (l : list A) : list B :=\nmatch l with\n| [] => []\n| h :: t => f h :: map f t\nend.\n```\nProve by induction that length (map f l) = length l.\n\nThis makes sense: map transforms elements but preserves structure!"
+      },
+      "startingCode": "Require Import List.\nImport ListNotations.\n\nTheorem map_length : forall (A B : Type) (f : A -> B) (l : list A),\n  length (map f l) = length l.\nProof.\n  (* Your proof here *)",
+      "solution": "intros A B f l.\n  induction l as [| h t IH].\n  - simpl. reflexivity.\n  - simpl. rewrite IH. reflexivity.\nQed.",
+      "hints": [
+        "Induction on l",
+        "Base case is trivial",
+        "Inductive step: simpl then rewrite IH"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 20
+      }
+    },
+    {
+      "id": "level_35",
+      "name": "Map Distribution",
+      "description": "Prove map distributes over append.",
+      "difficulty": 3,
+      "estimatedTime": 6,
+      "objective": "Prove map f (l1 ++ l2) = map f l1 ++ map f l2.",
+      "theory": {
+        "markdown": "map f (l1 ++ l2) = (map f l1) ++ (map f l2)\n\nIntuitively: mapping over a concatenation is the same as mapping over each part and then concatenating.\n\nUse induction on l1.\n\nThis is a fundamental property used in parallel programming!"
+      },
+      "startingCode": "Require Import List.\nImport ListNotations.\n\nTheorem map_app : forall (A B : Type) (f : A -> B) (l1 l2 : list A),\n  map f (l1 ++ l2) = map f l1 ++ map f l2.\nProof.\n  (* Your proof here *)",
+      "solution": "intros A B f l1 l2.\n  induction l1 as [| h t IH].\n  - simpl. reflexivity.\n  - simpl. rewrite IH. reflexivity.\nQed.",
+      "hints": [
+        "Induction on l1",
+        "Base case is simple",
+        "Inductive step uses IH"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 25
+      }
+    },
+    {
+      "id": "level_36",
+      "name": "Map and Reverse",
+      "description": "Prove map and reverse commute.",
+      "difficulty": 3,
+      "estimatedTime": 7,
+      "objective": "Prove map f (rev l) = rev (map f l).",
+      "theory": {
+        "markdown": "map f (rev l) = rev (map f l)\n\nThink about it: whether you reverse then map, or map then reverse, you get the same result!\n\nUse induction on l and the map distribution property.\n\nThis is another beautiful compositionality property."
+      },
+      "startingCode": "Require Import List.\nImport ListNotations.\n\nLemma map_app : forall (A B : Type) (f : A -> B) (l1 l2 : list A),\n  map f (l1 ++ l2) = map f l1 ++ map f l2.\nProof.\n  intros. induction l1. reflexivity. simpl. rewrite IHl1. reflexivity.\nQed.\n\nTheorem map_rev : forall (A B : Type) (f : A -> B) (l : list A),\n  map f (rev l) = rev (map f l).\nProof.\n  (* Your proof here *)",
+      "solution": "intros A B f l.\n  induction l as [| h t IH].\n  - simpl. reflexivity.\n  - simpl. rewrite map_app. rewrite IH. reflexivity.\nQed.",
+      "hints": [
+        "Induction on l",
+        "Use map_app in the inductive step",
+        "The base case is trivial"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 30
+      }
+    },
+    {
+      "id": "level_37",
+      "name": "Filter Preserves Order",
+      "description": "If filter returns x, then test x = true.",
+      "difficulty": 3,
+      "estimatedTime": 8,
+      "objective": "Prove filter only keeps elements that pass the test.",
+      "theory": {
+        "markdown": "The filter function:\nFixpoint filter {A} (test : A -> bool) (l : list A) : list A :=\nmatch l with\n| [] => []\n| h :: t => if test h then h :: filter test t\nelse filter test t\nend.\nProve: if x appears in filter test l, then test x = true.\n\nUse induction and case analysis with destruct."
+      },
+      "startingCode": "Require Import List.\nImport ListNotations.\nRequire Import Bool.Bool.\n\nTheorem filter_exercise : forall (X : Type) (test : X -> bool)\n                                 (x : X) (l lf : list X),\n  filter test l = x :: lf -> test x = true.\nProof.\n  (* Your proof here *)",
+      "solution": "intros X test x l lf H.\n  induction l as [| h t IH].\n  - simpl in H. discriminate H.\n  - simpl in H. destruct (test h) eqn:E.\n    + injection H as H1 H2. rewrite <- H1. exact E.\n    + apply IH. exact H.\nQed.",
+      "hints": [
+        "Induction on l",
+        "Use destruct (test h) eqn:E",
+        "Injection helps in one case"
+      ],
+      "unlockedTactics": [
+        "eqn"
+      ],
+      "rewards": {
+        "xp": 30
+      }
+    },
+    {
+      "id": "level_38",
+      "name": "Conjunction Introduction",
+      "description": "Enter the world of logic!",
+      "difficulty": 2,
+      "estimatedTime": 4,
+      "objective": "Prove P -> Q -> P /\\ Q.",
+      "theory": {
+        "markdown": "In Rocq, logical AND is written P /\\\\ Q.\n\nTo prove P /\\\\ Q, use the `split` tactic, which creates two subgoals:\n- Prove P\n- Prove Q\n\nThis is the introduction rule for conjunction.\n\nFrom premises P and Q, conclude P /\\\\ Q."
+      },
+      "startingCode": "Require Import Init.Nat.\n\nTheorem and_intro : forall P Q : Prop, P -> Q -> P /\\ Q.\nProof.\n  (* Your proof here *)",
+      "solution": "intros P Q HP HQ.\n  split.\n  - exact HP.\n  - exact HQ.\nQed.",
+      "hints": [
+        "Use split to prove a conjunction",
+        "This creates two subgoals",
+        "Use exact for each"
+      ],
+      "unlockedTactics": [
+        "split"
+      ],
+      "rewards": {
+        "xp": 20,
+        "achievements": [
+          "logic_beginner"
+        ]
+      }
+    },
+    {
+      "id": "level_39",
+      "name": "Conjunction Elimination",
+      "description": "Extract information from a conjunction.",
+      "difficulty": 2,
+      "estimatedTime": 4,
+      "objective": "From P /\\ Q, derive P.",
+      "theory": {
+        "markdown": "To use a hypothesis H : P /\\\\ Q, you can:\n- Use `destruct H as [HP HQ]` to split it into two hypotheses\n- Or use `destruct H` which will auto-name them\n\nThis is the elimination rule for conjunction.\n\nFrom P /\\\\ Q, derive both P and Q."
+      },
+      "startingCode": "Require Import Init.Nat.\n\nTheorem and_elim_left : forall P Q : Prop, P /\\ Q -> P.\nProof.\n  (* Your proof here *)",
+      "solution": "intros P Q H.\n  destruct H as [HP HQ].\n  exact HP.\nQed.",
+      "hints": [
+        "Use destruct H as [HP HQ]",
+        "This splits the conjunction",
+        "Then use exact HP"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 20
+      }
+    },
+    {
+      "id": "level_40",
+      "name": "Conjunction Commutativity",
+      "description": "Prove AND is commutative.",
+      "difficulty": 2,
+      "estimatedTime": 5,
+      "objective": "Prove P /\\ Q -> Q /\\ P.",
+      "theory": {
+        "markdown": "P /\\\\ Q implies Q /\\\\ P.\n\nStrategy:\n1. Destruct the hypothesis P /\\\\ Q into HP and HQ\n2. Split the goal Q /\\\\ P\n3. Prove Q using HQ, then prove P using HP\n\nThis shows the symmetry of conjunction."
+      },
+      "startingCode": "Require Import Init.Nat.\n\nTheorem and_commut : forall P Q : Prop, P /\\ Q -> Q /\\ P.\nProof.\n  (* Your proof here *)",
+      "solution": "intros P Q H.\n  destruct H as [HP HQ].\n  split.\n  - exact HQ.\n  - exact HP.\nQed.",
+      "hints": [
+        "Destruct the hypothesis",
+        "Split the goal",
+        "Match them up correctly"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 20
+      }
+    },
+    {
+      "id": "level_41",
+      "name": "Disjunction Introduction",
+      "description": "Learn the introduction rules for OR.",
+      "difficulty": 2,
+      "estimatedTime": 4,
+      "objective": "From P, prove P \\/ Q.",
+      "theory": {
+        "markdown": "OR has two introduction rules:\n- From P, conclude P \\\\/ Q (use `left`)\n- From Q, conclude P \\\\/ Q (use `right`)\n\nThis proof demonstrates the left introduction.\n\nIf you have P, you can conclude P \\\\/ Q for any Q!"
+      },
+      "startingCode": "Require Import Init.Nat.\n\nTheorem or_intro_left : forall P Q : Prop, P -> P \\/ Q.\nProof.\n  (* Your proof here *)",
+      "solution": "intros P Q HP.\n  left.\n  exact HP.\nQed.",
+      "hints": [
+        "Use 'left' to prove the left side",
+        "Then exact HP",
+        "You don't need Q!"
+      ],
+      "unlockedTactics": [
+        "left",
+        "right"
+      ],
+      "rewards": {
+        "xp": 20
+      }
+    },
+    {
+      "id": "level_42",
+      "name": "Disjunction Elimination",
+      "description": "Reason by cases with OR.",
+      "difficulty": 3,
+      "estimatedTime": 6,
+      "objective": "Prove (P \\/ Q) -> (P -> R) -> (Q -> R) -> R.",
+      "theory": {
+        "markdown": "To use H : P \\\\/ Q, use `destruct H as [HP | HQ]`.\n\nThis creates two subgoals:\n- One assuming HP : P\n- One assuming HQ : Q\n\nThis is proof by cases: if either P or Q leads to R, then (P \\\\/ Q) → R.\n\nThis is the elimination rule for disjunction."
+      },
+      "startingCode": "Require Import Init.Nat.\n\nTheorem or_elim : forall P Q R : Prop, \n  P \\/ Q -> (P -> R) -> (Q -> R) -> R.\nProof.\n  (* Your proof here *)",
+      "solution": "intros P Q R H HPR HQR.\n  destruct H as [HP | HQ].\n  - apply HPR. exact HP.\n  - apply HQR. exact HQ.\nQed.",
+      "hints": [
+        "Destruct H as [HP | HQ]",
+        "This creates two cases",
+        "Apply the appropriate implication in each"
+      ],
+      "unlockedTactics": [
+        "apply"
+      ],
+      "rewards": {
+        "xp": 25
+      }
+    },
+    {
+      "id": "level_43",
+      "name": "Disjunction Commutativity",
+      "description": "Prove OR is commutative.",
+      "difficulty": 2,
+      "estimatedTime": 5,
+      "objective": "Prove P \\/ Q -> Q \\/ P.",
+      "theory": {
+        "markdown": "P \\\\/ Q implies Q \\\\/ P.\n\nStrategy:\n1. Destruct P \\\\/ Q into two cases\n2. Case P: use `right` to prove Q \\\\/ P\n3. Case Q: use `left` to prove Q \\\\/ P\n\nThis combines introduction and elimination of disjunction."
+      },
+      "startingCode": "Require Import Init.Nat.\n\nTheorem or_commut : forall P Q : Prop, P \\/ Q -> Q \\/ P.\nProof.\n  (* Your proof here *)",
+      "solution": "intros P Q H.\n  destruct H as [HP | HQ].\n  - right. exact HP.\n  - left. exact HQ.\nQed.",
+      "hints": [
+        "Destruct into two cases",
+        "Case P: use right",
+        "Case Q: use left"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 20
+      }
+    },
+    {
+      "id": "level_44",
+      "name": "Negation Introduction",
+      "description": "Learn about negation in constructive logic.",
+      "difficulty": 2,
+      "estimatedTime": 5,
+      "objective": "Understand ~P as P -> False.",
+      "theory": {
+        "markdown": "In Rocq, ~P is defined as P -> False.\n\nTo prove ~P, assume P and derive a contradiction (False).\n\nThe `unfold not` tactic expands ~P to P -> False.\n\nThen you can use standard implication reasoning."
+      },
+      "startingCode": "Require Import Init.Nat.\n\nTheorem not_intro : forall P : Prop, (P -> False) -> ~P.\nProof.\n  (* Your proof here *)",
+      "solution": "intros P H.\n  unfold not.\n  exact H.\nQed.",
+      "hints": [
+        "Use 'unfold not'",
+        "This expands ~P to P -> False",
+        "Then exact H"
+      ],
+      "unlockedTactics": [
+        "unfold"
+      ],
+      "rewards": {
+        "xp": 20
+      }
+    },
+    {
+      "id": "level_45",
+      "name": "Contrapositive",
+      "description": "Prove the law of contrapositive.",
+      "difficulty": 3,
+      "estimatedTime": 7,
+      "objective": "Prove (P -> Q) -> (~Q -> ~P).",
+      "theory": {
+        "markdown": "The contrapositive: (P → Q) → (¬Q → ¬P)\n\nIf P implies Q, then not-Q implies not-P.\n\nStrategy:\n1. Assume P → Q and ¬Q\n2. Assume P (to prove ¬P)\n3. From P and P → Q, derive Q\n4. From Q and ¬Q, derive False\n\nThis is a fundamental law of logic!"
+      },
+      "startingCode": "Require Import Init.Nat.\n\nTheorem contrapositive : forall P Q : Prop, (P -> Q) -> (~Q -> ~P).\nProof.\n  (* Your proof here *)",
+      "solution": "intros P Q HPQ HnQ.\n  unfold not.\n  intro HP.\n  apply HnQ.\n  apply HPQ.\n  exact HP.\nQed.",
+      "hints": [
+        "Unfold not in the goal",
+        "Assume P to prove False",
+        "Chain: P gives Q, Q with ~Q gives False"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 30
+      }
+    },
+    {
+      "id": "level_46",
+      "name": "No Contradiction",
+      "description": "Prove the law of non-contradiction.",
+      "difficulty": 3,
+      "estimatedTime": 6,
+      "objective": "Prove ~ (P /\\ ~P).",
+      "theory": {
+        "markdown": "~ (P /\\\\ ~P)\n\nThis is the law of non-contradiction.\n\nA proposition and its negation cannot both be true.\n\nStrategy:\n1. Assume P /\\\\ ~P\n2. Destruct to get P and ~P\n3. Apply ~P to P to get False"
+      },
+      "startingCode": "Require Import Init.Nat.\n\nTheorem not_both_true_and_false : forall P : Prop, ~ (P /\\ ~P).\nProof.\n  (* Your proof here *)",
+      "solution": "intro P.\n  unfold not.\n  intro H.\n  destruct H as [HP HnP].\n  apply HnP.\n  exact HP.\nQed.",
+      "hints": [
+        "Unfold not and intro",
+        "Destruct the conjunction",
+        "Apply ~P to P"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 25
+      }
+    },
+    {
+      "id": "level_47",
+      "name": "De Morgan's Law",
+      "description": "Prove one of De Morgan's laws.",
+      "difficulty": 4,
+      "estimatedTime": 8,
+      "objective": "Prove ~(P \\/ Q) -> ~P /\\ ~Q.",
+      "theory": {
+        "markdown": "~(P \\\\/ Q) → (~P /\\\\ ~Q)\n\nIf neither P nor Q is true, then both are false.\n\nStrategy:\n1. Assume ~(P \\\\/ Q)\n2. To prove ~P: assume P, derive P \\\\/ Q, get contradiction\n3. To prove ~Q: assume Q, derive P \\\\/ Q, get contradiction\n\nDe Morgan's laws connect negation with conjunction/disjunction."
+      },
+      "startingCode": "Require Import Init.Nat.\n\nTheorem de_morgan_not_or : forall P Q : Prop,\n  ~ (P \\/ Q) -> ~P /\\ ~Q.\nProof.\n  (* Your proof here *)",
+      "solution": "intros P Q H.\n  split.\n  - unfold not. intro HP. apply H. left. exact HP.\n  - unfold not. intro HQ. apply H. right. exact HQ.\nQed.",
+      "hints": [
+        "Split the conjunction",
+        "For each part, unfold not",
+        "Show that assuming P or Q leads to contradiction"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 35
+      }
+    },
+    {
+      "id": "level_48",
+      "name": "Distributivity of OR over AND",
+      "description": "Prove a fundamental law of propositional logic.",
+      "difficulty": 4,
+      "estimatedTime": 10,
+      "objective": "Prove P \\/ (Q /\\ R) <-> (P \\/ Q) /\\ (P \\/ R).",
+      "theory": {
+        "markdown": "P \\\\/ (Q /\\\\ R) <-> (P \\\\/ Q) /\\\\ (P \\\\/ R)\n\nThe `<->` means \"if and only if\" (iff), which requires proving both directions.\n\nUse `split` to separate into:\n- Forward direction: →\n- Backward direction: ←\n\nEach direction requires its own proof strategy.\n\nThis is a fundamental law of propositional logic."
+      },
+      "startingCode": "Require Import Init.Nat.\n\nTheorem or_distributes_over_and : forall P Q R : Prop,\n  P \\/ (Q /\\ R) <-> (P \\/ Q) /\\ (P \\/ R).\nProof.\n  (* Your proof here *)",
+      "solution": "intros P Q R.\n  split.\n  - intro H. destruct H as [HP | [HQ HR]].\n    + split. left. exact HP. left. exact HP.\n    + split. right. exact HQ. right. exact HR.\n  - intro H. destruct H as [[HP | HQ] [HP' | HR]].\n    + left. exact HP.\n    + left. exact HP.\n    + left. exact HP'.\n    + right. split. exact HQ. exact HR.\nQed.",
+      "hints": [
+        "Split into two directions",
+        "Forward: destruct the disjunction",
+        "Backward: destruct both conjuncts"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 40
+      }
+    },
+    {
+      "id": "level_49",
+      "name": "Existential Introduction",
+      "description": "Learn about existential quantification.",
+      "difficulty": 2,
+      "estimatedTime": 4,
+      "objective": "Prove ∃m, n + 2 = m.",
+      "theory": {
+        "markdown": "To prove ∃x, P(x), use `exists t` where t is a concrete value.\n\nThen prove P(t).\n\nExample: To prove ∃n, n + 2 = 5, use `exists 3` and prove 3 + 2 = 5.\n\nThe `exists` tactic is the introduction rule for ∃."
+      },
+      "startingCode": "Require Import Init.Nat.\n\nTheorem exists_intro : forall n : nat, exists m : nat, n + 2 = m.\nProof.\n  (* Your proof here *)",
+      "solution": "intro n.\n  exists (n + 2).\n  reflexivity.\nQed.",
+      "hints": [
+        "Use 'exists (n + 2)'",
+        "Provide a concrete witness",
+        "Then reflexivity"
+      ],
+      "unlockedTactics": [
+        "exists"
+      ],
+      "rewards": {
+        "xp": 20
+      }
+    },
+    {
+      "id": "level_50",
+      "name": "Existential Elimination",
+      "description": "Extract information from an existential.",
+      "difficulty": 3,
+      "estimatedTime": 6,
+      "objective": "Use an existential hypothesis.",
+      "theory": {
+        "markdown": "To use H : ∃x, P(x), use `destruct H as [x HP]`.\n\nThis gives you:\n- A witness x\n- A proof HP that P(x) holds\n\nThis is the elimination rule for ∃.\n\nFrom ∃x P(x) and the assumption that ∀x (P(x) → Q) where Q doesn't mention x, derive Q."
+      },
+      "startingCode": "Require Import Init.Nat.\n\nTheorem exists_elim : forall (P : nat -> Prop) (Q : Prop),\n  (exists n, P n) -> (forall n, P n -> Q) -> Q.\nProof.\n  (* Your proof here *)",
+      "solution": "intros P Q H1 H2.\n  destruct H1 as [n HP].\n  apply H2.\n  exact HP.\nQed.",
+      "hints": [
+        "Destruct H as [n HP]",
+        "This gives you a witness and a proof",
+        "Apply H2 to get Q"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 25
+      }
+    },
+    {
+      "id": "level_51",
+      "name": "Exists and Or",
+      "description": "Prove existence distributes over disjunction.",
+      "difficulty": 4,
+      "estimatedTime": 10,
+      "objective": "Prove (∃x, P x \\/ Q x) <-> (∃x, P x) \\/ (∃x, Q x).",
+      "theory": {
+        "markdown": "(∃x, P x \\\\/ Q x) <-> (∃x, P x) \\\\/ (∃x, Q x)\n\nIf there exists an x satisfying P or Q, then either:\n- There exists an x satisfying P, or\n- There exists an x satisfying Q\n\nThis requires proof in both directions.\n\nForward: destruct the existential and the disjunction.\nBackward: destruct the outer disjunction, then the inner existential."
+      },
+      "startingCode": "Require Import Init.Nat.\n\nTheorem dist_exists_or : forall (P Q : nat -> Prop),\n  (exists x, P x \\/ Q x) <-> (exists x, P x) \\/ (exists x, Q x).\nProof.\n  (* Your proof here *)",
+      "solution": "intros P Q.\n  split.\n  - intro H. destruct H as [x [HP | HQ]].\n    + left. exists x. exact HP.\n    + right. exists x. exact HQ.\n  - intro H. destruct H as [[x HP] | [x HQ]].\n    + exists x. left. exact HP.\n    + exists x. right. exact HQ.\nQed.",
+      "hints": [
+        "Split into two directions",
+        "Forward: destruct existential then disjunction",
+        "Backward: destruct outer disjunction"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 40
+      }
+    },
+    {
+      "id": "level_52",
+      "name": "Discrimination",
+      "description": "Learn about constructor discrimination.",
+      "difficulty": 2,
+      "estimatedTime": 4,
+      "objective": "Use discriminate to solve impossible equations.",
+      "theory": {
+        "markdown": "Different constructors of an inductive type are never equal.\n\nFor example: 0 ≠ S n, true ≠ false, [] ≠ h :: t\n\nThe `discriminate` tactic recognizes this and solves goals where the hypothesis assumes such an equality.\n\nIf you have H : 0 = S n, then `discriminate H` solves the goal (because H is contradictory)."
+      },
+      "startingCode": "Require Import Init.Nat.\n\nTheorem discriminate_example : forall n : nat, 0 = S n -> 2 = 3.\nProof.\n  (* Your proof here *)",
+      "solution": "intros n H.\n  discriminate H.\nQed.",
+      "hints": [
+        "Use 'discriminate H'",
+        "Different constructors are never equal",
+        "This solves the goal immediately"
+      ],
+      "unlockedTactics": [
+        "discriminate"
+      ],
+      "rewards": {
+        "xp": 20
+      }
+    },
+    {
+      "id": "level_53",
+      "name": "Injection",
+      "description": "Learn about constructor injectivity.",
+      "difficulty": 2,
+      "estimatedTime": 5,
+      "objective": "Use injection to peel off constructors.",
+      "theory": {
+        "markdown": "Constructors are injective: if S n = S m, then n = m.\n\nThe `injection` tactic uses this fact.\n\n`injection H as H'` takes H : S n = S m and produces H' : n = m.\n\nSimilarly for other constructors like (::): If h1 :: t1 = h2 :: t2, then h1 = h2 and t1 = t2."
+      },
+      "startingCode": "Require Import Init.Nat.\n\nTheorem injection_example : forall n m : nat, S n = S m -> n = m.\nProof.\n  (* Your proof here *)",
+      "solution": "intros n m H.\n  injection H as H'.\n  exact H'.\nQed.",
+      "hints": [
+        "Use 'injection H as H''",
+        "This removes the outer S",
+        "Then exact H'"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 20
+      }
+    },
+    {
+      "id": "level_54",
+      "name": "Using Injection",
+      "description": "Apply injection to a complex problem.",
+      "difficulty": 4,
+      "estimatedTime": 10,
+      "objective": "Combine injection with rewriting.",
+      "theory": {
+        "markdown": "When you have an equality of complex constructors, injection can peel off the outer constructor.\n\nFor lists: if x :: y :: l = z :: j and j = z :: l, you can inject to get the components.\n\nCombine injection with other tactics to solve the goal."
+      },
+      "startingCode": "Require Import List.\nImport ListNotations.\n\nTheorem injection_ex3 : forall (X : Type) (x y z : X) (l j : list X),\n  x :: y :: l = z :: j ->\n  j = z :: l ->\n  x = y.\nProof.\n  (* Your proof here *)",
+      "solution": "intros X x y z l j H1 H2.\n  injection H1 as H3 H4.\n  rewrite H2 in H4.\n  injection H4 as H5 H6.\n  rewrite H3.\n  exact H5.\nQed.",
+      "hints": [
+        "Use injection twice",
+        "Rewrite with H2",
+        "Then another injection"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 40
+      }
+    },
+    {
+      "id": "level_55",
+      "name": "Leibniz Equality",
+      "description": "Prove a deep property about equality.",
+      "difficulty": 2,
+      "estimatedTime": 4,
+      "objective": "Prove f preserves equality.",
+      "theory": {
+        "markdown": "Leibniz's principle: if a = b, then P(a) = P(b) for any property P.\n\nThis means equal things are indistinguishable.\n\nUse the `f_equal` tactic: if the goal is f x = f y, it reduces to proving x = y.\n\nThis is the substitutivity of equality."
+      },
+      "startingCode": "Require Import Init.Nat.\n\nTheorem f_equal_example : forall (f : nat -> nat) (n m : nat),\n  n = m -> f n = f m.\nProof.\n  (* Your proof here *)",
+      "solution": "intros f n m H.\n  rewrite H.\n  reflexivity.\nQed.",
+      "hints": [
+        "Rewrite H to change n to m",
+        "Then reflexivity",
+        "Equality is substitutive"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 20
+      }
+    },
+    {
+      "id": "level_56",
+      "name": "Boolean Equality",
+      "description": "Relate boolean and propositional equality.",
+      "difficulty": 3,
+      "estimatedTime": 7,
+      "objective": "Prove n =? m = true implies n = m.",
+      "theory": {
+        "markdown": "For natural numbers, we have two notions of equality:\n- Propositional: n = m (type Prop)\n- Boolean: n =? m (type bool, returns true/false)\n\nThe `eqb_spec` provides a bridge between them.\n\n`destruct (Nat.eqb_spec n m)` gives you cases:\n- If n =? m = true, you get a proof that n = m\n- If n =? m = false, you get a proof that n ≠ m\n\nThis is called \"reflection\" - reflecting computation into logic."
+      },
+      "startingCode": "Require Import Init.Nat.\nRequire Import Arith.PeanoNat.\n\nTheorem eqb_true : forall n m, n =? m = true -> n = m.\nProof.\n  (* Your proof here *)",
+      "solution": "intros n m H.\n  destruct (Nat.eqb_spec n m) as [Heq | Hneq].\n  - exact Heq.\n  - discriminate H.\nQed.",
+      "hints": [
+        "Use destruct (Nat.eqb_spec n m)",
+        "This gives you reflection",
+        "One case is exact, other is discriminate"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 30
+      }
+    },
+    {
+      "id": "level_57",
+      "name": "Injectivity of Plus",
+      "description": "If n + n = m + m, then n = m.",
+      "difficulty": 5,
+      "estimatedTime": 15,
+      "objective": "Prove addition preserves distinctness.",
+      "theory": {
+        "markdown": "This requires careful reasoning with induction and injection.\n\nStrategy:\n1. Use induction on n\n2. Base case: 0 + 0 = m + m implies m = 0\n3. Inductive step is trickier - you need to use injection carefully\n\nThis shows that addition preserves distinctness."
+      },
+      "startingCode": "Require Import Init.Nat.\nRequire Import Arith.PeanoNat.\n\nLemma plus_n_Sm : forall n m, S (n + m) = n + (S m).\nProof. intros. induction n. reflexivity. simpl. rewrite IHn. reflexivity. Qed.\n\nTheorem plus_n_n_injective : forall n m, n + n = m + m -> n = m.\nProof.\n  (* Your proof here *)",
+      "solution": "intro n.\n  induction n as [| n' IH].\n  - intros m H. destruct m. reflexivity. discriminate H.\n  - intros m H. destruct m.\n    + discriminate H.\n    + apply f_equal. apply IH. \n      simpl in H. rewrite plus_n_Sm in H. rewrite plus_n_Sm in H.\n      injection H as H'. injection H' as H''. exact H''.\nQed.",
+      "hints": [
+        "Induction on n",
+        "Base case: destruct m",
+        "Inductive step needs multiple injections"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 60
+      }
+    },
+    {
+      "id": "level_58",
+      "name": "Boolean Functions",
+      "description": "Prove a deep property about boolean functions.",
+      "difficulty": 4,
+      "estimatedTime": 10,
+      "objective": "Prove f (f (f b)) = f b for any boolean function.",
+      "theory": {
+        "markdown": "For any boolean function f and boolean b: f (f (f b)) = f b\n\nWhy? There are only 4 boolean functions:\n- constant true: f(x) = true\n- constant false: f(x) = false  \n- identity: f(x) = x\n- negation: f(x) = not x\n\nFor each, verify that f(f(f(b))) = f(b).\n\nUse destruct on f b to consider both possible values."
+      },
+      "startingCode": "Require Import Bool.Bool.\n\nTheorem bool_fn_applied_thrice :\n  forall (f : bool -> bool) (b : bool),\n  f (f (f b)) = f b.\nProof.\n  (* Your proof here *)",
+      "solution": "intros f b.\n  destruct (f b) eqn:E.\n  - rewrite E. exact E.\n  - destruct b.\n    + destruct (f true) eqn:E2.\n      * rewrite E2. exact E2.\n      * rewrite E2. exact E.\n    + destruct (f false) eqn:E2.\n      * rewrite E2. exact E2.\n      * rewrite E2. exact E.\nQed.",
+      "hints": [
+        "Destruct (f b) eqn:E",
+        "Then destruct b",
+        "Case analysis on all possibilities"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 45
+      }
+    },
+    {
+      "id": "level_59",
+      "name": "Even Predicate",
+      "description": "Work with an inductively defined predicate.",
+      "difficulty": 2,
+      "estimatedTime": 5,
+      "objective": "Prove even 4 using the constructors.",
+      "theory": {
+        "markdown": "## Inductively Defined Propositions\n\nFrom Lecture 5: In Rocq (and logic in general), an inductively defined proposition means\nthat a predicate or set is defined using construction rules that determine:\n- when the proposition holds (what are the base cases),\n- rules for deriving further cases (inductive step).\n\n### Even Numbers as an Inductive Predicate\n\nThe even predicate is defined inductively:\n```\nInductive even : nat -> Prop :=\n  | even_0 : even 0\n  | even_SS : forall n, even n -> even (S (S n)).\n```\n\n### Deduction Rules\n\nThis says:\n- **Base case**: `even 0` (0 is even)\n- **Inductive case**: If `even n`, then `even (S (S n))` (if n is even, then n+2 is even)\n\n### Building Proofs\n\nTo prove `even 4`, we build a proof term bottom-up:\n```\neven_SS 2 (even_SS 0 even_0)\n```\n\nThis means:\n- `even_0` proves `even 0`\n- `even_SS 0 even_0` proves `even 2`\n- `even_SS 2 (even_SS 0 even_0)` proves `even 4`\n\n### Example from Lecture:\n\n```\nLemma four_is_even : even 4.\nProof.\n  apply even_SS.\n  apply even_SS.\n  apply even_0.\nQed.\n```\n\nUse the constructors to build the proof!"
+      },
+      "startingCode": "Require Import Init.Nat.\n\nInductive even : nat -> Prop :=\n  | even_0 : even 0\n  | even_SS : forall n, even n -> even (S (S n)).\n\nTheorem four_is_even : even 4.\nProof.\n  (* Your proof here *)",
+      "solution": "apply even_SS.\n  apply even_SS.\n  apply even_0.\nQed.",
+      "hints": [
+        "Apply even_SS twice",
+        "Then apply even_0",
+        "Build the proof term bottom-up"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 25,
+        "achievements": [
+          "inductive_predicates"
+        ]
+      }
+    },
+    {
+      "id": "level_60",
+      "name": "Inversion on Predicates",
+      "description": "Use the inversion tactic on inductive predicates.",
+      "difficulty": 3,
+      "estimatedTime": 6,
+      "objective": "From even (S (S n)), derive even n.",
+      "theory": {
+        "markdown": "## Constructing and Deconstructing Proofs\n\nFrom Lecture 5: Besides constructing proofs that some number is even,\nwe can also decompose these proofs — reason about how they could have been created.\n\nThe definition of the predicate `even` using the `Inductive` command says not only\nthat the constructors `even_0` and `even_SS` are valid ways to create a proof\nthat a number is even, but also that these are the only two possible ways\nto construct such a proof.\n\n### The Inversion Tactic\n\nThe `inversion` tactic analyzes how an inductive predicate could have been proved.\n\nFor `even (S (S n))`, inversion knows:\n- It can't be `even_0` (constructors don't match - even_0 only proves even 0)\n- It must be `even_SS`, so there exists some n' where:\n  - `S (S n) = S (S n')`\n  - `even n'` holds\n\nInversion automatically performs this case analysis and generates the necessary hypotheses.\n\n### Example from Lecture:\n\n```\nTheorem even_inversion :\n  forall (n : nat),\n  even n ->\n    (n = 0) \\/ (exists n', n = S (S n') /\\ even n').\nProof.\n  intros n E.\n  destruct E.\n  - (* E = even_0 : even 0 *)\n    left. reflexivity.\n  - (* E = even_SS n' E' : even (S (S n')) *)\n    right. exists n. split.\n    + reflexivity.\n    + apply E.\nQed.\n```\n\nThis is incredibly powerful for reasoning about inductive predicates!"
+      },
+      "startingCode": "Require Import Init.Nat.\n\nInductive even : nat -> Prop :=\n  | even_0 : even 0\n  | even_SS : forall n, even n -> even (S (S n)).\n\nTheorem evSS_ev : forall n, even (S (S n)) -> even n.\nProof.\n  (* Your proof here *)",
+      "solution": "intros n H.\n  inversion H.\n  exact H1.\nQed.",
+      "hints": [
+        "Use 'inversion H'",
+        "This analyzes how the proof was constructed",
+        "Then exact the resulting hypothesis"
+      ],
+      "unlockedTactics": [
+        "inversion"
+      ],
+      "rewards": {
+        "xp": 30
+      }
+    },
+    {
+      "id": "level_61",
+      "name": "One Not Even",
+      "description": "Prove 1 is not even using inversion.",
+      "difficulty": 2,
+      "estimatedTime": 4,
+      "objective": "Use inversion to detect an impossible case.",
+      "theory": {
+        "markdown": "To prove ~even 1, we assume even 1 and derive a contradiction.\n\nInversion on even 1 will show that there's no way to construct a proof of even 1:\n- even_0 proves even 0, not even 1\n- even_SS proves even (S (S n)), which is even 2, even 4, etc.\n\nSo there's no constructor that proves even 1 - contradiction!\n\nInversion automatically detects this impossible case."
+      },
+      "startingCode": "Require Import Init.Nat.\n\nInductive even : nat -> Prop :=\n  | even_0 : even 0\n  | even_SS : forall n, even n -> even (S (S n)).\n\nTheorem one_not_even : ~ even 1.\nProof.\n  (* Your proof here *)",
+      "solution": "unfold not.\n  intro H.\n  inversion H.\nQed.",
+      "hints": [
+        "Unfold not, intro H",
+        "Use inversion H",
+        "Inversion detects no constructor works"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 25
+      }
+    },
+    {
+      "id": "level_62",
+      "name": "Binary Relation - Reflexive",
+      "description": "Prove ≤ is reflexive.",
+      "difficulty": 2,
+      "estimatedTime": 3,
+      "objective": "Prove forall n, n <= n.",
+      "theory": {
+        "markdown": "A binary relation R on a set X is a subset of X × X.\n\nIn Rocq: `Definition relation (X : Type) := X -> X -> Prop`\n\nA relation R is reflexive if: ∀x, R x x\n\nThe ≤ relation on nat is defined inductively:\n- n ≤ n (reflexive case)\n- n ≤ m → n ≤ S m (successor case)\n\nProve that ≤ is reflexive by using its reflexive constructor."
+      },
+      "startingCode": "Require Import Init.Nat.\nRequire Import Arith.PeanoNat.\n\nTheorem le_reflexive : forall n : nat, n <= n.\nProof.\n  (* Your proof here *)",
+      "solution": "intro n.\n  apply Nat.le_refl.\nQed.",
+      "hints": [
+        "Use apply Nat.le_refl",
+        "Or build proof with le constructors",
+        "This is the reflexive property"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 20
+      }
+    },
+    {
+      "id": "level_63",
+      "name": "Binary Relation - Transitive",
+      "description": "Prove ≤ is transitive.",
+      "difficulty": 4,
+      "estimatedTime": 10,
+      "objective": "Prove n <= m -> m <= p -> n <= p.",
+      "theory": {
+        "markdown": "A relation R is transitive if: ∀x y z, R x y → R y z → R x z\n\nFor ≤: if n ≤ m and m ≤ p, then n ≤ p.\n\nUse induction on the proof of m ≤ p.\n\nBase case: m ≤ m, so we need to show n ≤ m (which we have)\nInductive step: m ≤ S p', and IH: n ≤ p'\n                Need to show: n ≤ S p'\n\nThis requires understanding the structure of the ≤ proof!"
+      },
+      "startingCode": "Require Import Init.Nat.\nRequire Import Arith.PeanoNat.\n\nTheorem le_trans : forall n m p : nat, n <= m -> m <= p -> n <= p.\nProof.\n  (* Your proof here *)",
+      "solution": "intros n m p Hnm Hmp.\n  induction Hmp.\n  - exact Hnm.\n  - apply Nat.le_succ_diag_r. exact IHHmp.\nQed.",
+      "hints": [
+        "Induction on the proof of m <= p",
+        "Base case: use Hnm directly",
+        "Inductive step: apply le_succ_diag_r"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 40
+      }
+    },
+    {
+      "id": "level_64",
+      "name": "Transitive Closure",
+      "description": "Understand transitive closures of relations.",
+      "difficulty": 3,
+      "estimatedTime": 7,
+      "objective": "Prove clos_trans R_example 1 3.",
+      "theory": {
+        "markdown": "The transitive closure of a relation R is the smallest transitive relation containing R.\n\nIt's defined inductively:\n```\nInductive clos_trans {X} (R : X -> X -> Prop) : X -> X -> Prop :=\n  | t_step : forall x y, R x y -> clos_trans R x y\n  | t_trans : forall x y z, clos_trans R x y -> clos_trans R y z -> clos_trans R x z.\n```\n\nFrom R x y, we can conclude clos_trans R x y.\nFrom clos_trans R x y and clos_trans R y z, conclude clos_trans R x z.\n\nUse the constructors to build proofs in the transitive closure!"
+      },
+      "startingCode": "Require Import Init.Nat.\n\nInductive clos_trans {X: Type} (R: X -> X -> Prop) : X -> X -> Prop :=\n  | t_step (x y : X) : R x y -> clos_trans R x y\n  | t_trans (x y z : X) : clos_trans R x y -> clos_trans R y z -> clos_trans R x z.\n\nInductive R_example : nat -> nat -> Prop :=\n  | R_1_2 : R_example 1 2\n  | R_2_3 : R_example 2 3.\n\nTheorem trans_closure_example : clos_trans R_example 1 3.\nProof.\n  (* Your proof here *)",
+      "solution": "apply t_trans with 2.\n  - apply t_step. apply R_1_2.\n  - apply t_step. apply R_2_3.\nQed.",
+      "hints": [
+        "Use t_trans with 2 as the middle point",
+        "Apply t_step to use the base relation",
+        "Chain the steps together"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 35
+      }
+    },
+    {
+      "id": "level_65",
+      "name": "Reflexive-Transitive Closure",
+      "description": "Work with the reflexive-transitive closure.",
+      "difficulty": 2,
+      "estimatedTime": 3,
+      "objective": "Prove clos_refl_trans R_example 1 1.",
+      "theory": {
+        "markdown": "The reflexive-transitive closure adds reflexivity:\n```\nInductive clos_refl_trans {X} (R : X -> X -> Prop) : X -> X -> Prop :=\n  | rt_step : forall x y, R x y -> clos_refl_trans R x y\n  | rt_refl : forall x, clos_refl_trans R x x\n  | rt_trans : forall x y z, clos_refl_trans R x y -> \n                clos_refl_trans R y z -> clos_refl_trans R x z.\n```\n\nThis is denoted R* in formal language theory.\n\nEvery element is related to itself (reflexivity), and we can chain relationships (transitivity).\n\nThis is fundamental in formal language theory and program semantics!"
+      },
+      "startingCode": "Require Import Init.Nat.\n\nInductive clos_refl_trans {X: Type} (R: X -> X -> Prop) : X -> X -> Prop :=\n  | rt_step (x y : X) : R x y -> clos_refl_trans R x y\n  | rt_refl (x : X) : clos_refl_trans R x x\n  | rt_trans (x y z : X) : clos_refl_trans R x y -> \n              clos_refl_trans R y z -> clos_refl_trans R x z.\n\nInductive R_example : nat -> nat -> Prop :=\n  | R_1_2 : R_example 1 2\n  | R_2_3 : R_example 2 3.\n\nTheorem refl_trans_example : clos_refl_trans R_example 1 1.\nProof.\n  (* Your proof here *)",
+      "solution": "apply rt_refl.\nQed.",
+      "hints": [
+        "Use rt_refl",
+        "Reflexive closure means everything relates to itself",
+        "One tactic solves it"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 20
+      }
+    },
+    {
+      "id": "level_66",
+      "name": "Partial Maps - Empty",
+      "description": "Work with partial maps.",
       "difficulty": 1,
-      "estimatedTime": 20,
-      "objective": "Understand the type hierarchy",
+      "estimatedTime": 3,
+      "objective": "Prove empty maps to None.",
       "theory": {
-        "markdown": "## Basic Types and Type Hierarchy in ROCQ\n\n| Type      | Where it belongs | Meaning                      | Example values |\n|-----------|------------------|------------------------------|----------------|\n| Set       | Type             | Universe of data types       | nat, bool, list |\n| Prop      | Type             | Universe of logical propositions | True, False, n=0|\n| Type      | Type1,2,..       | Universe of all types        | Set, Prop, list |\n| bool      | Set              | Boolean logic                | true, false     |\n| nat       | Set              | Natural numbers (Peano)      | O, S O, S (S O) |\n| unit      | Set              | One element (trivial type)   | tt              |\n| Empty_set | Set              | Empty type (no elements)     | --              |\n| list A    | Set              | List of elements of type A   | nil, cons 1 nil |",
-        "examples": [
-          {
-            "title": "Checking types",
-            "code": "Check Set.              (* Set : Type *)\nCheck Prop.             (* Prop : Type *)\nCheck nat.              (* nat : Set *)\nCheck True.             (* True : Prop *)\nCheck (3 = 4).          (* 3 = 4 : Prop *)"
-          }
-        ]
+        "markdown": "A partial map is a finite mapping from keys to values.\n\nIt's built on top of total maps using the option type:\n```\nDefinition partial_map (A : Type) := total_map (option A).\n```\n\nThe empty map returns None for all keys:\n```\nDefinition empty {A} : partial_map A := t_empty None.\n```\n\nPartial maps are fundamental in programming language semantics for modeling environments and stores!"
       },
-      "startingCode": "(* Check the type of the boolean value true *)",
-      "solution": "Check true.\n(* true : bool *)",
+      "startingCode": "Require Import String.\nOpen Scope string_scope.\n\nDefinition total_map (A : Type) := string -> A.\n\nDefinition t_empty {A : Type} (v : A) : total_map A :=\n  fun _ => v.\n\nDefinition partial_map (A : Type) := total_map (option A).\n\nDefinition empty {A : Type} : partial_map A :=\n  t_empty None.\n\nTheorem empty_maps_to_none : forall (A : Type) (x : string),\n  empty x = @None A.\nProof.\n  (* Your proof here *)",
+      "solution": "intros A x.\n  unfold empty.\n  unfold t_empty.\n  reflexivity.\nQed.",
       "hints": [
-        "Set is the universe of data types",
-        "Prop is the universe of logical propositions",
-        "Type is the universe of all types"
+        "Unfold empty and t_empty",
+        "Then reflexivity",
+        "Definitions unfold easily"
       ],
+      "unlockedTactics": [],
       "rewards": {
-        "xp": 50
+        "xp": 15
       }
     },
     {
-      "id": "1.5",
-      "name": "Lecture 1: Inductive Types",
-      "description": "Learn how to define custom data types using Inductive",
+      "id": "level_67",
+      "name": "Partial Maps - Update",
+      "description": "Prove properties about map updates.",
       "difficulty": 2,
-      "estimatedTime": 30,
-      "objective": "Define a custom inductive type for days of the week",
+      "estimatedTime": 5,
+      "objective": "Prove update m x v x = Some v.",
       "theory": {
-        "markdown": "## Custom Data Types\n\nThe `Inductive` keyword is used to define custom data types.\n\nDefinition:\n\n```\nInductive TypeName : Type :=\n  | Constructor1 : Type1 -> TypeName\n  | Constructor2 : Type2 -> TypeName\n  | ...\n  | ConstructorN : TypeN -> TypeName.\n```\n\n- Each constructor must have a unique name (can contain parameters).\n- Inductive types can have multiple parameters.",
-        "examples": [
-          {
-            "title": "Days of the week",
-            "code": "Inductive day : Type :=\n  | Monday\n  | Tuesday\n  | Wednesday\n  | Thursday\n  | Friday\n  | Saturday\n  | Sunday."
-          },
-          {
-            "title": "Using pattern matching with inductive types",
-            "code": "Definition next_weekday (d : day) : day :=\n  match d with\n  | Monday    => Tuesday\n  | Tuesday   => Wednesday\n  | Wednesday => Thursday\n  | Thursday  => Friday\n  | Friday    => Saturday\n  | Saturday  => Sunday\n  | Sunday    => Monday\n  end."
-          }
-        ]
+        "markdown": "Updating a map creates a new map that returns the new value for the specified key, and delegates to the old map otherwise:\n```\nDefinition update {A} (m : partial_map A) (x : string) (v : A) :=\n  (x !-> Some v ; m).\n```\n\nAfter updating x to v, looking up x returns v.\n\nThis is the fundamental property of maps!"
       },
-      "startingCode": "(* Define an inductive type for days of the week with seven constructors *)",
-      "solution": "Inductive day : Type :=\n  | Monday\n  | Tuesday\n  | Wednesday\n  | Thursday\n  | Friday\n  | Saturday\n  | Sunday.",
+      "startingCode": "Require Import String.\nOpen Scope string_scope.\n\nDefinition total_map (A : Type) := string -> A.\n\nDefinition t_empty {A : Type} (v : A) : total_map A := fun _ => v.\n\nDefinition t_update {A : Type} (m : total_map A) (x : string) (v : A) :=\n  fun x' => if String.eqb x x' then v else m x'.\n\nDefinition partial_map (A : Type) := total_map (option A).\n\nDefinition empty {A : Type} : partial_map A := t_empty None.\n\nDefinition update {A : Type} (m : partial_map A) (x : string) (v : A) :=\n  t_update m x (Some v).\n\nTheorem update_eq : forall (A : Type) (m : partial_map A) (x : string) (v : A),\n  update m x v x = Some v.\nProof.\n  (* Your proof here *)",
+      "solution": "intros A m x v.\n  unfold update.\n  unfold t_update.\n  rewrite String.eqb_refl.\n  reflexivity.\nQed.",
       "hints": [
-        "Use the Inductive keyword",
-        "Each constructor must have a unique name",
-        "Constructors can take parameters"
+        "Unfold update and t_update",
+        "Use String.eqb_refl",
+        "Then reflexivity"
       ],
+      "unlockedTactics": [],
       "rewards": {
-        "xp": 100
+        "xp": 20
       }
     },
     {
-      "id": "1.6",
-      "name": "Lecture 1: First Proofs - Intro and Reflexivity",
-      "description": "Learn your first proof tactics: intro and reflexivity",
-      "difficulty": 2,
-      "estimatedTime": 30,
-      "objective": "Prove that forall n : nat, n = n",
+      "id": "level_68",
+      "name": "Partial Maps - Neq",
+      "description": "Looking up a different key after update.",
+      "difficulty": 3,
+      "estimatedTime": 7,
+      "objective": "Prove update m x v y = m y when x <> y.",
       "theory": {
-        "markdown": "## First Proofs\n\nLtac: Language of tactics for constructing proofs\n\n### Basic Tactics\n\n- `intro` - introduces a variable or hypothesis\n  - The intro tactic has optional parameters to name the introduced objects\n- `reflexivity` - proves goals of the form `x = x`\n- `simpl` - simplifies expressions",
-        "examples": [
-          {
-            "title": "Reflexivity proof",
-            "code": "Theorem refl_nat : forall n : nat, n = n.\nProof.\n  intro n.         (* take any n *)\n  reflexivity.     (* trivial equality n = n *)\nQed."
-          },
-          {
-            "title": "Using simpl",
-            "code": "Theorem dva_plus_tri : 2 + 3 = 5.\nProof.\n  simpl.           (* simplifies 2 + 3 to 5 *)\n  reflexivity.     (* 5 = 5 *)\nQed."
-          }
-        ]
+        "markdown": "If you update key x but look up key y (where x ≠ y), you get the same result as in the original map.\n\nThis requires using the reflection property of string equality.\n\n`destruct (String.eqb_spec x y)` gives you:\n- Case: x = y (contradiction with assumption)\n- Case: x ≠ y (use this to rewrite)\n\nThis is the second fundamental property of maps."
       },
-      "startingCode": "Theorem my_first_proof : forall n : nat, n = n.\nProof.\n  (* Your proof here *)\nQed.",
-      "solution": "Theorem my_first_proof : forall n : nat, n = n.\nProof.\n  intro n.\n  reflexivity.\nQed.",
+      "startingCode": "Require Import String.\nOpen Scope string_scope.\n\nDefinition total_map (A : Type) := string -> A.\n\nDefinition t_empty {A : Type} (v : A) : total_map A := fun _ => v.\n\nDefinition t_update {A : Type} (m : total_map A) (x : string) (v : A) :=\n  fun x' => if String.eqb x x' then v else m x'.\n\nDefinition partial_map (A : Type) := total_map (option A).\n\nDefinition empty {A : Type} : partial_map A := t_empty None.\n\nDefinition update {A : Type} (m : partial_map A) (x : string) (v : A) :=\n  t_update m x (Some v).\n\nTheorem update_neq : forall (A : Type) (m : partial_map A) (x y : string) (v : A),\n  x <> y -> update m x v y = m y.\nProof.\n  (* Your proof here *)",
+      "solution": "intros A m x y v H.\n  unfold update.\n  unfold t_update.\n  destruct (String.eqb_spec x y) as [Heq | Hneq].\n  - contradiction.\n  - reflexivity.\nQed.",
       "hints": [
-        "Use intro to introduce the variable",
-        "Use reflexivity to prove equality",
-        "The proof is: intro n. reflexivity."
+        "Unfold definitions",
+        "Use destruct (String.eqb_spec x y)",
+        "Contradiction in one case, reflexivity in other"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 30
+      }
+    },
+    {
+      "id": "level_69",
+      "name": "Decidable Propositions",
+      "description": "Understand decidability in constructive logic.",
+      "difficulty": 3,
+      "estimatedTime": 6,
+      "objective": "Prove excluded middle for decidable propositions.",
+      "theory": {
+        "markdown": "Not everything is provable in constructive logic!\n\nThe law of excluded middle (P \\/ ~P) is not provable for arbitrary P.\n\nIn classical logic, every proposition is either true or false. But in constructive logic (like Rocq), we need evidence!\n\nWe can't prove (P \\/ ~P) without being able to decide P.\n\nHowever, for DECIDABLE propositions (like boolean equality), we CAN prove excluded middle!\n\nThis is related to the Halting Problem and Gödel's Incompleteness Theorem."
+      },
+      "startingCode": "Require Import Bool.Bool.\n\nTheorem excluded_middle_for_decidable :\n  forall b : bool, (b = true) \\/ (b = false).\nProof.\n  (* Your proof here *)",
+      "solution": "intro b.\n  destruct b.\n  - left. reflexivity.\n  - right. reflexivity.\nQed.",
+      "hints": [
+        "Destruct b to get two cases",
+        "Left case: b = true",
+        "Right case: b = false"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 30
+      }
+    },
+    {
+      "id": "level_70",
+      "name": "Congratulations!",
+      "description": "You've completed Introduction to Type Theory!",
+      "difficulty": 1,
+      "estimatedTime": 2,
+      "objective": "Celebrate your achievement!",
+      "theory": {
+        "markdown": "Congratulations! You've learned the foundations of type theory and formal proofs.\n\nYou've mastered:\n- ✓ Basic tactics (intro, reflexivity, simpl, rewrite, destruct)\n- ✓ Mathematical induction\n- ✓ Data structures (pairs, lists, options)\n- ✓ Polymorphism and higher-order functions\n- ✓ Logical connectives (∧, ∨, ¬, →, ↔)\n- ✓ Quantifiers (∀, ∃)\n- ✓ Inductive predicates and relations\n- ✓ Advanced tactics (injection, discrimination, inversion)\n- ✓ Maps and partial maps\n\nThese skills form the foundation of:\n- **Formal verification**: proving programs correct\n- **Type systems**: understanding programming language design\n- **Logic**: constructive mathematics and proof theory\n- **Functional programming**: types as specifications\n\nWhere to go from here:\n1. Study simply-typed lambda calculus\n2. Learn about dependent types\n3. Explore program verification\n4. Study the Curry-Howard correspondence\n5. Investigate advanced type systems (System F, CoC)\n\nThe journey doesn't end here - it's just beginning!\n\nThis final level proves a simple celebratory theorem."
+      },
+      "startingCode": "Require Import Init.Nat.\nRequire Import List.\nImport ListNotations.\n\nTheorem you_are_awesome : forall skills : list string,\n  In \"perseverance\" skills -> \n  In \"logic\" skills ->\n  In \"curiosity\" skills ->\n  length skills >= 3.\nProof.\n  (* Your proof here - or just celebrate! *)",
+      "solution": "intros skills H1 H2 H3.\n  (* You proved it! You have all these skills and more! *)\n  (* The proof is in your journey through these 70 levels. *)\nAdmitted.\n(* We admit this one - you've earned it! *)",
+      "hints": [
+        "You've learned so much!",
+        "This is just the beginning",
+        "Keep exploring type theory!"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 100,
+        "achievements": [
+          "type_theory_master",
+          "course_complete"
+        ]
+      }
+    },
+    {
+      "id": "level_1",
+      "name": "Your First Proof",
+      "description": "Welcome to Type Theory! Learn the most basic proof tactics.",
+      "difficulty": 1,
+      "estimatedTime": 3,
+      "objective": "Prove that any natural number equals itself using intro and reflexivity.",
+      "theory": {
+        "markdown": "In Rocq, we prove statements using tactics. The most basic tactics are:\n\n**intro**: introduces a variable or hypothesis\n**reflexivity**: proves that something equals itself\n\nFor example, to prove `forall n : nat, n = n`, we:\n1. Use `intro n` to bring n into our context\n2. Use `reflexivity` to prove `n = n`\n\nThe `forall` keyword means \"for all\" - we're proving something about ALL natural numbers."
+      },
+      "startingCode": "Require Import Init.Nat.\n\nTheorem refl_nat : forall n : nat, n = n.\nProof.\n  (* Your proof here *)",
+      "solution": "intro n.\n  reflexivity.\nQed.",
+      "hints": [
+        "Use 'intro n' to introduce the variable",
+        "Use 'reflexivity' to prove n = n",
+        "Remember to end with 'Qed.'"
       ],
       "unlockedTactics": [
         "intro",
         "reflexivity"
       ],
       "rewards": {
-        "xp": 100
+        "xp": 10
       }
     },
     {
-      "id": "1.7",
-      "name": "Lecture 1: Proof by Rewriting",
-      "description": "Learn how to use the rewrite tactic",
-      "difficulty": 2,
-      "estimatedTime": 30,
-      "objective": "Prove a theorem using rewrite",
+      "id": "level_2",
+      "name": "Using Hypotheses",
+      "description": "Learn to use the exact tactic with hypotheses.",
+      "difficulty": 1,
+      "estimatedTime": 3,
+      "objective": "Prove a simple implication using hypotheses.",
       "theory": {
-        "markdown": "## Proof by Rewriting\n\nThe `rewrite` tactic is used when we have an equality in context\nand want to use it to replace one side of the equation with the other.",
-        "examples": [
-          {
-            "title": "Basic rewrite",
-            "code": "Theorem example_rewrite :\n  forall n m : nat, n = m -> n + 1 = m + 1.\nProof.\n  intros n m H.       (* n, m and assumption H: n = m *)\n  rewrite H.          (* replace n with m in the goal *)\n  reflexivity.        (* m + 1 = m + 1 *)\nQed."
-          },
-          {
-            "title": "Rewrite backwards",
-            "code": "Theorem example_rewrite_backwards :\n  forall n m : nat, n = m -> m + 1 = n + 1.\nProof.\n  intros n m H.\n  rewrite <- H.       (* replace m back with n *)\n  reflexivity.\nQed."
-          }
-        ]
+        "markdown": "The `exact` tactic finishes a proof when you have exactly what you need.\n\nWhen you have a hypothesis `H : P` and your goal is also `P`, you can write `exact H` to complete the proof.\n\nThe `intros` tactic (with an 's') can introduce multiple things at once:\n- `intros n m` introduces both n and m\n- `intros n m H` introduces n, m, and hypothesis H"
       },
-      "startingCode": "Theorem rewrite_exercise : forall n m : nat, n = m -> n + 2 = m + 2.\nProof.\n  (* Your proof here *)\nQed.",
-      "solution": "Theorem rewrite_exercise : forall n m : nat, n = m -> n + 2 = m + 2.\nProof.\n  intros n m H.\n  rewrite H.\n  reflexivity.\nQed.",
+      "startingCode": "Require Import Init.Nat.\n\nTheorem use_hypothesis : forall (n m : nat), n = m -> n = m.\nProof.\n  (* Your proof here *)",
+      "solution": "intros n m H.\n  exact H.\nQed.",
       "hints": [
-        "rewrite is used when we have an equality in context",
-        "Use rewrite H to replace one side with the other",
-        "Use rewrite <- H for the opposite direction"
+        "Use 'intros' to introduce multiple things at once",
+        "Use 'exact H' when you have exactly what you need",
+        "The hypothesis H is your friend!"
+      ],
+      "unlockedTactics": [
+        "intros",
+        "exact"
+      ],
+      "rewards": {
+        "xp": 10
+      }
+    },
+    {
+      "id": "level_3",
+      "name": "Simple Computation",
+      "description": "Use the simpl tactic to perform computation.",
+      "difficulty": 1,
+      "estimatedTime": 2,
+      "objective": "Prove that 2 + 3 = 5 using computation.",
+      "theory": {
+        "markdown": "The `simpl` tactic performs computation. It evaluates expressions:\n- `2 + 3` → `5`\n- `S (S O)` → `2`\n\nIn Rocq, natural numbers are built from:\n- `O` (zero)\n- `S n` (successor of n)\n\nSo `2` is actually `S (S O)`, and `5` is `S (S (S (S (S O))))`.\n\nAfter simplification, use `reflexivity` to complete the proof."
+      },
+      "startingCode": "Require Import Init.Nat.\n\nTheorem two_plus_three : 2 + 3 = 5.\nProof.\n  (* Your proof here *)",
+      "solution": "simpl.\n  reflexivity.\nQed.",
+      "hints": [
+        "Use 'simpl' to compute 2 + 3",
+        "After simpl, use 'reflexivity'",
+        "Let Rocq do the arithmetic!"
+      ],
+      "unlockedTactics": [
+        "simpl"
+      ],
+      "rewards": {
+        "xp": 10
+      }
+    },
+    {
+      "id": "level_4",
+      "name": "Rewriting",
+      "description": "Learn the powerful rewrite tactic.",
+      "difficulty": 1,
+      "estimatedTime": 4,
+      "objective": "Use rewrite to transform the goal using an equality.",
+      "theory": {
+        "markdown": "## Proof by Rewriting\n\nFrom Lecture 1: The `rewrite` tactic is used when we have an equality in context\nand want to use it to replace one side of the equation with the other.\n\nWhen you have a hypothesis `H : a = b`, the `rewrite` tactic replaces `a` with `b`:\n\n- `rewrite H` replaces left-to-right (a → b)\n- `rewrite <- H` replaces right-to-left (b → a)\n\n### Example from Lecture:\n\n```\nTheorem example_rewrite :\n  forall n m : nat, n = m -> n + 1 = m + 1.\nProof.\n  intros n m H.       (* n, m and assumption H: n = m *)\n  rewrite H.          (* replace n with m in the goal *)\n  reflexivity.        (* m + 1 = m + 1 *)\nQed.\n```\n\nThis is one of the most powerful tactics in theorem proving!\n\nThe key insight: equality is preserved under function application. If `n = m`, then `f(n) = f(m)` for any function `f`."
+      },
+      "startingCode": "Require Import Init.Nat.\n\nTheorem example_rewrite : forall n m : nat, n = m -> n + 1 = m + 1.\nProof.\n  (* Your proof here *)",
+      "solution": "intros n m H.\n  rewrite H.\n  reflexivity.\nQed.",
+      "hints": [
+        "When you have H : a = b, use 'rewrite H'",
+        "This replaces a with b in the goal",
+        "Then use reflexivity"
       ],
       "unlockedTactics": [
         "rewrite"
       ],
       "rewards": {
-        "xp": 100
+        "xp": 15
       }
     },
     {
-      "id": "1.8",
-      "name": "Lecture 1: Proof by Case Analysis - Destruct",
-      "description": "Learn how to use destruct for case analysis",
-      "difficulty": 2,
-      "estimatedTime": 30,
-      "objective": "Prove a theorem using destruct",
+      "id": "level_5",
+      "name": "Backward Rewriting",
+      "description": "Use rewrite in the opposite direction.",
+      "difficulty": 1,
+      "estimatedTime": 3,
+      "objective": "Use backward rewrite with the <- arrow.",
       "theory": {
-        "markdown": "## Proof by Case Analysis - Destruct\n\nThe `destruct` tactic is used to perform case analysis without recursion.\nThe tactic generates subgoals for each possible constructor of the term.\nSuitable for inductive types without recursion.",
-        "examples": [
-          {
-            "title": "Destruct on bool",
-            "code": "Theorem example_destruct_bool :\n  forall b : bool, b = b. \nProof.\n  intros b.\n  destruct b.      (* split into cases true and false *)\n  - reflexivity.   (* case true *)\n  - reflexivity.   (* case false *)\nQed."
-          },
-          {
-            "title": "Destruct on nat",
-            "code": "Theorem example_destruct_nat :\n  forall n : nat, n = n.\nProof.\n  intros n.\n  destruct n as [| n'].  (* split into O and S n' *)\n  - reflexivity.          (* case O *)\n  - reflexivity.          (* case S n' *)\nQed."
-          }
-        ]
+        "markdown": "The `<-` arrow reverses the direction of rewriting.\n\nIf `H : n = m`, then:\n- `rewrite H` changes n to m\n- `rewrite <- H` changes m to n\n\nThis is useful when you need to introduce complexity rather than simplify."
       },
-      "startingCode": "Theorem destruct_exercise : forall b : bool, b = b.\nProof.\n  (* Your proof here *)\nQed.",
-      "solution": "Theorem destruct_exercise : forall b : bool, b = b.\nProof.\n  intros b.\n  destruct b.\n  - reflexivity.\n  - reflexivity.\nQed.",
+      "startingCode": "Require Import Init.Nat.\n\nTheorem example_rewrite_backwards : forall n m : nat, n = m -> m + 1 = n + 1.\nProof.\n  (* Your proof here *)",
+      "solution": "intros n m H.\n  rewrite <- H.\n  reflexivity.\nQed.",
       "hints": [
-        "destruct is used for case analysis without recursion",
-        "It generates subgoals for each possible constructor",
-        "Use destruct b for bool, destruct n for nat"
+        "Use 'rewrite <- H' to rewrite from right to left",
+        "This replaces m with n",
+        "The arrow shows direction"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 10
+      }
+    },
+    {
+      "id": "level_6",
+      "name": "Boolean Self-Equality",
+      "description": "Learn case analysis with destruct.",
+      "difficulty": 2,
+      "estimatedTime": 5,
+      "objective": "Prove that every boolean equals itself using case analysis.",
+      "theory": {
+        "markdown": "The `destruct` tactic performs case analysis on an inductive type.\n\nFor `bool`, there are two cases: `true` and `false`.\n\nSyntax: `destruct b.` creates two subgoals:\n- One where b = true\n- One where b = false\n\nUse `-` to mark each case in your proof."
+      },
+      "startingCode": "Require Import Bool.Bool.\n\nTheorem bool_self : forall b : bool, b = b.\nProof.\n  (* Your proof here *)",
+      "solution": "intro b.\n  destruct b.\n  - reflexivity.\n  - reflexivity.\nQed.",
+      "hints": [
+        "Use 'destruct b' to split into cases",
+        "Use '-' to mark each case",
+        "Both cases can be solved with reflexivity"
       ],
       "unlockedTactics": [
         "destruct"
       ],
       "rewards": {
-        "xp": 100
+        "xp": 15
       }
     },
     {
-      "id": "2.1",
-      "name": "Lecture 2: Proof by Induction",
-      "description": "Learn how to prove theorems using induction",
-      "difficulty": 3,
-      "estimatedTime": 40,
-      "objective": "Prove a theorem using induction",
+      "id": "level_7",
+      "name": "OR with True",
+      "description": "Prove a boolean property using destruct and simpl.",
+      "difficulty": 2,
+      "estimatedTime": 4,
+      "objective": "Prove that b || true = true for any boolean b.",
       "theory": {
-        "markdown": "## Proof by Induction\n\nInduction proof for a statement that some property P(n) holds for all n : nat:\n\n1. Base case: show that P(0) holds.\n2. Inductive step: show that if P(n') holds, then P(S n') also holds.\n3. Conclusion: from 1. and 2. it follows that P(n) holds for all n.\n\nFormally, the principle of proof by induction can be expressed as:\n    (P(0) ∧ ∀n.(P(n) → P(S n))) → ∀n.P(n)\n\nDifference between tactics destruct and induction:\n\n- **destruct**:\n  * Used for case analysis according to constructors.\n  * Does not extend the proof with an inductive hypothesis.\n  * Typical for bool, small cases of nat, or when dividing into finite possibilities is sufficient.\n\n- **induction**:\n  * Used when the property requires recursion.\n  * In addition to dividing into cases, we also get an inductive hypothesis.\n  * Typical for proofs about nat, list, or other recursive structures."
+        "markdown": "Boolean OR (written ||) returns true if either operand is true.\n\nWhen you destruct a boolean in the goal, simpl will compute the result:\n- true || true = true\n- false || true = true\n\nThis is a good pattern: destruct, then simpl, then reflexivity."
       },
-      "startingCode": "Theorem induction_exercise : forall n : nat, 0 + n = n.\nProof.\n  (* Your proof here *)\nQed.",
-      "solution": "Theorem induction_exercise : forall n : nat, 0 + n = n.\nProof.\n  intro n.\n  simpl.\n  reflexivity.\nQed.",
+      "startingCode": "Require Import Bool.Bool.\n\nTheorem orb_true : forall b : bool, b || true = true.\nProof.\n  (* Your proof here *)",
+      "solution": "intro b.\n  destruct b.\n  - simpl. reflexivity.\n  - simpl. reflexivity.\nQed.",
       "hints": [
-        "induction generates base case and inductive step",
-        "Base case: prove P(0)",
-        "Inductive step: prove P(n) -> P(S n) using inductive hypothesis"
+        "Destruct b into two cases",
+        "Use simpl in each case to compute the OR",
+        "Both cases should simplify nicely"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 15
+      }
+    },
+    {
+      "id": "level_8",
+      "name": "Zero Plus N",
+      "description": "Work with addition on natural numbers.",
+      "difficulty": 1,
+      "estimatedTime": 3,
+      "objective": "Prove that 0 + n = n using simplification.",
+      "theory": {
+        "markdown": "Addition on natural numbers is defined recursively on the first argument:\n0 + n = n\n(S m) + n = S (m + n)\nSo `0 + n` simplifies directly to `n`.\n\nThis is why `simpl` works here without induction."
+      },
+      "startingCode": "Require Import Init.Nat.\n\nTheorem plus_O_n : forall n : nat, 0 + n = n.\nProof.\n  (* Your proof here *)",
+      "solution": "intro n.\n  simpl.\n  reflexivity.\nQed.",
+      "hints": [
+        "Addition on the left simplifies easily",
+        "Use simpl to evaluate 0 + n",
+        "Then reflexivity finishes it"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 10
+      }
+    },
+    {
+      "id": "level_9",
+      "name": "One Plus N",
+      "description": "Prove that 1 + n = S n.",
+      "difficulty": 1,
+      "estimatedTime": 3,
+      "objective": "Use computation to prove a property about successor.",
+      "theory": {
+        "markdown": "Since 1 = S 0, we have:\n1 + n = (S 0) + n\n\nBy the definition of addition:\n(S 0) + n = S (0 + n) = S n\n\nThe `simpl` tactic will perform this computation for you."
+      },
+      "startingCode": "Require Import Init.Nat.\n\nTheorem one_plus_n : forall n : nat, 1 + n = S n.\nProof.\n  (* Your proof here *)",
+      "solution": "intro n.\n  simpl.\n  reflexivity.\nQed.",
+      "hints": [
+        "Remember 1 = S 0",
+        "Simpl will compute (S 0) + n",
+        "This is just applying the definition"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 10
+      }
+    },
+    {
+      "id": "level_10",
+      "name": "Chaining Rewrites",
+      "description": "Use multiple rewrites in sequence.",
+      "difficulty": 2,
+      "estimatedTime": 4,
+      "objective": "Prove transitivity of equality by chaining rewrites.",
+      "theory": {
+        "markdown": "You can use `rewrite` multiple times in sequence.\n\nEach rewrite transforms the goal step by step until you can finish with `reflexivity`.\n\nTip: You can also chain rewrites with `rewrite H1, H2, H3.`"
+      },
+      "startingCode": "Require Import Init.Nat.\n\nTheorem trans_eq : forall n m k : nat, n = m -> m = k -> n = k.\nProof.\n  (* Your proof here *)",
+      "solution": "intros n m k H1 H2.\n  rewrite H1.\n  rewrite H2.\n  reflexivity.\nQed.",
+      "hints": [
+        "Use rewrite twice, once for each hypothesis",
+        "First rewrite H1, then H2",
+        "You can chain: rewrite H1, H2."
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 15
+      }
+    },
+    {
+      "id": "level_11",
+      "name": "Plus Two",
+      "description": "Apply rewrite to a function application.",
+      "difficulty": 1,
+      "estimatedTime": 3,
+      "objective": "If n = m, then n + 2 = m + 2.",
+      "theory": {
+        "markdown": "This is a straightforward application of rewrite.\n\nThe key insight: equality is preserved under function application. If n = m, then f(n) = f(m) for any function f.\n\nHere, f(x) = x + 2."
+      },
+      "startingCode": "Require Import Init.Nat.\n\nTheorem plus_two : forall (n m : nat), n = m -> n + 2 = m + 2.\nProof.\n  (* Your proof here *)",
+      "solution": "intros n m H.\n  rewrite H.\n  reflexivity.\nQed.",
+      "hints": [
+        "Rewrite H to change n to m",
+        "Equality is preserved under functions",
+        "Then reflexivity"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 10
+      }
+    },
+    {
+      "id": "level_12",
+      "name": "Your First Induction",
+      "description": "Enter the realm of mathematical induction!",
+      "difficulty": 3,
+      "estimatedTime": 8,
+      "objective": "Prove n + 0 = n using induction.",
+      "theory": {
+        "markdown": "Proof by induction on natural numbers has two steps:\n\n**Base case**: Prove P(0)\n**Inductive step**: Assume P(n') (the inductive hypothesis IH), then prove P(S n')\n\nThe tactic is: `induction n as [| n' IH].`\n\nThis creates two subgoals:\n- Base: where n = 0\n- Inductive: where n = S n', and you have IH : P(n')\n\nThe principle: P(0) ∧ (∀n. P(n) → P(S n)) → ∀n. P(n)"
+      },
+      "startingCode": "Require Import Init.Nat.\nRequire Import Arith.PeanoNat.\n\nTheorem plus_n_O : forall n : nat, n + 0 = n.\nProof.\n  (* Your proof here *)",
+      "solution": "intro n.\n  induction n as [| n' IH].\n  - simpl. reflexivity.\n  - simpl. rewrite IH. reflexivity.\nQed.",
+      "hints": [
+        "Use 'induction n as [| n' IH]'",
+        "Base case: 0 + 0 = 0",
+        "Inductive step: use IH in the rewrite"
       ],
       "unlockedTactics": [
         "induction"
       ],
       "rewards": {
-        "xp": 150
+        "xp": 25,
+        "achievements": [
+          "first_induction"
+        ]
       }
     },
     {
-      "id": "3.1",
-      "name": "Lecture 3: Data Structures - Pairs",
-      "description": "Learn about pairs and how to work with them",
+      "id": "level_13",
+      "name": "Minus n n",
+      "description": "Prove that n - n = 0.",
       "difficulty": 2,
-      "estimatedTime": 30,
-      "objective": "Define a pair type and projection functions",
+      "estimatedTime": 5,
+      "objective": "Use induction to prove a subtraction property.",
       "theory": {
-        "markdown": "## Data Structures - Pairs\n\nIn this section we will get acquainted with some basic data structures\nin the Rocq environment, which are the foundation for data representation\nand logical reasoning about programs.\n\nWe will cover:\n- Simple structures like **pairs**,\n- Dynamic structures like **lists**,\n- We will reason about these structures formally using logical proofs,\n- We will show their **polymorphic versions** that work for any type,\n- And finally introduce the **option** type, which is used to represent\n  partially defined functions.\n\nImportant note:\n- The standard Rocq library contains definitions of basic structures\n  like **pair** and **list**.\n- However, we will first define them ourselves from scratch,\n  to better understand the principles of their operation.\n\n### Pair\n\nThe only way to create a pair of natural numbers\nis to apply the natpair constructor to two arguments of type nat.\n\nTo extract values of type natpair we need two projections: fst and snd.",
-        "examples": [
-          {
-            "title": "Defining a pair type",
-            "code": "Inductive natpair: Type :=\n| pair (n m :nat)."
-          },
-          {
-            "title": "Projection functions",
-            "code": "Definition fst (x: natpair) : nat := \n  match x with\n  | pair n m => n\n  end.\n\nDefinition snd (x: natpair) : nat := \n  match x with\n  | pair n m => m\n  end."
-          }
-        ]
+        "markdown": "## Your First Induction Proof\n\nFrom Lecture 2: Proof by induction for a statement that some property P(n) holds for all n : nat:\n\n1. **Base case**: Show that P(0) holds.\n2. **Inductive step**: Show that if P(n') holds, then P(S n') also holds.\n3. **Conclusion**: From 1. and 2. it follows that P(n) holds for all n.\n\n### The Induction Tactic\n\nWhen you use `induction n as [| n' IH]`:\n- The first case `|` is the base case (n = 0)\n- The second case `| n' IH` is the inductive step, where:\n  - `n'` is the predecessor\n  - `IH` is the inductive hypothesis: P(n') holds\n\n### This Exercise\n\nThis requires induction because subtraction is defined recursively.\n\n**Base case**: `0 - 0 = 0` (by definition)\n\n**Inductive step**: \n```\n(S n') - (S n') = n' - n' = 0  [by IH]\n```\n\nRemember to use your inductive hypothesis `IH`!\n\n### Example Pattern from Lecture:\n\n```\nTheorem plus_n_O : forall n : nat, n + 0 = n.\nProof.\n  intro n.\n  induction n as [| n' IH].\n  - (* Base case: n = 0 *)\n    simpl. reflexivity.\n  - (* Inductive step *)\n    simpl.\n    rewrite IH.\n    reflexivity.\nQed.\n```"
       },
-      "startingCode": "(* Define a pair type for natural numbers and projection functions *)\nInductive natpair: Type :=\n| pair (n m :nat).\n\n(* Define fst function *)\nDefinition fst (x: natpair) : nat := \n  (* Your code here *)\n\n(* Define snd function *)\nDefinition snd (x: natpair) : nat := \n  (* Your code here *)",
-      "solution": "Inductive natpair: Type :=\n| pair (n m :nat).\n\nDefinition fst (x: natpair) : nat := \n  match x with\n  | pair n m => n\n  end.\n\nDefinition snd (x: natpair) : nat := \n  match x with\n  | pair n m => m\n  end.",
+      "startingCode": "Require Import Init.Nat.\nRequire Import Arith.PeanoNat.\n\nTheorem minus_n_n : forall n, minus n n = 0.\nProof.\n  (* Your proof here *)",
+      "solution": "intro n.\n  induction n as [| n' IH].\n  - simpl. reflexivity.\n  - simpl. exact IH.\nQed.",
       "hints": [
-        "Use Inductive to define the pair type",
-        "Create projection functions fst and snd",
-        "Use pattern matching to extract values"
+        "Induction on n",
+        "Base case is trivial",
+        "In inductive step, use exact IH"
       ],
+      "unlockedTactics": [],
       "rewards": {
-        "xp": 100
+        "xp": 20
       }
     },
     {
-      "id": "3.2",
-      "name": "Lecture 3: Lists",
-      "description": "Learn about lists and list operations",
+      "id": "level_14",
+      "name": "Multiplication by Zero",
+      "description": "Prove that n * 0 = 0.",
       "difficulty": 2,
-      "estimatedTime": 35,
-      "objective": "Define list operations like length and append",
+      "estimatedTime": 5,
+      "objective": "Use induction to prove a multiplication property.",
       "theory": {
-        "markdown": "## Lists\n\nLists are dynamic data structures that can grow or shrink.",
-        "examples": [
-          {
-            "title": "Defining a list type",
-            "code": "Inductive natlist : Type :=\n  | nil : natlist\n  | cons : nat -> natlist -> natlist."
-          },
-          {
-            "title": "List length function",
-            "code": "Fixpoint length (l:natlist) : nat := \n  match l with \n  | [] => 0\n  | head :: tail => 1 + (length tail)\n  end."
-          },
-          {
-            "title": "List append function",
-            "code": "Fixpoint append (l1 l2: natlist) : natlist :=\n  match l1 with\n  | [] => l2\n  | head::tail => head::(append tail l2)\n  end."
-          }
-        ]
+        "markdown": "Multiplication is defined as:\n- 0 * m = 0\n- (S n) * m = m + (n * m)\n\nSo for n * 0, we need induction on n:\n- Base: 0 * 0 = 0\n- Step: (S n') * 0 = 0 + (n' * 0) = 0 + 0 = 0"
       },
-      "startingCode": "(* Define a length function for lists *)\nFixpoint length (l:natlist) : nat := \n  (* Your code here *)",
-      "solution": "Fixpoint length (l:natlist) : nat := \n  match l with \n  | [] => 0\n  | head :: tail => 1 + (length tail)\n  end.",
+      "startingCode": "Require Import Init.Nat.\nRequire Import Arith.PeanoNat.\n\nTheorem mul_0_r : forall n : nat, n * 0 = 0.\nProof.\n  (* Your proof here *)",
+      "solution": "intro n.\n  induction n as [| n' IH].\n  - simpl. reflexivity.\n  - simpl. exact IH.\nQed.",
       "hints": [
-        "Lists are defined inductively with nil and cons",
-        "Use Fixpoint for recursive list functions",
-        "Pattern match on the list structure"
+        "Induction on n",
+        "Base: 0 * 0 = 0",
+        "Step: (S n') * 0 = 0 + (n' * 0)"
       ],
+      "unlockedTactics": [],
       "rewards": {
-        "xp": 100
+        "xp": 20
       }
     },
     {
-      "id": "5.1",
-      "name": "Lecture 5: Inductively Defined Propositions",
-      "description": "Learn about inductively defined propositions and relations",
+      "id": "level_15",
+      "name": "Multiplication by One",
+      "description": "Prove that n * 1 = n.",
       "difficulty": 3,
-      "estimatedTime": 40,
-      "objective": "Define an inductive proposition for even numbers",
+      "estimatedTime": 7,
+      "objective": "Combine induction with the plus_n_O lemma.",
       "theory": {
-        "markdown": "## Inductively Defined Propositions\n\nIn Rocq (and logic in general), an inductively defined proposition means\nthat a predicate or set is defined using construction rules that determine:\n- when the proposition holds (what are the base cases),\n- rules for deriving further cases (inductive step).\n\n### Example: Even Numbers\n\nDeduction rules:\n\n```\n------------ (ev_0)\n   even 0\n\n     even n\n----------------- (ev_SS)\n  even (S (S n))\n```\n\nDefinition: n is even if it is 0, or if n-2 is even.",
-        "examples": [
-          {
-            "title": "Defining even numbers",
-            "code": "Inductive even : nat -> Prop :=\n  | even_O : even 0\n  | even_SS : forall n, even n -> even (S (S n))."
-          },
-          {
-            "title": "Proving 4 is even",
-            "code": "Lemma four_is_even : even 4.\nProof.\n  apply even_SS.\n  apply even_SS.\n  apply even_O.\nQed."
-          }
-        ]
+        "markdown": "## Combining Induction with Lemmas\n\nFrom Lecture 2: In more complex proofs, you'll combine induction with previously proven lemmas.\n\n### Using Existing Lemmas\n\nWhen you have a lemma like `plus_n_O : forall n, n + 0 = n`, you can use it in your proofs with `rewrite plus_n_O`.\n\n### This Exercise\n\nYou'll need:\n- **Induction on n**\n- **The fact that n + 0 = n** (which you proved earlier as `plus_n_O`!)\n\n**Base case**: `0 * 1 = 0`\n\n**Inductive step**: \n```\n(S n') * 1 = 1 + (n' * 1)    [by definition of multiplication]\n           = 1 + n'           [by IH: n' * 1 = n']\n           = S n'             [by definition]\n           = S n' + 0         [by plus_n_O]\n```\n\n### Pattern from Lecture:\n\n```\nTheorem example_rewrite_with_theorem :\n  forall n, 0 + n + 1 = n + 1.\nProof.\n  intro n.\n  rewrite plus_O_n.   (* use lemma plus_O_n *)\n  reflexivity.\nQed.\n```\n\nThe key is recognizing when to apply your previously proven lemmas!"
       },
-      "startingCode": "(* Define an inductive proposition for even numbers *)\nInductive even : nat -> Prop :=\n  (* Your constructors here *)",
-      "solution": "Inductive even : nat -> Prop :=\n  | even_O : even 0\n  | even_SS : forall n, even n -> even (S (S n)).",
+      "startingCode": "Require Import Init.Nat.\nRequire Import Arith.PeanoNat.\n\nLemma plus_n_O : forall n, n + 0 = n.\nProof. intro. induction n. reflexivity. simpl. rewrite IHn. reflexivity. Qed.\n\nTheorem mult_n_1 : forall n, n * 1 = n.\nProof.\n  (* Your proof here *)",
+      "solution": "intro n.\n  induction n as [| n' IH].\n  - simpl. reflexivity.\n  - simpl. rewrite IH. rewrite plus_n_O. reflexivity.\nQed.",
       "hints": [
-        "Use Inductive to define propositions",
-        "Define base cases and inductive steps",
-        "Use constructors to build proofs"
+        "You'll need induction on n",
+        "Use the lemma plus_n_O",
+        "Base: 0 * 1 = 0, Step needs rewriting"
       ],
+      "unlockedTactics": [],
       "rewards": {
-        "xp": 150
+        "xp": 25
       }
     },
     {
-      "id": "5.2",
-      "name": "Lecture 5: Binary Relations - Less or Equal",
-      "description": "Learn about binary relations and how to define them",
+      "id": "level_16",
+      "name": "Successor Equality",
+      "description": "Prove S (n + m) = n + (S m).",
       "difficulty": 3,
-      "estimatedTime": 40,
-      "objective": "Prove a theorem about the less-or-equal relation",
+      "estimatedTime": 6,
+      "objective": "Prove a key lemma about successor and addition.",
       "theory": {
-        "markdown": "## Binary Relations\n\n### Less or Equal Relation\n\nInductive definition of the less-or-equal relation:\n\nDeduction rules:\n\n```\n-------------- (le_n)\n    n <= n\n\n    n <= m\n-------------- (le_S)\n    n <= S m\n```",
-        "examples": [
-          {
-            "title": "Defining le",
-            "code": "Inductive le : nat -> nat -> Prop :=\n  | le_n (n : nat) : le n n\n  | le_S (n m : nat) : le n m -> le n (S m).\n\nNotation \"n <= m\" := (le n m) (at level 70)."
-          },
-          {
-            "title": "Proving 3 <= 5",
-            "code": "Example le_3_5 : 3 <= 5.\nProof.\n  apply le_S.\n  apply le_S.\n  apply le_n.\nQed."
-          }
-        ]
+        "markdown": "This is a key lemma about the interaction of successor and addition.\n\nUse induction on n:\n- Base: S (0 + m) = S m = 0 + (S m)\n- Step: S ((S n') + m) = S (S (n' + m)) = S (n' + (S m)) = (S n') + (S m)\n\nThe `f_equal` tactic can be useful: if you need to prove `f a = f b`, it reduces the goal to proving `a = b`."
       },
-      "startingCode": "(* Prove that 2 <= 4 *)\nExample le_2_4 : 2 <= 4.\nProof.\n  (* Your proof here *)\nQed.",
-      "solution": "Example le_2_4 : 2 <= 4.\nProof.\n  apply le_S.\n  apply le_S.\n  apply le_n.\nQed.",
+      "startingCode": "Require Import Init.Nat.\nRequire Import Arith.PeanoNat.\n\nTheorem plus_n_Sm : forall n m : nat, S (n + m) = n + (S m).\nProof.\n  (* Your proof here *)",
+      "solution": "intros n m.\n  induction n as [| n' IH].\n  - simpl. reflexivity.\n  - simpl. rewrite IH. reflexivity.\nQed.",
       "hints": [
-        "Use apply to use constructors",
-        "le_n proves n <= n",
-        "le_S proves n <= m -> n <= S m"
+        "Use induction on n",
+        "Base case simplifies nicely",
+        "f_equal can help in the inductive step"
+      ],
+      "unlockedTactics": [
+        "f_equal"
       ],
       "rewards": {
-        "xp": 150
+        "xp": 25
       }
     },
     {
-      "id": "6.1",
-      "name": "Lecture 6: Maps and Total Maps",
-      "description": "Learn about maps as data structures",
-      "difficulty": 3,
-      "estimatedTime": 40,
-      "objective": "Define a total map and update operation",
+      "id": "level_17",
+      "name": "Commutativity of Addition",
+      "description": "The classic theorem: addition is commutative!",
+      "difficulty": 4,
+      "estimatedTime": 10,
+      "objective": "Prove n + m = m + n.",
       "theory": {
-        "markdown": "## Maps and Total Maps\n\n### Total Maps\n\nA total map is a function from keys to values that always returns a value,\neven when the key is not explicitly defined.",
-        "examples": [
-          {
-            "title": "Defining total map",
-            "code": "Definition total_map (A : Type) := string -> A."
-          },
-          {
-            "title": "Empty total map",
-            "code": "Definition t_empty {A : Type} (v : A) : total_map A :=\n  (fun _ => v)."
-          },
-          {
-            "title": "Updating a total map",
-            "code": "Definition t_update {A : Type} (m : total_map A)\n                    (x : string) (v : A) :=\n  fun x' => if String.eqb x x' then v else m x'."
-          }
-        ]
+        "markdown": "This is one of the fundamental theorems of arithmetic.\n\nStrategy:\n1. Induction on n\n2. Base case: 0 + m = m + 0 (use plus_n_O)\n3. Inductive step: (S n') + m = m + (S n') \n   - Use IH: n' + m = m + n'\n   - Use plus_n_Sm: m + (S n') = S (m + n')\n\nThis proof shows the beauty of induction!"
       },
-      "startingCode": "(* Define a total map update function *)\nDefinition t_update {A : Type} (m : total_map A)\n                    (x : string) (v : A) :=\n  (* Your code here *)",
-      "solution": "Definition t_update {A : Type} (m : total_map A)\n                    (x : string) (v : A) :=\n  fun x' => if String.eqb x x' then v else m x'.",
+      "startingCode": "Require Import Init.Nat.\nRequire Import Arith.PeanoNat.\n\nLemma plus_n_O : forall n, n + 0 = n.\nProof. intro. induction n. reflexivity. simpl. rewrite IHn. reflexivity. Qed.\n\nLemma plus_n_Sm : forall n m, S (n + m) = n + (S m).\nProof. intros. induction n. reflexivity. simpl. rewrite IHn. reflexivity. Qed.\n\nTheorem add_comm : forall n m : nat, n + m = m + n.\nProof.\n  (* Your proof here *)",
+      "solution": "intros n m.\n  induction n as [| n' IH].\n  - simpl. rewrite plus_n_O. reflexivity.\n  - simpl. rewrite IH. rewrite plus_n_Sm. reflexivity.\nQed.",
       "hints": [
-        "Total maps are functions from keys to values",
-        "Use string as the key type",
-        "Update creates a new function that checks for the key"
+        "Use induction on n",
+        "You'll need plus_n_O for base case",
+        "You'll need plus_n_Sm for inductive step"
       ],
+      "unlockedTactics": [],
       "rewards": {
-        "xp": 150
+        "xp": 50,
+        "achievements": [
+          "commutativity_master"
+        ]
+      }
+    },
+    {
+      "id": "level_18",
+      "name": "Associativity of Addition",
+      "description": "Prove that addition is associative.",
+      "difficulty": 3,
+      "estimatedTime": 7,
+      "objective": "Prove n + (m + p) = (n + m) + p.",
+      "theory": {
+        "markdown": "Associativity is another fundamental property.\n\nUse induction on n:\n- Base: 0 + (m + p) = m + p = (0 + m) + p\n- Step: (S n') + (m + p) = S (n' + (m + p)) \n                         = S ((n' + m) + p)  [by IH]\n                         = (S (n' + m)) + p\n                         = ((S n') + m) + p\n\nThe structure of the proof mirrors the recursive definition of addition."
+      },
+      "startingCode": "Require Import Init.Nat.\nRequire Import Arith.PeanoNat.\n\nTheorem add_assoc : forall n m p : nat, n + (m + p) = (n + m) + p.\nProof.\n  (* Your proof here *)",
+      "solution": "intros n m p.\n  induction n as [| n' IH].\n  - simpl. reflexivity.\n  - simpl. rewrite IH. reflexivity.\nQed.",
+      "hints": [
+        "Induction on n",
+        "Base case is straightforward",
+        "Inductive step uses IH directly"
+      ],
+      "unlockedTactics": [],
+      "rewards": {
+        "xp": 30
       }
     }
   ]

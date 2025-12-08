@@ -1,11 +1,15 @@
 {
   "version": "1.0",
-  "lastUpdated": "2024-11-18",
+  "lastUpdated": "2025-12-08",
   "worlds": [
     {
-      "file": "introduction.json",
+      "file": "rocqbasics.json",
       "enabled": true,
       "alwaysUnlocked": true
+    },
+    {
+      "file": "introduction.json",
+      "enabled": true
     }
   ]
 }

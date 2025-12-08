@@ -1,0 +1,438 @@
+{
+  "id": "rocqbasics",
+  "name": "Rocq Basics",
+  "description": "Learn the fundamentals of the Rocq proof assistant: its languages, syntax, and core features",
+  "order": 1,
+  "icon": "🔧",
+  "color": "#10b981",
+  "estimatedHours": 8,
+  "tags": [
+    "basics",
+    "syntax",
+    "features",
+    "rocq"
+  ],
+  "availableTheorems": [],
+  "levels": [
+    {
+      "id": "basics_1",
+      "name": "What is Rocq?",
+      "description": "Introduction to Rocq and its components",
+      "difficulty": 1,
+      "estimatedTime": 10,
+      "objective": "Understand what Rocq is and its main components",
+      "theory": {
+        "markdown": "# What is Rocq?\n\n**Rocq** (originally **Coq**) is an interactive proof assistant (proof assistant).\n\n## Components of Rocq\n\nRocq consists of several languages:\n\n1. **Gallina**: The basic functional language based on type theory\n   - Used for writing programs and definitions\n   - Strongly typed functional programming\n   - Based on the Calculus of Inductive Constructions\n\n2. **Vernacular**: The command language\n   - Commands like: `Definition`, `Inductive`, `Lemma`, `Theorem`, `Print`, `Check`, `Compute`\n   - Used to define objects, state theorems, and query the system\n\n3. **Ltac**: The tactic language\n   - Tactics for constructing proofs interactively\n   - Examples: `intro`, `reflexivity`, `rewrite`, `induction`, `destruct`\n   - Allows step-by-step proof construction\n\n## Type Theory Foundation\n\nRocq is based on **type theory**, specifically the **Calculus of Inductive Constructions** (CIC).\n\nThis provides:\n- Strong type safety\n- Mathematical rigor\n- Ability to prove properties of programs\n- Integration of programming and proving\n\n## Official Resources\n\n- Official website: https://rocq-prover.org/\n- Documentation: https://rocq-prover.org/docs\n- Wikipedia: https://en.wikipedia.org/wiki/Calculus_of_constructions\n\n## Key Features\n\n- **Interactive theorem proving**: Build proofs step by step\n- **Program verification**: Prove properties about your programs\n- **Extraction**: Extract verified programs to other languages\n- **Rich standard library**: Extensive mathematical and computational libraries"
+      },
+      "startingCode": "(* This is a knowledge level - no code to write *)\n(* Just read the theory and understand Rocq's components *)",
+      "solution": "(* This level is informational - no solution needed *)",
+      "hints": [
+        "Rocq is an interactive proof assistant",
+        "It consists of multiple languages",
+        "It's based on type theory"
+      ],
+      "rewards": {
+        "xp": 20
+      }
+    },
+    {
+      "id": "basics_2",
+      "name": "Basic Vernacular Commands",
+      "description": "Learn the essential Vernacular commands for querying and defining",
+      "difficulty": 1,
+      "estimatedTime": 15,
+      "objective": "Use Check, Print, and Compute commands",
+      "theory": {
+        "markdown": "## Basic Vernacular Commands\n\nFrom Lecture 1: Querying and controlling Rocq through Vernacular language commands.\n\n### Check Command\n\nThe `Check` command tells you the type of any expression:\n\n```\nCheck 1.              (* 1 : nat *)\nCheck nat.            (* nat : Set *)\nCheck (1 + 1).        (* 1 + 1 : nat *)\n```\n\n### Print Command\n\nThe `Print` command shows the definition of an identifier:\n\n```\nDefinition x := 10.\nPrint x.              (* Shows: x = 10 : nat *)\n```\n\n### Compute Command\n\nThe `Compute` command evaluates an expression:\n\n```\nCompute (1 + 1).      (* = 2 : nat *)\nCompute (succ 10).    (* = 11 : nat *)\n```\n\n### About Command\n\nThe `About` command provides information about an identifier:\n\n```\nAbout plus.           (* Shows information about the plus function *)\n```\n\n### Search Command\n\nThe `Search` command finds definitions related to a pattern:\n\n```\nSearch nat.           (* Returns list of values related to nat *)\nSearch \"_ + _\".       (* Search by pattern *)\n```\n\n### Locate Command\n\nThe `Locate` command finds where a notation is defined:\n\n```\nLocate \"+\".           (* Shows where + is defined *)\n```\n\nThese commands are essential for exploring and understanding Rocq's type system and library!"
+      },
+      "startingCode": "Require Import Init.Nat.\n\n(* Use Check to find the type of the number 5 *)\n(* Your command here *)\n\n(* Use Compute to evaluate 2 + 3 *)\n(* Your command here *)\n\n(* Use Print to see the definition of nat *)\n(* Your command here *)",
+      "solution": "Require Import Init.Nat.\n\nCheck 5.\n(* 5 : nat *)\n\nCompute (2 + 3).\n(* = 5 : nat *)\n\nPrint nat.\n(* Shows the definition of nat *)",
+      "hints": [
+        "Check tells you the type of an expression",
+        "Print shows the definition",
+        "Compute evaluates an expression"
+      ],
+      "rewards": {
+        "xp": 25
+      }
+    },
+    {
+      "id": "basics_3",
+      "name": "Defining Variables and Functions",
+      "description": "Learn how to define variables and functions using Definition",
+      "difficulty": 1,
+      "estimatedTime": 15,
+      "objective": "Define a variable and a simple function",
+      "theory": {
+        "markdown": "## Defining Variables and Functions\n\nFrom Lecture 1: The `Definition` keyword is used to define both variables and functions.\n\n### Defining Variables\n\n```\nDefinition x := 10.\nDefinition name := value.\n```\n\n### Defining Functions\n\nFunctions can take parameters:\n\n```\nDefinition succ (x : nat) : nat := x + 1.\n```\n\nSyntax: `Definition name (param : type) : return_type := body.`\n\n### Function Types\n\nFunctions in Rocq have types like `nat -> nat` (function from nat to nat).\n\nFor multiple parameters: `nat -> nat -> nat` (curried function).\n\n### Examples\n\n```\nDefinition x := 10.\nDefinition succ (x : nat) : nat := x + 1.\nDefinition plus x y := x + y.  (* plus : nat -> nat -> nat *)\n```\n\n### Partial Application\n\nFunctions are curried, so you can partially apply them:\n\n```\nDefinition plus2 := plus 2.    (* plus2 : nat -> nat *)\nCompute plus2 3.               (* = 5 *)\n```\n\nThis is a fundamental feature of functional programming!"
+      },
+      "startingCode": "Require Import Init.Nat.\n\n(* Define a variable y with value 20 *)\n(* Your definition here *)\n\n(* Define a function double that multiplies a number by 2 *)\n(* Your definition here *)",
+      "solution": "Require Import Init.Nat.\n\nDefinition y := 20.\n\nDefinition double (x : nat) : nat := x * 2.",
+      "hints": [
+        "Use Definition for both variables and functions",
+        "Function syntax: Definition name (param : type) : return_type := body.",
+        "Don't forget the period at the end"
+      ],
+      "rewards": {
+        "xp": 30
+      }
+    },
+    {
+      "id": "basics_4",
+      "name": "Type System and Type Hierarchy",
+      "description": "Understand Rocq's type system and the type hierarchy",
+      "difficulty": 2,
+      "estimatedTime": 20,
+      "objective": "Understand the difference between Set, Prop, and Type",
+      "theory": {
+        "markdown": "## Type System and Type Hierarchy\n\nFrom Lecture 1: Rocq has a rich type system with a hierarchy of universes.\n\n### Type Hierarchy\n\n| Type      | Where it belongs | Meaning                      | Example values |\n|-----------|------------------|------------------------------|----------------|\n| Set       | Type             | Universe of data types       | nat, bool, list |\n| Prop      | Type             | Universe of logical propositions | True, False, n=0|\n| Type      | Type1,2,..       | Universe of all types        | Set, Prop, list |\n| bool      | Set              | Boolean logic                | true, false     |\n| nat       | Set              | Natural numbers (Peano)      | O, S O, S (S O) |\n| unit      | Set              | One element (trivial type)   | tt              |\n| Empty_set | Set              | Empty type (no elements)     | --              |\n| list A    | Set              | List of elements of type A   | nil, cons 1 nil |\n\n### Key Concepts\n\n- **Set**: The universe of computational types (data types)\n- **Prop**: The universe of logical propositions (proofs)\n- **Type**: The universe containing both Set and Prop\n\n### Examples\n\n```\nCheck Set.              (* Set : Type *)\nCheck Prop.             (* Prop : Type *)\nCheck Type.             (* Type : Type1 *)\n\nCheck bool.             (* bool : Set *)\nCheck nat.              (* nat : Set *)\nCheck True.             (* True : Prop *)\nCheck (3 = 4).          (* 3 = 4 : Prop *)\n```\n\nThis separation between data (Set) and proofs (Prop) is fundamental to Rocq's design!"
+      },
+      "startingCode": "Require Import Init.Nat.\nRequire Import Bool.Bool.\n\n(* Check the type of Set *)\n(* Your command here *)\n\n(* Check the type of a boolean value *)\n(* Your command here *)\n\n(* Check the type of a proposition (equality) *)\n(* Your command here *)",
+      "solution": "Require Import Init.Nat.\nRequire Import Bool.Bool.\n\nCheck Set.\n(* Set : Type *)\n\nCheck true.\n(* true : bool *)\n\nCheck (3 = 4).\n(* 3 = 4 : Prop *)",
+      "hints": [
+        "Set is the universe of data types",
+        "Prop is the universe of logical propositions",
+        "Type is the universe of all types"
+      ],
+      "rewards": {
+        "xp": 30
+      }
+    },
+    {
+      "id": "basics_5",
+      "name": "Pattern Matching",
+      "description": "Learn pattern matching with match expressions",
+      "difficulty": 2,
+      "estimatedTime": 20,
+      "objective": "Write a function using pattern matching",
+      "theory": {
+        "markdown": "## Pattern Matching\n\nFrom Lecture 1: Pattern matching is a fundamental feature for working with inductive types.\n\n### Match Syntax\n\n```\nmatch expression with\n| pattern1 => result1\n| pattern2 => result2\n| ...\nend\n```\n\n### Pattern Matching on Booleans\n\n```\nDefinition negb (b : bool) : bool :=\n  match b with\n  | true => false\n  | false => true\n  end.\n```\n\n### Pattern Matching on Natural Numbers\n\nNatural numbers have two constructors:\n- `O` (zero)\n- `S n` (successor of n)\n\n```\nDefinition pred (n : nat) : nat :=\n  match n with\n  | O => O\n  | S n' => n'\n  end.\n```\n\n### Complete Functions\n\n**Important**: In Rocq, all functions must be complete - they must handle all possible cases.\nUnlike languages like Haskell or OCaml, you cannot have partial pattern matching.\n\nThis ensures all functions terminate and are well-defined for all inputs."
+      },
+      "startingCode": "Require Import Bool.Bool.\n\n(* Define a function is_zero that returns true if n is 0, false otherwise *)\n(* Use pattern matching on nat *)\nDefinition is_zero (n : nat) : bool :=\n  (* Your code here *)",
+      "solution": "Require Import Bool.Bool.\n\nDefinition is_zero (n : nat) : bool :=\n  match n with\n  | O => true\n  | S _ => false\n  end.",
+      "hints": [
+        "Use match ... with to pattern match",
+        "Each case is separated by |",
+        "End with end."
+      ],
+      "rewards": {
+        "xp": 35
+      }
+    },
+    {
+      "id": "basics_6",
+      "name": "Recursive Functions with Fixpoint",
+      "description": "Learn how to define recursive functions using Fixpoint",
+      "difficulty": 2,
+      "estimatedTime": 25,
+      "objective": "Define a recursive function using Fixpoint",
+      "theory": {
+        "markdown": "## Recursive Functions\n\nFrom Lecture 1: Recursive functions are defined using the `Fixpoint` keyword.\n\n### Fixpoint Syntax\n\n```\nFixpoint function_name (params) : return_type :=\n  match param with\n  | base_case => base_result\n  | recursive_case => recursive_call\n  end.\n```\n\n### Example: Factorial\n\n```\nFixpoint factorial (n : nat) : nat :=\n  match n with\n  | 0 => 1\n  | S n' => n * factorial n'\n  end.\n```\n\n### Structural Recursion\n\nRocq requires **structural recursion** - the recursive call must be on a structurally smaller argument.\nThis ensures termination.\n\nIn the factorial example:\n- Base case: `0` (smallest)\n- Recursive case: `factorial n'` where `n'` is smaller than `S n'`\n\n### Mutual Recursion\n\nYou can define mutually recursive functions using `with`:\n\n```\nFixpoint is_even (n : nat) : bool :=\n  match n with\n  | 0 => true\n  | S n => is_odd n\n  end\nwith is_odd (n : nat) : bool :=\n  match n with\n  | 0 => false\n  | S n => is_even n\n  end.\n```\n\nThis allows functions to call each other recursively!"
+      },
+      "startingCode": "Require Import Init.Nat.\n\n(* Define a recursive function sum that adds all numbers from 0 to n *)\n(* sum 0 = 0, sum 1 = 1, sum 2 = 3, etc. *)\nFixpoint sum (n : nat) : nat :=\n  (* Your code here *)",
+      "solution": "Require Import Init.Nat.\n\nFixpoint sum (n : nat) : nat :=\n  match n with\n  | O => O\n  | S n' => S n' + sum n'\n  end.",
+      "hints": [
+        "Use Fixpoint for recursive functions",
+        "The function must be structurally recursive",
+        "Pattern match to handle base and recursive cases"
+      ],
+      "rewards": {
+        "xp": 40
+      }
+    },
+    {
+      "id": "basics_7",
+      "name": "Inductive Types",
+      "description": "Learn how to define custom inductive types",
+      "difficulty": 2,
+      "estimatedTime": 25,
+      "objective": "Define a custom inductive type",
+      "theory": {
+        "markdown": "## Inductive Types\n\nFrom Lecture 1: The `Inductive` keyword is used to define custom data types.\n\n### Basic Syntax\n\n```\nInductive TypeName : Type :=\n  | Constructor1 : Type1 -> TypeName\n  | Constructor2 : Type2 -> TypeName\n  | ...\n  | ConstructorN : TypeN -> TypeName.\n```\n\n### Key Points\n\n- Each constructor must have a unique name\n- Constructors can take parameters\n- Inductive types can have multiple parameters\n- The type defines all possible ways to create values of that type\n\n### Example: Days of the Week\n\n```\nInductive day : Type :=\n  | Monday\n  | Tuesday\n  | Wednesday\n  | Thursday\n  | Friday\n  | Saturday\n  | Sunday.\n```\n\n### Example: Natural Numbers\n\nEven `nat` is defined inductively:\n\n```\nInductive nat : Type :=\n  | O : nat\n  | S : nat -> nat.\n```\n\nThis says: a natural number is either:\n- `O` (zero), or\n- `S n` (successor of some natural number n)\n\n### Pattern Matching with Inductive Types\n\nOnce defined, you can pattern match on inductive types:\n\n```\nDefinition next_day (d : day) : day :=\n  match d with\n  | Monday => Tuesday\n  | Tuesday => Wednesday\n  | ...\n  | Sunday => Monday\n  end.\n```\n\nInductive types are the foundation of data structures in Rocq!"
+      },
+      "startingCode": "(* Define an inductive type for colors: Red, Green, Blue *)\n(* Your definition here *)\n\n(* Define a function that returns the next color in sequence *)\n(* Red -> Green -> Blue -> Red *)\nDefinition next_color (c : color) : color :=\n  (* Your code here *)",
+      "solution": "Inductive color : Type :=\n  | Red\n  | Green\n  | Blue.\n\nDefinition next_color (c : color) : color :=\n  match c with\n  | Red => Green\n  | Green => Blue\n  | Blue => Red\n  end.",
+      "hints": [
+        "Use Inductive keyword",
+        "Each constructor must have a unique name",
+        "Constructors can take parameters"
+      ],
+      "rewards": {
+        "xp": 40
+      }
+    },
+    {
+      "id": "basics_8",
+      "name": "Polymorphic Functions",
+      "description": "Learn how to write functions that work with any type",
+      "difficulty": 2,
+      "estimatedTime": 20,
+      "objective": "Define a polymorphic identity function",
+      "theory": {
+        "markdown": "## Polymorphic Functions\n\nFrom Lecture 1: Polymorphic functions work with any type, making code reusable.\n\n### Type Parameters\n\nYou can parameterize functions by type:\n\n```\nDefinition id_poly (A : Type) (x : A) : A := x.\n```\n\nThis function works for any type `A`!\n\n### Type Inference\n\nRocq can often infer types:\n\n```\nCompute id_poly nat 3.     (* 3 : nat *)\nCompute id_poly _ 3.       (* _ means \"infer the type\" *)\n```\n\n### Implicit Type Arguments\n\nYou can make type arguments implicit using curly braces:\n\n```\nDefinition id_poly3 {A : Type} (x : A) : A := x.\nCompute id_poly3 3.        (* Type is inferred automatically *)\n```\n\n### Explicit Type Application\n\nUse `@` to make implicit arguments explicit:\n\n```\nCompute @id_poly3 nat 3.   (* Explicitly provide the type *)\n```\n\n### Example: Polymorphic List Functions\n\n```\nDefinition head {A : Type} (l : list A) (default : A) : A :=\n  match l with\n  | [] => default\n  | h :: _ => h\n  end.\n```\n\nThis works for lists of any type: `list nat`, `list bool`, `list (list nat)`, etc.\n\nPolymorphism is essential for writing reusable, generic code!"
+      },
+      "startingCode": "(* Define a polymorphic function that returns the first element of a pair *)\n(* It should work for pairs of any type *)\nDefinition first {A B : Type} (p : A * B) : A :=\n  (* Your code here *)",
+      "solution": "Definition first {A B : Type} (p : A * B) : A :=\n  match p with\n  | (x, y) => x\n  end.",
+      "hints": [
+        "Use type parameters: (A : Type)",
+        "The function works for any type A",
+        "This is called polymorphism"
+      ],
+      "rewards": {
+        "xp": 35
+      }
+    },
+    {
+      "id": "basics_9",
+      "name": "Lambda Functions",
+      "description": "Learn anonymous (lambda) functions",
+      "difficulty": 1,
+      "estimatedTime": 15,
+      "objective": "Use lambda functions",
+      "theory": {
+        "markdown": "## Anonymous (Lambda) Functions\n\nFrom Lecture 1: Lambda functions allow you to define functions inline without naming them.\n\n### Syntax\n\n```\nfun x => expression\n```\n\n### Examples\n\n```\nDefinition id_nat : nat -> nat := fun x => x.\n```\n\nThis is equivalent to:\n\n```\nDefinition id_nat' (x : nat) : nat := x.\n```\n\n### Using Lambdas\n\nLambdas are useful for:\n- Passing functions as arguments\n- Returning functions from functions\n- Defining functions inline\n\n### Example: Higher-Order Functions\n\n```\nDefinition apply_twice {A : Type} (f : A -> A) (x : A) : A :=\n  f (f x).\n\nCompute apply_twice (fun n => n + 1) 5.\n(* = 7 : nat *)\n```\n\n### Multiple Parameters\n\n```\nfun x y => x + y\n```\n\nThis is equivalent to:\n\n```\nfun x => fun y => x + y\n```\n\nLambda functions are a fundamental feature of functional programming!"
+      },
+      "startingCode": "Require Import Init.Nat.\n\n(* Define a function that adds 5 to a number using a lambda *)\nDefinition add_five : nat -> nat :=\n  (* Your code here *)",
+      "solution": "Require Import Init.Nat.\n\nDefinition add_five : nat -> nat :=\n  fun x => x + 5.",
+      "hints": [
+        "Syntax: fun x => expression",
+        "Lambda functions are anonymous",
+        "They can be used anywhere a function is expected"
+      ],
+      "rewards": {
+        "xp": 30
+      }
+    },
+    {
+      "id": "basics_10",
+      "name": "Let Expressions",
+      "description": "Learn local definitions with let",
+      "difficulty": 1,
+      "estimatedTime": 15,
+      "objective": "Use let to define local variables",
+      "theory": {
+        "markdown": "## Let Expressions\n\nFrom Lecture 1: The `let` construction allows you to define local variables within an expression.\n\n### Syntax\n\n```\nlet name := value in\nexpression\n```\n\n### Example\n\n```\nDefinition add_xy : nat :=\n  let x := 10 in\n  let y := 20 in\n  x + y.\n```\n\n### Nested Lets\n\nYou can nest multiple `let` expressions:\n\n```\nlet x := 5 in\nlet y := 10 in\nlet z := x + y in\nz * 2\n```\n\n### Scope\n\nVariables defined with `let` are only available in the expression after `in`.\n\n### Use Cases\n\n- Breaking down complex calculations\n- Naming intermediate results for clarity\n- Avoiding repetition in expressions\n\nLet expressions make code more readable and maintainable!"
+      },
+      "startingCode": "Require Import Init.Nat.\n\n(* Use let to compute (2 + 3) * (4 + 5) with intermediate variables *)\nDefinition result : nat :=\n  (* Your code here *)",
+      "solution": "Require Import Init.Nat.\n\nDefinition result : nat :=\n  let a := 2 + 3 in\n  let b := 4 + 5 in\n  a * b.",
+      "hints": [
+        "Syntax: let name := value in expression",
+        "You can nest multiple lets",
+        "Useful for intermediate calculations"
+      ],
+      "rewards": {
+        "xp": 25
+      }
+    },
+    {
+      "id": "basics_11",
+      "name": "Notations and Custom Syntax",
+      "description": "Learn how to define custom notations",
+      "difficulty": 2,
+      "estimatedTime": 20,
+      "objective": "Understand how notations work in Rocq",
+      "theory": {
+        "markdown": "## Notations and Custom Syntax\n\nFrom Lecture 1: Rocq allows you to define custom notations to make code more readable.\n\n### Notation Command\n\n```\nNotation \"symbol\" := (expression) (at level N, associativity).\n```\n\n### Example: Custom Pair Notation\n\n```\nNotation \"( x , y )\" := (pair x y).\n```\n\n### Infix Operators\n\nYou can define infix operators:\n\n```\nNotation \"x ++ y\" := (append x y) \n                     (at level 60, right associativity).\n```\n\n### Precedence Levels\n\nThe `at level N` specifies operator precedence (higher = tighter binding).\n\nCommon levels:\n- 0-10: Lowest precedence\n- 50-60: Arithmetic operators (+, *)\n- 70: Comparison operators (<=, =)\n- 100: Application (function calls)\n\n### Associativity\n\n- `left associativity`: `a + b + c` = `(a + b) + c`\n- `right associativity`: `a -> b -> c` = `a -> (b -> c)`\n- `no associativity`: Must use parentheses\n\n### Example from Lecture\n\n```\nNotation \"x + y\" := (plus x y) (at level 50, left associativity).\nNotation \"x * y\" := (mult x y) (at level 40, left associativity).\n```\n\nNotations are syntactic sugar - they don't change the meaning, just the appearance!"
+      },
+      "startingCode": "(* This is a knowledge level about notations *)\n(* No code to write, just understand the concept *)",
+      "solution": "(* Informational level - no solution needed *)",
+      "hints": [
+        "Notations make code more readable",
+        "Use the Notation command",
+        "You can define infix operators"
+      ],
+      "rewards": {
+        "xp": 30
+      }
+    },
+    {
+      "id": "basics_12",
+      "name": "Modules and Namespaces",
+      "description": "Learn how to organize code with modules",
+      "difficulty": 2,
+      "estimatedTime": 20,
+      "objective": "Understand modules and how to use them",
+      "theory": {
+        "markdown": "## Modules and Namespaces\n\nFrom Lecture 1: Modules allow you to organize code and avoid name conflicts.\n\n### Module Syntax\n\n```\nModule ModuleName.\n  (* definitions here *)\nEnd ModuleName.\n```\n\n### Accessing Module Contents\n\nAccess definitions from a module using dot notation:\n\n```\nModuleName.definition_name\n```\n\n### Example\n\n```\nModule NatPlayground.\n  Inductive nat : Type :=\n    | O\n    | S (n : nat).\n  \n  Fixpoint plus (n m : nat) : nat :=\n    match n with\n    | O => m\n    | S n' => S (plus n' m)\n    end.\nEnd NatPlayground.\n\nCheck NatPlayground.plus.  (* NatPlayground.plus : ... *)\n```\n\n### Benefits\n\n- **Namespace isolation**: Avoid name conflicts\n- **Code organization**: Group related definitions\n- **Experimentation**: Test definitions without affecting global namespace\n- **Libraries**: Organize large codebases\n\n### Opening Modules\n\nYou can open a module to use its contents without the prefix:\n\n```\nOpen Scope ModuleName.\n```\n\nModules are essential for organizing larger Rocq developments!"
+      },
+      "startingCode": "(* Create a module called MyMath with a function square *)\nModule MyMath.\n  (* Your definition here *)\nEnd MyMath.\n\n(* Use the square function from the module *)\n(* Your code here *)",
+      "solution": "Module MyMath.\n  Definition square (n : nat) : nat := n * n.\nEnd MyMath.\n\nCheck MyMath.square.\n(* MyMath.square : nat -> nat *)",
+      "hints": [
+        "Modules group related definitions",
+        "Use Module Name. ... End Name.",
+        "Access with ModuleName.definition"
+      ],
+      "rewards": {
+        "xp": 30
+      }
+    },
+    {
+      "id": "basics_13",
+      "name": "Require and Import",
+      "description": "Learn how to use libraries and modules",
+      "difficulty": 1,
+      "estimatedTime": 15,
+      "objective": "Import standard library modules",
+      "theory": {
+        "markdown": "## Require and Import\n\nFrom Lecture 1 & 2: Rocq has a rich standard library that you can import.\n\n### Require Import\n\nLoads a module and makes its definitions available:\n\n```\nRequire Import Init.Nat.        (* Natural numbers *)\nRequire Import Bool.Bool.       (* Booleans *)\nRequire Import List.            (* Lists *)\n```\n\n### Import\n\nBrings notations into scope:\n\n```\nImport ListNotations.           (* Enables [1;2;3] syntax *)\n```\n\n### Common Imports\n\n- `Init.Nat`: Natural numbers and arithmetic\n- `Bool.Bool`: Boolean operations\n- `List`: Lists and list operations\n- `Arith.PeanoNat`: Additional arithmetic lemmas\n- `Strings.String`: String operations\n\n### Open Scope\n\nOpens a notation scope:\n\n```\nOpen Scope string_scope.        (* Enables string operations *)\nOpen Scope nat_scope.           (* Enables nat operations *)\n```\n\n### Example from Lectures\n\n```\nRequire Import Init.Nat.\nRequire Import Coq.Arith.PeanoNat.\nRequire Import Coq.Lists.List.\nImport ListNotations.\n```\n\nThis gives you access to:\n- Natural number operations\n- List functions and notations\n- Arithmetic lemmas and theorems\n\nProper imports are essential for using Rocq's standard library!"
+      },
+      "startingCode": "(* Import the necessary modules to work with lists *)\n(* Your imports here *)\n\n(* Now you can use list notation like [1;2;3] *)\nCheck [1; 2; 3].",
+      "solution": "Require Import List.\nImport ListNotations.\n\nCheck [1; 2; 3].\n(* [1; 2; 3] : list nat *)",
+      "hints": [
+        "Require Import loads a module",
+        "Import brings notations into scope",
+        "Use Require Import for standard library"
+      ],
+      "rewards": {
+        "xp": 25
+      }
+    },
+    {
+      "id": "basics_14",
+      "name": "Complete Functions Requirement",
+      "description": "Understand why all functions must be complete",
+      "difficulty": 2,
+      "estimatedTime": 20,
+      "objective": "Understand the requirement for complete functions",
+      "theory": {
+        "markdown": "## Complete Functions Requirement\n\nFrom Lecture 1: In Rocq, you can only define **complete functions** - functions that terminate for every input.\n\n### What This Means\n\nUnlike languages like Haskell or OCaml, you cannot have:\n- Partial pattern matching\n- Non-terminating functions\n- Undefined cases\n\n### Example: Invalid Definition\n\nThis would be valid in Haskell/OCaml but **invalid** in Rocq:\n\n```\nDefinition negb (b : bool) : bool :=\n  match b with\n  | true => false\n  (* Missing false case! *)\n  end.\n```\n\n### Why This Matters\n\nThis requirement ensures:\n- **Mathematical rigor**: All functions are well-defined\n- **Termination**: Programs always finish\n- **Type safety**: No runtime errors from undefined cases\n- **Verification**: Properties can be proven about all inputs\n\n### Structural Recursion\n\nRecursive functions must be **structurally recursive** - the recursive call must be on a structurally smaller argument.\n\nThis is automatically checked by Rocq and ensures termination.\n\n### Example: Valid Complete Function\n\n```\nDefinition negb (b : bool) : bool :=\n  match b with\n  | true => false\n  | false => true\n  end.\n```\n\nAll cases are covered!\n\nThis design choice makes Rocq suitable for formal verification and mathematical proofs."
+      },
+      "startingCode": "Require Import Bool.Bool.\n\n(* Define a complete function that returns true for true, false for false *)\n(* Make sure to handle all cases! *)\nDefinition identity_bool (b : bool) : bool :=\n  (* Your code here *)",
+      "solution": "Require Import Bool.Bool.\n\nDefinition identity_bool (b : bool) : bool :=\n  match b with\n  | true => true\n  | false => false\n  end.",
+      "hints": [
+        "All functions must terminate",
+        "Pattern matching must cover all cases",
+        "This ensures mathematical rigor"
+      ],
+      "rewards": {
+        "xp": 30
+      }
+    },
+    {
+      "id": "basics_15",
+      "name": "Basic Proof Tactics Overview",
+      "description": "Introduction to proof tactics in Rocq",
+      "difficulty": 1,
+      "estimatedTime": 20,
+      "objective": "Understand the basic proof tactics",
+      "theory": {
+        "markdown": "## Basic Proof Tactics\n\nFrom Lecture 1: Ltac is the tactic language for constructing proofs interactively.\n\n### The Proof Environment\n\nWhen you write:\n```\nTheorem name : statement.\nProof.\n  (* tactics here *)\nQed.\n```\n\nYou enter \"proof mode\" where you use tactics to build the proof.\n\n### Basic Tactics\n\n**intro / intros**: Introduces variables or hypotheses\n```\nintro n.              (* Introduce one variable *)\nintros n m H.         (* Introduce multiple *)\n```\n\n**reflexivity**: Proves goals of the form `x = x`\n```\nreflexivity.          (* Proves n = n *)\n```\n\n**simpl**: Simplifies expressions by computation\n```\nsimpl.                (* Computes 2 + 3 to 5 *)\n```\n\n**exact**: Uses a hypothesis or lemma that exactly matches the goal\n```\nexact H.              (* When H : P and goal is P *)\n```\n\n**rewrite**: Uses an equality to transform the goal\n```\nrewrite H.            (* Replace left side with right *)\nrewrite <- H.         (* Replace right side with left *)\n```\n\n**destruct**: Case analysis on a value\n```\ndestruct b.           (* Split into true and false cases *)\n```\n\n**induction**: Proof by induction (gives inductive hypothesis)\n```\ninduction n.          (* Base case and inductive step *)\n```\n\n### Proof Structure\n\n```\nTheorem example : forall n, n = n.\nProof.\n  intro n.            (* Bring n into context *)\n  reflexivity.        (* Prove n = n *)\nQed.                  (* Complete the proof *)\n```\n\nTactics are the building blocks of interactive theorem proving!"
+      },
+      "startingCode": "Require Import Init.Nat.\n\n(* Prove that 5 = 5 *)\nTheorem five_equals_five : 5 = 5.\nProof.\n  (* Your proof here *)\nQed.",
+      "solution": "Require Import Init.Nat.\n\nTheorem five_equals_five : 5 = 5.\nProof.\n  reflexivity.\nQed.",
+      "hints": [
+        "Tactics are commands that build proofs",
+        "intro introduces variables",
+        "reflexivity proves equalities"
+      ],
+      "rewards": {
+        "xp": 30
+      }
+    },
+    {
+      "id": "basics_16",
+      "name": "Theorem vs Lemma vs Example",
+      "description": "Understand the different ways to state theorems",
+      "difficulty": 1,
+      "estimatedTime": 15,
+      "objective": "Know when to use Theorem, Lemma, or Example",
+      "theory": {
+        "markdown": "## Theorem, Lemma, and Example\n\nFrom Lecture 1 & 2: Rocq provides different keywords for stating mathematical results.\n\n### Theorem\n\nUsed for main, important results:\n\n```\nTheorem main_result : forall n, n + 0 = n.\nProof.\n  (* proof *)\nQed.\n```\n\n### Lemma\n\nUsed for helper results that support main theorems:\n\n```\nLemma helper_lemma : forall n, 0 + n = n.\nProof.\n  (* proof *)\nQed.\n\nTheorem main_result : forall n, n + 0 = n.\nProof.\n  (* uses helper_lemma *)\nQed.\n```\n\n### Example\n\nUsed for demonstrations and exercises:\n\n```\nExample simple_example : 2 + 2 = 4.\nProof.\n  reflexivity.\nQed.\n```\n\n### When to Use Which?\n\n- **Theorem**: Important, reusable results\n- **Lemma**: Supporting facts used in proofs\n- **Example**: Demonstrations, exercises, test cases\n\n### All Are Equivalent\n\nFrom Rocq's perspective, `Theorem`, `Lemma`, and `Example` are all equivalent.\nThe choice is purely for documentation and code organization.\n\n### Fact, Remark, Corollary\n\nRocq also supports:\n- `Fact`: Similar to Example\n- `Remark`: For observations\n- `Corollary`: For consequences of theorems\n\nChoose the keyword that best describes your result's role!"
+      },
+      "startingCode": "Require Import Init.Nat.\n\n(* Write an Example showing that 3 + 2 = 5 *)\n(* Your example here *)",
+      "solution": "Require Import Init.Nat.\n\nExample three_plus_two : 3 + 2 = 5.\nProof.\n  reflexivity.\nQed.",
+      "hints": [
+        "Theorem for main results",
+        "Lemma for helper results",
+        "Example for demonstrations"
+      ],
+      "rewards": {
+        "xp": 20
+      }
+    },
+    {
+      "id": "basics_17",
+      "name": "Searching the Library",
+      "description": "Learn how to find existing theorems and definitions",
+      "difficulty": 1,
+      "estimatedTime": 20,
+      "objective": "Use Search to find library functions",
+      "theory": {
+        "markdown": "## Searching the Library\n\nFrom Lecture 1: Rocq's standard library is vast. Use search commands to find what you need.\n\n### Search Command\n\nFinds definitions related to a term:\n\n```\nSearch nat.           (* All definitions mentioning nat *)\nSearch plus.          (* All definitions mentioning plus *)\n```\n\n### SearchPattern\n\nFinds by type pattern:\n\n```\nSearchPattern (_ + _ = _ + _).    (* Theorems about addition *)\nSearchPattern (nat -> nat -> nat). (* Functions nat -> nat -> nat *)\n```\n\n### Locate\n\nFinds where a notation is defined:\n\n```\nLocate \"+\".           (* Shows where + is defined *)\nLocate \"++\".          (* Shows where ++ is defined *)\n```\n\n### About\n\nShows information about a specific identifier:\n\n```\nAbout plus.           (* Information about plus function *)\n```\n\n### Print\n\nShows the definition:\n\n```\nPrint plus.           (* Full definition of plus *)\n```\n\n### Example from Lecture\n\n```\nSearch nat.           (* Returns list of values related to nat *)\nSearch \"_ + _\".       (* Search by pattern *)\nLocate \"+\".           (* Shows: \"x + y\" := Nat.add x y *)\n```\n\nThese commands are essential for exploring Rocq's extensive standard library!"
+      },
+      "startingCode": "Require Import Init.Nat.\n\n(* Use Search to find theorems about multiplication *)\n(* Your command here *)\n\n(* Use Locate to find where * is defined *)\n(* Your command here *)",
+      "solution": "Require Import Init.Nat.\n\nSearchPattern (nat -> nat -> nat).  (* Finds functions like mult *)\nLocate \"*\".                          (* Shows where * is defined *)",
+      "hints": [
+        "Search finds definitions by name or pattern",
+        "SearchPattern finds by type signature",
+        "Locate finds where notations are defined"
+      ],
+      "rewards": {
+        "xp": 30
+      }
+    },
+    {
+      "id": "basics_18",
+      "name": "Proof by Computation",
+      "description": "Learn when reflexivity can prove equalities automatically",
+      "difficulty": 1,
+      "estimatedTime": 15,
+      "objective": "Use reflexivity to prove computational equalities",
+      "theory": {
+        "markdown": "## Proof by Computation\n\nFrom Lecture 1: Rocq can automatically prove many equalities by computation.\n\n### Reflexivity and Computation\n\nThe `reflexivity` tactic can prove goals where both sides compute to the same value:\n\n```\nTheorem two_plus_two : 2 + 2 = 4.\nProof.\n  reflexivity.        (* Automatically computes 2+2 to 4 *)\nQed.\n```\n\n### Simpl Before Reflexivity\n\nSometimes you need `simpl` first:\n\n```\nTheorem example : 2 + 3 = 5.\nProof.\n  simpl.              (* Simplifies 2 + 3 to 5 *)\n  reflexivity.        (* Proves 5 = 5 *)\nQed.\n```\n\n### When It Works\n\nReflexivity works when:\n- Both sides are syntactically equal: `n = n`\n- Both sides compute to the same value: `2 + 2 = 4`\n- The equality is definitionally equal\n\n### When You Need More\n\nFor non-computational equalities, you need other tactics:\n- `rewrite` for using hypotheses\n- `induction` for recursive properties\n- `destruct` for case analysis\n\n### Example from Lecture\n\n```\nTheorem dva_plus_tri : 2 + 3 = 5.\nProof.\n  simpl.              (* zjednoduší 2 + 3 na 5 *)\n  reflexivity.        (* 5 = 5 *)\nQed.\n\nTheorem dva_plus_tri' : 2 + 3 = 5.\nProof.\n  reflexivity.        (* Also works directly! *)\nQed.\n```\n\nComputation is a powerful tool for proving equalities!"
+      },
+      "startingCode": "Require Import Init.Nat.\n\n(* Prove that 10 + 5 = 15 using reflexivity *)\nTheorem ten_plus_five : 10 + 5 = 15.\nProof.\n  (* Your proof here *)\nQed.",
+      "solution": "Require Import Init.Nat.\n\nTheorem ten_plus_five : 10 + 5 = 15.\nProof.\n  reflexivity.\nQed.",
+      "hints": [
+        "reflexivity can prove things that compute to the same value",
+        "It automatically simplifies both sides",
+        "Works for any decidable equality"
+      ],
+      "rewards": {
+        "xp": 25
+      }
+    },
+    {
+      "id": "basics_19",
+      "name": "Admitted and Incomplete Proofs",
+      "description": "Learn about Admitted for incomplete proofs",
+      "difficulty": 1,
+      "estimatedTime": 10,
+      "objective": "Understand when to use Admitted",
+      "theory": {
+        "markdown": "## Admitted and Incomplete Proofs\n\nFrom Lecture 1: The `Admitted` keyword allows you to accept a theorem without proving it.\n\n### Syntax\n\n```\nTheorem incomplete : statement.\nProof.\n  (* some tactics *)\n  Admitted.           (* Accept without proof *)\n```\n\n### When to Use\n\n- **During development**: When you want to use a lemma before proving it\n- **Prototyping**: To test the structure of a larger proof\n- **Learning**: To focus on one part while temporarily accepting others\n\n### Warning\n\n`Admitted` creates a \"hole\" in your proof - Rocq accepts it as if it were proven,\nbut it's not actually verified. Use with caution!\n\n### Example from Lecture\n\n```\nTheorem example_rewrite_chain' :\n  forall n, n = n + 0 -> n + 1 = (n + 0) + 1.\nProof.\n  intros n H.\n  rewrite H.          (* rewrite in wrong direction *)\n  Admitted.           (* Incomplete proof *)\n```\n\n### Best Practice\n\n- Mark admitted proofs clearly\n- Replace with actual proofs before finalizing\n- Use for development, not in production code\n\nAdmitted is a useful development tool, but always complete your proofs!"
+      },
+      "startingCode": "(* This is informational - understand when Admitted is used *)\n(* No code to write *)",
+      "solution": "(* Informational level - no solution needed *)",
+      "hints": [
+        "Admitted accepts a proof without proving it",
+        "Useful during development",
+        "Creates a 'hole' in the proof"
+      ],
+      "rewards": {
+        "xp": 15
+      }
+    },
+    {
+      "id": "basics_20",
+      "name": "Rocq File Structure",
+      "description": "Understand how Rocq files are organized",
+      "difficulty": 1,
+      "estimatedTime": 15,
+      "objective": "Understand Rocq file organization",
+      "theory": {
+        "markdown": "## Rocq File Structure\n\nFrom Lecture 1 & 2: Rocq files follow a typical structure.\n\n### Typical File Organization\n\n1. **Imports** (at the top):\n```\nRequire Import Init.Nat.\nRequire Import Bool.Bool.\nImport ListNotations.\n```\n\n2. **Definitions**:\n```\nDefinition x := 10.\nFixpoint factorial (n : nat) : nat := ...\n```\n\n3. **Inductive Types**:\n```\nInductive day : Type := ...\n```\n\n4. **Theorems and Proofs**:\n```\nTheorem example : statement.\nProof.\n  (* tactics *)\nQed.\n```\n\n### Comments\n\nRocq uses `(* ... *)` for comments:\n\n```\n(* This is a comment *)\nDefinition x := 10.  (* Inline comment *)\n```\n\nMulti-line comments nest:\n```\n(* Outer comment\n   (* Inner comment *)\n   More outer comment *)\n```\n\n### Modules\n\nYou can organize code in modules:\n\n```\nModule MyModule.\n  (* definitions *)\nEnd MyModule.\n```\n\n### Best Practices\n\n- Group related definitions together\n- Use modules for organization\n- Comment complex definitions\n- Import only what you need\n\nGood organization makes Rocq code maintainable and readable!"
+      },
+      "startingCode": "(* This is informational - understand file structure *)\n(* No code to write *)",
+      "solution": "(* Informational level - no solution needed *)",
+      "hints": [
+        "Files typically start with Require Import",
+        "Then definitions and theorems",
+        "Comments use (* ... *)"
+      ],
+      "rewards": {
+        "xp": 20
+      }
+    }
+  ]
+}

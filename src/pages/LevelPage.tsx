@@ -42,7 +42,6 @@ export function LevelPage() {
       if (!worldId || !levelId) return;
       
       try {
-        // Load the world first
         const loadedWorld = await loadWorldData(worldId);
         if (!loadedWorld) {
           toast.error('World not found');
@@ -52,7 +51,6 @@ export function LevelPage() {
         
         setWorld(loadedWorld);
         
-        // Now get the level from the loaded world
         const loadedLevel = loadedWorld.levels.find(l => l.id === levelId);
         if (loadedLevel) {
           setLevel(loadedLevel);
@@ -259,7 +257,7 @@ export function LevelPage() {
               onClick={handleRunProof} 
               disabled={isExecuting && !isLevelComplete}
             >
-              {isExecuting && !isLevelComplete ? 'Running...' : isLevelComplete ? 'Next Level →' : 'Run Proof'}
+              {isExecuting && !isLevelComplete ? 'Running...' : isLevelComplete ? 'Next Level →' : 'Check Proof'}
             </Button>
           </div>
           

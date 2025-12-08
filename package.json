@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "tsc && vite build && cp -r node_modules/@ocaml-wasm/ dist && cp -r node_modules/ocaml-wasm/ dist",
     "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx",
     "deploy": "npm run build && gh-pages -d dist"
@@ -36,6 +36,7 @@
     "postcss": "^8.4.32",
     "tailwindcss": "^3.3.6",
     "typescript": "^5.3.0",
-    "vite": "^5.0.0"
+    "vite": "^5.0.0",
+    "vite-plugin-static-copy": "^3.1.4"
   }
 }

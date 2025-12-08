@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build && cp -r node_modules/@ocaml-wasm/ dist && cp -r node_modules/ocaml-wasm/ dist",
+    "build": "tsc && vite build && mkdir -p dist/node_modules && cp -r node_modules/@ocaml-wasm/ dist/node_modules && cp -r node_modules/ocaml-wasm/ dist/node_modules && cp -r node_modules/jscoq dist",
     "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx",
     "deploy": "npm run build && gh-pages -d dist"

@@ -1,0 +1,30 @@
+# Cloudflare Pages headers configuration
+# Headers for jsCoq static assets
+/jscoq/*
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=31536000, immutable
+
+# Headers for vendor dependencies (ocaml-wasm WASM files)
+# Other dependencies (bootstrap, codemirror, jquery) are bundled by Vite
+/vendor/ocaml-wasm/*
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=31536000, immutable
+
+# Headers for node_modules/ocaml-wasm (backwards compatibility - redirects to vendor)
+/node_modules/ocaml-wasm/*
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=31536000, immutable
+
+# Headers for application assets
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Headers for HTML files
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Headers for JSON files
+/*.json
+  Content-Type: application/json
+  Cache-Control: public, max-age=3600
+

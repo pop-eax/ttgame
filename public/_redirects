@@ -1,0 +1,4 @@
+# Redirect /node_modules/ocaml-wasm/* to /vendor/ocaml-wasm/* for Cloudflare Pages
+# Other dependencies (bootstrap, codemirror, jquery) are bundled by Vite
+/node_modules/ocaml-wasm/* /vendor/ocaml-wasm/:splat 200
+

@@ -72,8 +72,8 @@ export function useJsCoq(containerId: string, theme: 'light' | 'dark' = 'light')
       // Map theme: 'light' -> 'light', 'dark' -> 'dark' (jsCoq uses these directly)
       const coqManager = await JsCoq.start([containerId], {
         wrapper_id: wrapperId,
-        init_pkgs: ['init', 'coq'],
-        all_pkgs: ['init', 'coq', 'coq-collections'],
+        init_pkgs: ['coq'],
+        all_pkgs: ['coq'],
         init_import: ['Coq.Lists.List'],
 
         theme: themeRef.current,

@@ -10,7 +10,7 @@ export function useProofExecution() {
   // This hook just manages the execution state
   const execute = async (
     code: string, 
-    level: Level,
+    _level: Level,
     executeProof?: (code: string) => Promise<ProofState>,
     isLoaded?: boolean
   ): Promise<ProofState> => {

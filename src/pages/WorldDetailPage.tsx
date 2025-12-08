@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { LevelList } from '../components/worlds/LevelList';
 import { useGame } from '../context/GameContext';

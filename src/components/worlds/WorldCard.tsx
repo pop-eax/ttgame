@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import { World } from '../../types/world';
 import { Lock, CheckCircle2 } from 'lucide-react';

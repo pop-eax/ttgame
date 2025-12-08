@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Zap, BookOpen, X } from 'lucide-react';
 
 interface TacticsAndTheoremsPanelProps {
@@ -23,10 +23,6 @@ function TheoremModal({ isOpen, onClose, theorem }: TheoremModalProps) {
 
   // Generate a simple example based on the theorem
   const generateExample = (name: string, type: string): string => {
-    // Try to extract variable names from the type
-    const varMatch = type.match(/forall\s+(\w+)\s*:/);
-    const varName = varMatch ? varMatch[1] : 'x';
-    
     // Simple example generation
     if (type.includes('->')) {
       return `Example: Use ${name} to apply this theorem in your proof.\n\nrewrite ${name}.\n(* or *)\napply ${name}.`;

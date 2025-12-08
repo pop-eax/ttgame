@@ -288,7 +288,6 @@ export function LevelPage() {
             
             <ProofEditor
               containerId={COQ_EDITOR_ID}
-              initialValue={level.startingCode}
               isLoaded={jsCoqLoaded}
             />
           </div>

@@ -1,4 +1,3 @@
-import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { Theory } from '../../types/world';

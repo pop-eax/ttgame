@@ -1,18 +1,12 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 interface ProofEditorProps {
   containerId: string;
-  initialValue?: string;
-  onContentChange?: (value: string) => void;
-  onCursorChange?: (line: number, code: string) => void;
   isLoaded?: boolean;
 }
 
 export function ProofEditor({ 
   containerId, 
-  initialValue = '',
-  onContentChange,
-  onCursorChange,
   isLoaded = true 
 }: ProofEditorProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);

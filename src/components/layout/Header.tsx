@@ -1,15 +1,13 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { User, Download, Upload, Settings, HelpCircle, Moon, Sun } from 'lucide-react';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { User, Download, Upload, HelpCircle, Moon, Sun } from 'lucide-react';
 import { useGame } from '../../context/GameContext';
 import { useTheme } from '../../context/ThemeContext';
 import { downloadExport, importFromFile } from '../../services/exportService';
 import { Modal } from '../common/Modal';
-import { Button } from '../common/Button';
 import toast from 'react-hot-toast';
 
 export function Header() {
-  const navigate = useNavigate();
   const { gameData } = useGame();
   const { theme, toggleTheme } = useTheme();
   const [showUserMenu, setShowUserMenu] = useState(false);

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, ReactNode } from 'react';
+import { createContext, useContext, ReactNode } from 'react';
 import { useGameState } from '../hooks/useGameState';
 import { GameData } from '../types/game';
 import { World } from '../types/world';

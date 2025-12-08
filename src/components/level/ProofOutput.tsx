@@ -1,4 +1,3 @@
-import React from 'react';
 import { ProofState as ProofStateType } from '../../types/proof';
 import { AlertCircle, CheckCircle2, Info, Target, List } from 'lucide-react';
 

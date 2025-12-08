@@ -1,4 +1,5 @@
-import { GameData, ExportData } from '../types/game';
+import { GameData } from '../types/game';
+import { ExportData } from '../types/export';
 import { generateChecksum, verifyChecksum } from '../utils/checksum';
 import { validateGameData } from '../utils/validators';
 

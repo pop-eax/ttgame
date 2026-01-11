@@ -2,6 +2,8 @@
 
 An interactive, gamified learning platform for type theory using Rocq (formerly Coq).
 
+The game is current available at [https://rocq-game.kpi.fei.tuke.sk/](https://rocq-game.kpi.fei.tuke.sk/)
+
 ## Features
 
 - 🎮 Interactive proof writing with immediate feedback
